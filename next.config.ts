@@ -27,18 +27,7 @@ const securityHeaders = [
   },
   {
     key: 'Content-Security-Policy',
-    value: [
-      "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.clerk.accounts.dev https://challenges.cloudflare.com",
-      "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://*.public.blob.vercel-storage.com https://img.youtube.com https://i.ytimg.com https://pbs.twimg.com https://abs.twimg.com https://randomuser.me https://*.clerk.com https://img.clerk.com",
-      "font-src 'self' data:",
-      "connect-src 'self' https://*.clerk.accounts.dev https://*.clerk.com https://api.polar.sh",
-      "frame-src https://challenges.cloudflare.com https://*.clerk.accounts.dev",
-      "frame-ancestors 'none'",
-      "form-action 'self'",
-      "base-uri 'self'",
-    ].join('; '),
+    value: "frame-ancestors 'none'",
   },
 ]
 
