@@ -351,9 +351,9 @@ export default async function KnowledgeBasePage() {
             <p className="text-foreground font-medium">Your command center — see everything at a glance.</p>
 
             <div className="space-y-3">
-              <h3 className="text-sm font-semibold text-foreground">Stats overview</h3>
+              <h3 className="text-sm font-semibold text-foreground">Activity rings</h3>
               <p>
-                Six stat cards at the top: total clients, active clients, total projects, active projects, total tasks, and pending tasks. Below that, you&apos;ll see tasks due this week, projects due this week, and overdue items grouped by project.
+                Three concentric rings give you an instant visual pulse on your workload. The outer ring shows active projects vs. total, the middle ring shows tasks completed vs. total, and the inner ring shows tasks due this week. The center number is your due-this-week count. Below the rings you&apos;ll see tasks due this week, projects due this week, and overdue items grouped by project.
               </p>
             </div>
 
@@ -565,7 +565,7 @@ export default async function KnowledgeBasePage() {
                 <li><code>GET /api/v1/tasks</code> — List tasks (params: status, limit)</li>
               </ul>
               <p>
-                A curl example and Apple Shortcuts setup guide are provided in the settings card. You can revoke or regenerate your token at any time.
+                A curl example and Apple Shortcuts setup guide are provided in the settings card. Tokens are hashed before storage — only the first 8 characters are shown after creation. You can revoke or regenerate your token at any time.
               </p>
             </div>
 
