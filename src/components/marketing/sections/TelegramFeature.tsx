@@ -144,10 +144,10 @@ export function TelegramFeature() {
         <ScrollReveal delay={0}>
           <div className="text-center mb-14">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight">
-              Capture tasks from anywhere
+              Work smarter from anywhere
             </h2>
             <p className="text-base md:text-lg text-muted-foreground mt-4 max-w-2xl mx-auto">
-              AI insights, email, Siri, keyboard shortcuts, and Telegram — five ways to stay on top without breaking your flow.
+              AI-powered insights, email, Siri, keyboard shortcuts, and Telegram — five ways to stay on top without breaking your flow.
             </p>
           </div>
         </ScrollReveal>
