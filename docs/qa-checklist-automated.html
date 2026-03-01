@@ -859,6 +859,9 @@
     <div class="check-item auto-verified"><input type="checkbox" id="c178"><label for="c178"><code>/api/webhook/email</code> without valid token — returns 400/404 <span class="auto-badge pass">E2E PASS</span></label></div>
     <div class="check-item auto-verified"><input type="checkbox" id="c179"><label for="c179"><code>/api/webhook/telegram</code> without secret — returns 401 <span class="auto-badge code">CODE VERIFIED — checks x-telegram-bot-api-secret-token header</span></label></div>
     <div class="check-item auto-verified"><input type="checkbox" id="c180"><label for="c180">Pro-only features return 403 for free users via API <span class="auto-badge code">CODE VERIFIED — plan !== 'pro' returns 403</span></label></div>
+    <div class="check-item auto-verified"><input type="checkbox" id="c341"><label for="c341">API tokens hashed with SHA-256 before DB storage <span class="auto-badge code">CODE VERIFIED — integrations.ts: hashToken(crypto.createHash('sha256')) on generate + lookup</span></label></div>
+    <div class="check-item auto-verified"><input type="checkbox" id="c342"><label for="c342">Telegram verification codes use crypto.randomInt (high entropy) <span class="auto-badge code">CODE VERIFIED — telegram.ts: crypto.randomInt(100000, 999999) replaces Math.random</span></label></div>
+    <div class="check-item auto-verified"><input type="checkbox" id="c343"><label for="c343">Task comment body validated: trimmed + max 5000 chars <span class="auto-badge code">CODE VERIFIED — tasks.ts: addTaskComment validates body.trim() and .slice(0, 5000)</span></label></div>
   </div>
 </div>
 
@@ -876,6 +879,25 @@
     <div class="check-item auto-verified"><input type="checkbox" id="c182"><label for="c182">/dashboard redirects to sign-in when not authenticated <span class="auto-badge code">CODE VERIFIED — /dashboard not in public routes, Clerk middleware redirects</span></label></div>
     <div class="check-item auto-verified"><input type="checkbox" id="c183"><label for="c183">/tasks, /projects, /clients, /calendar, /settings, /invoices — all protected <span class="auto-badge pass">E2E PASS</span></label></div>
     <div class="check-item auto-verified"><input type="checkbox" id="c337"><label for="c337"><code>/invoice/[token]</code> — accessible without auth (public share route) <span class="auto-badge code">CODE VERIFIED — middleware.ts: /invoice in bypassPaths + isPublicRoute</span></label></div>
+  </div>
+</div>
+
+<div class="section" data-section="p3-headers">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-title">3.3b Security Headers</span>
+    <div class="section-progress">
+      <span class="section-count"></span>
+      <div class="section-bar"><div class="section-bar-fill"></div></div>
+      <svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="check-item auto-verified"><input type="checkbox" id="c348"><label for="c348">X-Content-Type-Options: nosniff <span class="auto-badge code">CODE VERIFIED — next.config.ts: securityHeaders array</span></label></div>
+    <div class="check-item auto-verified"><input type="checkbox" id="c349"><label for="c349">X-Frame-Options: DENY <span class="auto-badge code">CODE VERIFIED — next.config.ts: securityHeaders array</span></label></div>
+    <div class="check-item auto-verified"><input type="checkbox" id="c350"><label for="c350">Strict-Transport-Security: max-age=63072000; includeSubDomains; preload <span class="auto-badge code">CODE VERIFIED — next.config.ts: securityHeaders array</span></label></div>
+    <div class="check-item auto-verified"><input type="checkbox" id="c351"><label for="c351">Referrer-Policy: strict-origin-when-cross-origin <span class="auto-badge code">CODE VERIFIED — next.config.ts: securityHeaders array</span></label></div>
+    <div class="check-item auto-verified"><input type="checkbox" id="c352"><label for="c352">Content-Security-Policy: frame-ancestors 'none' <span class="auto-badge code">CODE VERIFIED — next.config.ts: securityHeaders array</span></label></div>
+    <div class="check-item auto-verified"><input type="checkbox" id="c353"><label for="c353">Permissions-Policy: camera=(), microphone=(self), geolocation=() <span class="auto-badge code">CODE VERIFIED — next.config.ts: securityHeaders array</span></label></div>
   </div>
 </div>
 
@@ -900,6 +922,7 @@
     <div class="check-item auto-verified"><input type="checkbox" id="c338"><label for="c338">Delete invoice: cascade-deletes all InvoiceItems <span class="auto-badge code">CODE VERIFIED — InvoiceItem: onDelete: Cascade on Invoice relation</span></label></div>
     <div class="check-item auto-verified"><input type="checkbox" id="c339"><label for="c339">User A cannot view User B's invoices <span class="auto-badge code">CODE VERIFIED — getInvoices/getInvoice: where { userId } filter</span></label></div>
     <div class="check-item auto-verified"><input type="checkbox" id="c340"><label for="c340">Public invoice token: invalid token returns 404 <span class="auto-badge code">CODE VERIFIED — getInvoiceByToken returns null → notFound()</span></label></div>
+    <div class="check-item auto-verified"><input type="checkbox" id="c344"><label for="c344">Invoice share tokens use crypto.randomBytes (not CUID) <span class="auto-badge code">CODE VERIFIED — invoices.ts: crypto.randomBytes(32).toString('hex') for shareToken</span></label></div>
   </div>
 </div>
 
@@ -938,6 +961,9 @@
     <div class="check-item"><input type="checkbox" id="c194"><label for="c194">Dashboard loads under 2 seconds <span class="auto-badge manual">MANUAL — needs prod</span></label></div>
     <div class="check-item"><input type="checkbox" id="c195"><label for="c195">Search results appear within 500ms <span class="auto-badge manual">MANUAL</span></label></div>
     <div class="check-item"><input type="checkbox" id="c196"><label for="c196">Command bar + Quick-add open instantly <span class="auto-badge manual">MANUAL</span></label></div>
+    <div class="check-item auto-verified"><input type="checkbox" id="c345"><label for="c345">TaskBoard lazy-loaded via next/dynamic (not in initial bundle) <span class="auto-badge code">CODE VERIFIED — ProjectTabs.tsx: dynamic(() => import('./TaskBoard'))</span></label></div>
+    <div class="check-item auto-verified"><input type="checkbox" id="c346"><label for="c346">Team member + org member queries parallelized with Promise.all <span class="auto-badge code">CODE VERIFIED — projects/[id]/page.tsx: Promise.all([getProjectMembers, getOrgMembers])</span></label></div>
+    <div class="check-item auto-verified"><input type="checkbox" id="c347"><label for="c347">Task comments loaded on-demand (not on page load) <span class="auto-badge code">CODE VERIFIED — TaskList.tsx: getTaskComments(taskId) called on expand, _count in initial query</span></label></div>
   </div>
 </div>
 
@@ -992,6 +1018,8 @@
     <div class="check-item auto-verified"><input type="checkbox" id="c289"><label for="c289">Stale verification codes (&gt;10 min): Telegram link codes expire correctly <span class="auto-badge code">CODE VERIFIED — telegramVerifyExpires: { gt: new Date() } check</span></label></div>
     <div class="check-item auto-verified"><input type="checkbox" id="c290"><label for="c290">API tokens: revoked tokens immediately rejected <span class="auto-badge code">CODE VERIFIED — findFirst({ apiToken }) returns null if revoked → 401</span></label></div>
     <div class="check-item auto-verified"><input type="checkbox" id="c291"><label for="c291">Email tokens: regenerated tokens immediately replace old ones <span class="auto-badge code">CODE VERIFIED — @unique on inboundEmailToken, overwrite on regenerate</span></label></div>
+    <div class="check-item auto-verified"><input type="checkbox" id="c354"><label for="c354">KB page: hides marketing nav/footer for authenticated users <span class="auto-badge code">CODE VERIFIED — kb/page.tsx: auth() check, conditional MarketingNav/Footer render</span></label></div>
+    <div class="check-item auto-verified"><input type="checkbox" id="c355"><label for="c355">KB page: renders in app layout (with sidebar) for authenticated users <span class="auto-badge code">CODE VERIFIED — kb/page.tsx moved inside (app) route group, layout wraps it</span></label></div>
   </div>
 </div>
 
@@ -1125,7 +1153,18 @@
     // 3.4 Data Integrity — ProjectAccess cleanup (1)
     'c248',
     // 3.5 Subscription Enforcement — cancel/downgrade/usage warning (3)
-    'c250','c251','c252'
+    'c250','c251','c252',
+    // === PR #112 + #114: Security, Performance, KB Auth ===
+    // 3.2 API Security — token hashing, telegram entropy, comment validation (3)
+    'c341','c342','c343',
+    // 3.4 Data Integrity — crypto-random invoice tokens (1)
+    'c344',
+    // 3.6 Performance — lazy-load, parallel queries, on-demand comments (3)
+    'c345','c346','c347',
+    // 3.3b Security Headers — all 6 headers (6)
+    'c348','c349','c350','c351','c352','c353',
+    // 3.9 Account Lifecycle — KB auth-aware rendering (2)
+    'c354','c355'
   ];
 
   function loadState() {
