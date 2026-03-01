@@ -8,6 +8,7 @@ import { useTheme } from './ThemeProvider'
 import { SidebarAuth } from './SidebarAuth'
 import { PulseLogo } from './PulseLogo'
 import { CommandBarTrigger } from './CommandBar'
+import { checkIsAdmin } from '@/actions/admin'
 
 const getNavigation = (clientCount?: number) => [
   {
@@ -91,10 +92,11 @@ interface SidebarProps {
   isAdmin?: boolean
 }
 
-export function Sidebar({ clientCount, clerkEnabled = false, isAdmin = false }: SidebarProps) {
+export function Sidebar({ clientCount, clerkEnabled = false, isAdmin: isAdminProp = false }: SidebarProps) {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
   const [isCollapsed, setIsCollapsed] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(isAdminProp)
   const { theme, toggleTheme } = useTheme()
   const navigation = getNavigation(clientCount)
 
@@ -102,6 +104,11 @@ export function Sidebar({ clientCount, clerkEnabled = false, isAdmin = false }: 
     const stored = localStorage.getItem('sidebar-collapsed')
     if (stored) setIsCollapsed(stored === 'true')
   }, [])
+
+  // Self-correct admin status after client-side navigation
+  useEffect(() => {
+    checkIsAdmin().then(setIsAdmin)
+  }, [pathname])
 
   // Lock body scroll when mobile sidebar is open
   useEffect(() => {

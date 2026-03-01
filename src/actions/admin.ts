@@ -1,9 +1,19 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
-import { requireAdmin, isAdminUser } from '@/lib/auth'
+import { requireAdmin, requireUserId, isAdminUser } from '@/lib/auth'
 import { clerkClient } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
+
+/** Lightweight check for the Sidebar to self-correct after client-side nav */
+export async function checkIsAdmin(): Promise<boolean> {
+  try {
+    const userId = await requireUserId()
+    return isAdminUser(userId)
+  } catch {
+    return false
+  }
+}
 
 export async function getAdminStats() {
   await requireAdmin()
