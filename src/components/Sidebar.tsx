@@ -240,6 +240,7 @@ export function Sidebar({ clientCount, clerkEnabled = false, isAdmin: isAdminPro
               <Link
                 key={item.name}
                 href={item.href}
+                prefetch={false}
                 onClick={() => setIsOpen(false)}
                 title={isCollapsed ? item.name : undefined}
                 className={cn(
@@ -291,6 +292,7 @@ export function Sidebar({ clientCount, clerkEnabled = false, isAdmin: isAdminPro
           {isAdmin && (
             <Link
               href="/admin"
+              prefetch={false}
               onClick={() => setIsOpen(false)}
               title={isCollapsed ? 'Admin' : undefined}
               className={cn(
@@ -309,6 +311,7 @@ export function Sidebar({ clientCount, clerkEnabled = false, isAdmin: isAdminPro
           )}
           <Link
             href="/settings"
+            prefetch={false}
             onClick={() => setIsOpen(false)}
             title={isCollapsed ? 'Settings' : undefined}
             className={cn(
