@@ -162,9 +162,7 @@ export async function getProject(id: string) {
         include: {
           images: true,
           files: true,
-          comments: {
-            orderBy: { createdAt: 'desc' as const },
-          },
+          _count: { select: { comments: true } },
         },
         orderBy: [
           { status: 'desc' as const },

@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { requireUserId } from '@/lib/auth'
 import { revalidatePath } from 'next/cache'
 import { sendInvoiceEmail } from '@/lib/email'
+import crypto from 'crypto'
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -314,6 +315,7 @@ export async function createInvoice(data: InvoiceInput) {
           fromName: data.fromName ?? null,
           fromEmail: data.fromEmail ?? null,
           fromAddress: data.fromAddress ?? null,
+          shareToken: crypto.randomBytes(16).toString('hex'),
         },
       })
 

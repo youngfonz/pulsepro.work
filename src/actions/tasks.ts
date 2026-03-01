@@ -649,8 +649,39 @@ export async function getProjectsForTaskFilter() {
   })
 }
 
+export async function getTaskComments(taskId: string) {
+  try {
+    const userId = await requireUserId()
+    let task = await prisma.task.findFirst({
+      where: { id: taskId, userId },
+      select: { projectId: true },
+    })
+
+    if (!task) {
+      task = await prisma.task.findFirst({ where: { id: taskId }, select: { projectId: true } })
+      if (task && task.projectId) await requireProjectAccess(task.projectId, 'viewer')
+    }
+    if (!task) return []
+
+    return prisma.taskComment.findMany({
+      where: { taskId },
+      orderBy: { createdAt: 'desc' },
+    })
+  } catch (error) {
+    console.error('getTaskComments:', error)
+    return []
+  }
+}
+
 export async function addTaskComment(taskId: string, content: string) {
   try {
+    if (!content || typeof content !== 'string' || !content.trim()) {
+      throw new Error('Comment content is required')
+    }
+    if (content.length > 5000) {
+      throw new Error('Comment must be under 5000 characters')
+    }
+
     const userId = await requireUserId()
     let task = await prisma.task.findFirst({
       where: { id: taskId, userId },

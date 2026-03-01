@@ -11,7 +11,7 @@ import { Modal } from '@/components/ui/Modal'
 import { FileUpload } from '@/components/ui/FileUpload'
 import { TagInput } from '@/components/ui/TagInput'
 import { DatePicker } from '@/components/ui/DatePicker'
-import { toggleTask, deleteTask, updateTask, addTaskImage, removeTaskImage, addTaskFile, removeTaskFile, addTaskComment, deleteTaskComment, getAllTags } from '@/actions/tasks'
+import { toggleTask, deleteTask, updateTask, addTaskImage, removeTaskImage, addTaskFile, removeTaskFile, addTaskComment, deleteTaskComment, getTaskComments, getAllTags } from '@/actions/tasks'
 import { priorityColors, priorityLabels, formatDate, isOverdue, formatFileSize, getFileIcon } from '@/lib/utils'
 
 interface TaskImage {
@@ -50,7 +50,7 @@ interface Task {
   tags: string[]
   images: TaskImage[]
   files: TaskFile[]
-  comments: TaskComment[]
+  _count: { comments: number }
 }
 
 export function TaskList({ tasks, canEdit = true }: { tasks: Task[]; canEdit?: boolean }) {
@@ -193,12 +193,12 @@ function TaskItem({ task, canEdit = true }: { task: Task; canEdit?: boolean }) {
                   {task.files.length} file{task.files.length > 1 ? 's' : ''}
                 </span>
               )}
-              {task.comments.length > 0 && (
+              {task._count.comments > 0 && (
                 <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                   </svg>
-                  {task.comments.length}
+                  {task._count.comments}
                 </span>
               )}
             </div>
@@ -277,7 +277,7 @@ function TaskItem({ task, canEdit = true }: { task: Task; canEdit?: boolean }) {
                 </div>
               </div>
             )}
-            <TaskComments taskId={task.id} comments={task.comments} canEdit={canEdit} />
+            <TaskComments taskId={task.id} canEdit={canEdit} />
           </div>
         )}
       </div>
@@ -549,10 +549,22 @@ function TaskEditForm({ task, onClose }: { task: Task; onClose: () => void }) {
   )
 }
 
-function TaskComments({ taskId, comments, canEdit = true }: { taskId: string; comments: TaskComment[]; canEdit?: boolean }) {
+function TaskComments({ taskId, canEdit = true }: { taskId: string; canEdit?: boolean }) {
   const [isPending, startTransition] = useTransition()
   const [newComment, setNewComment] = useState('')
-  const [localComments, setLocalComments] = useState(comments)
+  const [localComments, setLocalComments] = useState<TaskComment[]>([])
+  const [loaded, setLoaded] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    getTaskComments(taskId).then(comments => {
+      if (!cancelled) {
+        setLocalComments(comments)
+        setLoaded(true)
+      }
+    })
+    return () => { cancelled = true }
+  }, [taskId])
 
   const handleAddComment = () => {
     if (!newComment.trim()) return
@@ -589,6 +601,15 @@ function TaskComments({ taskId, comments, canEdit = true }: { taskId: string; co
     if (diffHours < 24) return `${diffHours}h ago`
     if (diffDays < 7) return `${diffDays}d ago`
     return formatDate(date)
+  }
+
+  if (!loaded) {
+    return (
+      <div className="space-y-3">
+        <p className="text-xs font-medium text-muted-foreground">Comments</p>
+        <p className="text-xs text-muted-foreground">Loading comments...</p>
+      </div>
+    )
   }
 
   return (

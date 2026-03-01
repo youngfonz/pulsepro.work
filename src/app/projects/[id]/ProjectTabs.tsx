@@ -1,9 +1,14 @@
 'use client'
 
 import { useState } from 'react'
+import dynamic from 'next/dynamic'
 import { TaskList } from './TaskList'
-import { TaskBoard } from './TaskBoard'
 import { AddTaskForm } from './AddTaskForm'
+
+const TaskBoard = dynamic(
+  () => import('./TaskBoard').then(mod => ({ default: mod.TaskBoard })),
+  { loading: () => <div className="py-12 text-center text-muted-foreground text-sm">Loading board view...</div> },
+)
 import { AddBookmarkForm } from './AddBookmarkForm'
 import { TimeTracker } from './TimeTracker'
 import { ProjectImages } from './ProjectImages'
@@ -25,7 +30,7 @@ interface Task {
   tags: string[]
   images: any[]
   files: any[]
-  comments: any[]
+  _count: { comments: number }
 }
 
 interface TimeEntry {

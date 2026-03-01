@@ -4,6 +4,12 @@ import { prisma } from '@/lib/prisma'
 import { requireUserId, isAdminUser } from '@/lib/auth'
 import crypto from 'crypto'
 
+// ── Helpers ──────────────────────────────────────────────────────────
+
+function hashApiToken(token: string): string {
+  return crypto.createHash('sha256').update(token).digest('hex')
+}
+
 // ── Settings ────────────────────────────────────────────────────────
 
 export async function getIntegrationSettings() {
@@ -18,7 +24,7 @@ export async function getIntegrationSettings() {
     return {
       plan: admin ? ('pro' as const) : ('free' as const),
       emailToken: null,
-      apiToken: null,
+      hasApiToken: false,
     }
   }
 
@@ -26,7 +32,7 @@ export async function getIntegrationSettings() {
   return {
     plan: effectivePlan as 'free' | 'pro' | 'team',
     emailToken: subscription.inboundEmailToken,
-    apiToken: subscription.apiToken,
+    hasApiToken: !!subscription.apiToken,
   }
 }
 
@@ -106,15 +112,16 @@ export async function generateApiToken() {
     return { error: 'API access is a Pro feature.' }
   }
 
+  // Token already exists — user must regenerate to get a new one
   if (subscription.apiToken) {
-    return { token: subscription.apiToken }
+    return { hasToken: true }
   }
 
   const token = `pp_${crypto.randomBytes(24).toString('hex')}`
 
   await prisma.subscription.update({
     where: { userId },
-    data: { apiToken: token },
+    data: { apiToken: hashApiToken(token) },
   })
 
   return { token }
@@ -150,7 +157,7 @@ export async function regenerateApiToken() {
 
   await prisma.subscription.update({
     where: { userId },
-    data: { apiToken: token },
+    data: { apiToken: hashApiToken(token) },
   })
 
   return { token }

@@ -16,8 +16,8 @@ export async function generateTelegramLink() {
     return { error: 'Telegram integration is a Pro feature.' }
   }
 
-  // Generate a short, human-readable code (e.g. LINK-A3X7F2)
-  const hex = crypto.randomBytes(3).toString('hex').toUpperCase()
+  // Generate a short, human-readable code (e.g. LINK-A3X7F2B1)
+  const hex = crypto.randomBytes(4).toString('hex').toUpperCase()
   const code = `LINK-${hex}`
   const expires = new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
 

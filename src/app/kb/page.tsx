@@ -79,27 +79,8 @@ export default async function KnowledgeBasePage() {
     <div className={isAuthenticated ? '' : 'min-h-screen bg-background'}>
       {!isAuthenticated && <MarketingNav />}
 
-      <div className={isAuthenticated ? 'flex' : ''}>
-        {/* Sticky sidebar nav — authenticated only, desktop */}
-        {isAuthenticated && (
-          <nav className="hidden md:block w-48 shrink-0 sticky top-0 h-[calc(100vh-3.5rem)] overflow-y-auto border-r border-border py-4 pr-4">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-3 px-2">Sections</p>
-            <ul className="space-y-0.5">
-              {sectionLinks.map(([href, label]) => (
-                <li key={href}>
-                  <a
-                    href={href}
-                    className="block text-[13px] text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-md px-2 py-1.5 transition-colors"
-                  >
-                    {label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        )}
-
-        <main id="main-content" className={isAuthenticated ? 'flex-1 min-w-0 px-4 md:px-8 py-4 max-w-3xl' : 'max-w-4xl mx-auto px-4 md:px-8 py-20'}>
+      <div>
+        <main id="main-content" className={isAuthenticated ? 'max-w-3xl mx-auto px-4 md:px-8 py-6' : 'max-w-4xl mx-auto px-4 md:px-8 py-20'}>
           <div className={isAuthenticated ? 'mb-8' : 'mb-12'}>
             <h1 className={`font-bold text-foreground ${isAuthenticated ? 'text-2xl mb-2' : 'text-3xl mb-3'}`}>Knowledge Base</h1>
             <p className={isAuthenticated ? 'text-sm text-muted-foreground' : 'text-muted-foreground'}>
@@ -107,20 +88,12 @@ export default async function KnowledgeBasePage() {
             </p>
           </div>
 
-          {/* Section nav — mobile pills for auth, full pills for public */}
-          {!isAuthenticated ? (
-            <nav className="mb-10 flex flex-wrap gap-2">
-              {sectionLinks.map(([href, label]) => (
-                <a key={href} href={href} className="text-xs font-medium px-3 py-1.5 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">{label}</a>
-              ))}
-            </nav>
-          ) : (
-            <nav className="mb-6 flex flex-wrap gap-2 md:hidden">
-              {sectionLinks.map(([href, label]) => (
-                <a key={href} href={href} className="text-xs font-medium px-3 py-1.5 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">{label}</a>
-              ))}
-            </nav>
-          )}
+          {/* Section nav pills */}
+          <nav className={isAuthenticated ? 'mb-6 flex flex-wrap gap-2' : 'mb-10 flex flex-wrap gap-2'}>
+            {sectionLinks.map(([href, label]) => (
+              <a key={href} href={href} className="text-xs font-medium px-3 py-1.5 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">{label}</a>
+            ))}
+          </nav>
 
           <div className="space-y-3">
 

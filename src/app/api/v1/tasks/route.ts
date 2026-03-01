@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { isAdminUser } from '@/lib/auth'
 import { parseTaskFromVoice } from '@/lib/voice'
+import crypto from 'crypto'
 
 /**
  * Extract project name from natural language text.
@@ -42,9 +43,25 @@ async function authenticateToken(request: NextRequest) {
     return { error: 'Missing API token', status: 401 }
   }
 
-  const subscription = await prisma.subscription.findFirst({
-    where: { apiToken: token },
+  // Hash the incoming token and look up by hash (new tokens are stored hashed)
+  const tokenHash = crypto.createHash('sha256').update(token).digest('hex')
+  let subscription = await prisma.subscription.findFirst({
+    where: { apiToken: tokenHash },
   })
+
+  // Fallback: try plain-text lookup for legacy tokens and auto-migrate
+  if (!subscription) {
+    subscription = await prisma.subscription.findFirst({
+      where: { apiToken: token },
+    })
+    if (subscription) {
+      // Auto-migrate: hash the legacy token in place
+      await prisma.subscription.update({
+        where: { id: subscription.id },
+        data: { apiToken: tokenHash },
+      })
+    }
+  }
 
   if (!subscription) {
     return { error: 'Invalid API token', status: 401 }

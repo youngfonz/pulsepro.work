@@ -38,7 +38,10 @@ export default async function ProjectDetailPage({ params }: Props) {
 
   if (role) {
     try {
-      const members = await getProjectMembers(id)
+      const [members, orgResult] = await Promise.all([
+        getProjectMembers(id),
+        hasOrg ? getOrgMembers() : Promise.resolve([]),
+      ])
       teamData = {
         owner: members.owner as typeof teamData.owner,
         members: members.members.map(m => ({
@@ -47,9 +50,7 @@ export default async function ProjectDetailPage({ params }: Props) {
           user: m.user,
         })),
       }
-      if (hasOrg) {
-        orgMembers = await getOrgMembers()
-      }
+      orgMembers = orgResult
     } catch {
       // Team data fetch failed — continue without it
     }
