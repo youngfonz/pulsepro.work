@@ -2,6 +2,8 @@ import { notFound } from 'next/navigation'
 import { getTask, getProjectsForTaskFilter } from '@/actions/tasks'
 import { TaskDetail } from './TaskDetail'
 
+export const dynamic = 'force-dynamic'
+
 interface Props {
   params: Promise<{ id: string }>
 }

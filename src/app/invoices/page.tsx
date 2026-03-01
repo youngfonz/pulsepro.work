@@ -5,6 +5,8 @@ import { Card, CardContent } from '@/components/ui/Card'
 import { InvoicesFilter } from './InvoicesFilter'
 import { InvoicesList } from './InvoicesList'
 
+export const dynamic = 'force-dynamic'
+
 interface Props {
   searchParams: Promise<{ status?: string; clientId?: string }>
 }

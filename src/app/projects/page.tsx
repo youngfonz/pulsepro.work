@@ -6,6 +6,8 @@ import { Card, CardContent } from '@/components/ui/Card'
 import { ProjectsFilter } from './ProjectsFilter'
 import { ProjectsView } from './ProjectsView'
 
+export const dynamic = 'force-dynamic'
+
 interface Props {
   searchParams: Promise<{ search?: string; status?: string; priority?: string; clientId?: string; sort?: string }>
 }

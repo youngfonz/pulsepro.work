@@ -2,6 +2,8 @@ import { getInvoice } from '@/actions/invoices'
 import { notFound } from 'next/navigation'
 import { InvoiceDetail } from './InvoiceDetail'
 
+export const dynamic = 'force-dynamic'
+
 interface Props {
   params: Promise<{ id: string }>
 }

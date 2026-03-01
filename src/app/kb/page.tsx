@@ -3,6 +3,8 @@ import { MarketingFooter } from '@/components/marketing/MarketingFooter'
 import { auth } from '@clerk/nextjs/server'
 import type { Metadata } from 'next'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Knowledge Base — Pulse Pro',
   description: 'Learn how to use Pulse Pro. Guides for task management, project tracking, client organization, integrations, and more.',

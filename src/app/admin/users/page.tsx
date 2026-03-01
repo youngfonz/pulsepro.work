@@ -3,6 +3,8 @@ import { getAdminUsers } from '@/actions/admin'
 import { requireAdmin } from '@/lib/auth'
 import { AdminUsersTable } from './AdminUsersTable'
 
+export const dynamic = 'force-dynamic'
+
 export default async function AdminUsersPage() {
   const adminId = await requireAdmin()
   const { users, totalCount } = await getAdminUsers()

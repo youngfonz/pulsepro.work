@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { DashboardCalendar } from '@/components/DashboardCalendar'
+
+export const dynamic = 'force-dynamic'
 import { DashboardGreeting } from '@/components/DashboardGreeting'
 import { OnboardingOverlay } from '@/components/OnboardingOverlay'
 import { DashboardProvider, DashboardGrid, DashboardCustomize, type DashboardSectionDef } from '@/components/DashboardLayout'

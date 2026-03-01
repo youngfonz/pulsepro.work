@@ -8,6 +8,8 @@ import { SortableHeader } from '@/components/ui/SortableHeader'
 import { statusColors, statusLabels } from '@/lib/utils'
 import { ClientsFilter } from './ClientsFilter'
 
+export const dynamic = 'force-dynamic'
+
 interface Props {
   searchParams: Promise<{ search?: string; status?: string; sort?: string }>
 }

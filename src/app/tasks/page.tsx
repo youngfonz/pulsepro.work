@@ -10,6 +10,8 @@ import { AddTaskDialog } from './AddTaskDialog'
 import { CompletedSection } from './CompletedSection'
 import { ProgressRing } from '@/components/ui/ProgressRing'
 
+export const dynamic = 'force-dynamic'
+
 interface Props {
   searchParams: Promise<{
     date?: string

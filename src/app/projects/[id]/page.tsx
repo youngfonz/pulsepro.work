@@ -7,6 +7,8 @@ import { ProjectHeader } from './ProjectHeader'
 import { ProjectTabs } from './ProjectTabs'
 import type { ProjectRole } from '@/lib/access'
 
+export const dynamic = 'force-dynamic'
+
 interface Props {
   params: Promise<{ id: string }>
 }

@@ -5,6 +5,8 @@ import { BookmarksFilter } from './BookmarksFilter'
 import { BookmarksList } from './BookmarksList'
 import { AddBookmarkButton } from './AddBookmarkButton'
 
+export const dynamic = 'force-dynamic'
+
 interface Props {
   searchParams: Promise<{ search?: string; projectId?: string; type?: string; sort?: string; add?: string }>
 }

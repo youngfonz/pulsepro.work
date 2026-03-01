@@ -2,6 +2,8 @@ import { getInvoiceByToken } from '@/actions/invoices'
 import { notFound } from 'next/navigation'
 import { formatDate } from '@/lib/utils'
 
+export const dynamic = 'force-dynamic'
+
 interface Props {
   params: Promise<{ token: string }>
 }

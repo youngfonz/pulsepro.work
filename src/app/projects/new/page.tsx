@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { ProjectForm } from '@/components/forms/ProjectForm'
 import { getClientsForSelect } from '@/actions/projects'
 
+export const dynamic = 'force-dynamic'
+
 interface Props {
   searchParams: Promise<{ clientId?: string }>
 }

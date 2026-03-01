@@ -8,6 +8,8 @@ import { statusColors, statusLabels, priorityColors, priorityLabels, formatDate 
 import { ClientForm } from '@/components/forms/ClientForm'
 import { DeleteClientButton } from './DeleteClientButton'
 
+export const dynamic = 'force-dynamic'
+
 interface Props {
   params: Promise<{ id: string }>
 }

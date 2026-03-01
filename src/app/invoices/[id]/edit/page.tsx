@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { InvoiceForm } from '../../new/InvoiceForm'
 
+export const dynamic = 'force-dynamic'
+
 export default async function EditInvoicePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const [invoice, clients, nextNumber] = await Promise.all([

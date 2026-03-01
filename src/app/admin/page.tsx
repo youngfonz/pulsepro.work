@@ -2,6 +2,8 @@ import Link from 'next/link'
 import { getAdminStats, getMaintenanceMode } from '@/actions/admin'
 import { MaintenanceToggle } from './MaintenanceToggle'
 
+export const dynamic = 'force-dynamic'
+
 export default async function AdminPage() {
   const [stats, maintenanceMode] = await Promise.all([
     getAdminStats(),

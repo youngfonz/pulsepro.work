@@ -2,6 +2,8 @@ import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Calendar } from './Calendar'
 
+export const dynamic = 'force-dynamic'
+
 interface Props {
   searchParams: Promise<{ year?: string; month?: string }>
 }

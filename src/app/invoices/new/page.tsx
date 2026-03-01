@@ -3,6 +3,8 @@ import { Card, CardContent } from '@/components/ui/Card'
 import Link from 'next/link'
 import { InvoiceForm } from './InvoiceForm'
 
+export const dynamic = 'force-dynamic'
+
 export default async function NewInvoicePage() {
   const [clients, nextNumber] = await Promise.all([
     getClientsForInvoice(),
