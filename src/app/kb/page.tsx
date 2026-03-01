@@ -59,44 +59,70 @@ export default async function KnowledgeBasePage() {
     // auth() may fail — default to unauthenticated
   }
 
+  const sectionLinks = [
+    ['#getting-started', 'Getting Started'],
+    ['#quick-capture', 'Quick Capture'],
+    ['#tasks', 'Tasks'],
+    ['#projects', 'Projects'],
+    ['#clients', 'Clients'],
+    ['#bookmarks', 'Bookmarks'],
+    ['#dashboard', 'Dashboard'],
+    ['#search', 'Search'],
+    ['#invoicing', 'Invoicing'],
+    ['#collaboration', 'Collaboration'],
+    ['#integrations', 'Integrations'],
+    ['#billing', 'Billing & Plans'],
+    ['#shortcuts', 'Shortcuts'],
+  ]
+
   return (
     <div className={isAuthenticated ? '' : 'min-h-screen bg-background'}>
       {!isAuthenticated && <MarketingNav />}
-      <main id="main-content" className={`max-w-4xl mx-auto px-4 md:px-8 ${isAuthenticated ? 'py-4' : 'py-20'}`}>
-        <div className="mb-12">
-          <h1 className="text-3xl font-bold text-foreground mb-3">Knowledge Base</h1>
-          <p className="text-muted-foreground">
-            Everything you need to know about using Pulse Pro. Click any section to expand it.
-          </p>
-        </div>
 
-        <nav className="mb-10 flex flex-wrap gap-2">
-          {[
-            ['#getting-started', 'Getting Started'],
-            ['#quick-capture', 'Quick Capture'],
-            ['#tasks', 'Tasks'],
-            ['#projects', 'Projects'],
-            ['#clients', 'Clients'],
-            ['#bookmarks', 'Bookmarks'],
-            ['#dashboard', 'Dashboard'],
-            ['#search', 'Search'],
-            ['#invoicing', 'Invoicing'],
-            ['#collaboration', 'Collaboration'],
-            ['#integrations', 'Integrations'],
-            ['#billing', 'Billing & Plans'],
-            ['#shortcuts', 'Shortcuts'],
-          ].map(([href, label]) => (
-            <a
-              key={href}
-              href={href}
-              className="text-xs font-medium px-3 py-1.5 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
-            >
-              {label}
-            </a>
-          ))}
-        </nav>
+      <div className={isAuthenticated ? 'flex' : ''}>
+        {/* Sticky sidebar nav — authenticated only, desktop */}
+        {isAuthenticated && (
+          <nav className="hidden md:block w-48 shrink-0 sticky top-0 h-[calc(100vh-3.5rem)] overflow-y-auto border-r border-border py-4 pr-4">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-3 px-2">Sections</p>
+            <ul className="space-y-0.5">
+              {sectionLinks.map(([href, label]) => (
+                <li key={href}>
+                  <a
+                    href={href}
+                    className="block text-[13px] text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-md px-2 py-1.5 transition-colors"
+                  >
+                    {label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
 
-        <div className="space-y-3">
+        <main id="main-content" className={isAuthenticated ? 'flex-1 min-w-0 px-4 md:px-8 py-4 max-w-3xl' : 'max-w-4xl mx-auto px-4 md:px-8 py-20'}>
+          <div className={isAuthenticated ? 'mb-8' : 'mb-12'}>
+            <h1 className={`font-bold text-foreground ${isAuthenticated ? 'text-2xl mb-2' : 'text-3xl mb-3'}`}>Knowledge Base</h1>
+            <p className={isAuthenticated ? 'text-sm text-muted-foreground' : 'text-muted-foreground'}>
+              Everything you need to know about using Pulse Pro.{!isAuthenticated && ' Click any section to expand it.'}
+            </p>
+          </div>
+
+          {/* Section nav — mobile pills for auth, full pills for public */}
+          {!isAuthenticated ? (
+            <nav className="mb-10 flex flex-wrap gap-2">
+              {sectionLinks.map(([href, label]) => (
+                <a key={href} href={href} className="text-xs font-medium px-3 py-1.5 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">{label}</a>
+              ))}
+            </nav>
+          ) : (
+            <nav className="mb-6 flex flex-wrap gap-2 md:hidden">
+              {sectionLinks.map(([href, label]) => (
+                <a key={href} href={href} className="text-xs font-medium px-3 py-1.5 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">{label}</a>
+              ))}
+            </nav>
+          )}
+
+          <div className="space-y-3">
 
           {/* 1. Getting Started */}
           <Section title="Getting Started" id="getting-started">
@@ -653,12 +679,13 @@ export default async function KnowledgeBasePage() {
 
         </div>
 
-        <div className="mt-12 text-center text-sm text-muted-foreground">
+        <div className={`mt-12 text-sm text-muted-foreground ${isAuthenticated ? '' : 'text-center'}`}>
           <p>
             Can&apos;t find what you&apos;re looking for? <a href="/contact" className="text-primary underline">Contact us</a> and we&apos;ll help.
           </p>
         </div>
       </main>
+      </div>
       {!isAuthenticated && <MarketingFooter />}
     </div>
   )
