@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { resend } from '@/lib/email'
 import { sendTelegramMessage } from '@/lib/telegram'
 
-const OWNER_USER_ID = 'user_39gDkEXlWy6U3vOmaWdymHZn2uI'
+const OWNER_USER_ID = process.env.REMINDER_USER_ID
 
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('authorization')
@@ -16,8 +16,8 @@ export async function GET(request: NextRequest) {
   }
 
   const reminderEmail = process.env.REMINDER_EMAIL
-  if (!reminderEmail) {
-    return NextResponse.json({ error: 'REMINDER_EMAIL not set' }, { status: 503 })
+  if (!reminderEmail || !OWNER_USER_ID) {
+    return NextResponse.json({ error: 'REMINDER_EMAIL or REMINDER_USER_ID not set' }, { status: 503 })
   }
 
   const now = new Date()

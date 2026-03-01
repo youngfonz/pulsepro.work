@@ -6,6 +6,10 @@ import { checkLimit } from '@/lib/subscription'
 import { revalidatePath } from 'next/cache'
 import { getAccessibleProjectIds, requireProjectAccess } from '@/lib/access'
 
+const VALID_PRIORITIES = ['high', 'medium', 'low']
+const MAX_TITLE_LENGTH = 500
+const MAX_TEXT_LENGTH = 10000
+
 export async function getTask(id: string) {
   const userId = await requireUserId()
   const include = {
@@ -58,12 +62,17 @@ export async function createTask(projectId: string | null, formData: FormData) {
       throw new Error(`Free plan limit: ${limit.limit} tasks. Upgrade to Pro for unlimited tasks.`)
     }
 
+    const title = (formData.get('title') as string || '').slice(0, MAX_TITLE_LENGTH)
+    if (!title.trim()) throw new Error('Title is required')
+    const priority = formData.get('priority') as string || 'medium'
+    if (!VALID_PRIORITIES.includes(priority)) throw new Error('Invalid priority')
+
     const data = {
       userId: taskUserId,
-      title: formData.get('title') as string,
-      description: formData.get('description') as string || null,
-      notes: formData.get('notes') as string || null,
-      priority: formData.get('priority') as string || 'medium',
+      title,
+      description: (formData.get('description') as string || '').slice(0, MAX_TEXT_LENGTH) || null,
+      notes: (formData.get('notes') as string || '').slice(0, MAX_TEXT_LENGTH) || null,
+      priority,
       startDate: formData.get('startDate')
         ? new Date(formData.get('startDate') as string)
         : null,
@@ -97,12 +106,17 @@ export async function updateTask(id: string, formData: FormData) {
       await requireProjectAccess(task.projectId, 'editor')
     }
 
+    const title = (formData.get('title') as string || '').slice(0, MAX_TITLE_LENGTH)
+    if (!title.trim()) throw new Error('Title is required')
+    const priority = formData.get('priority') as string || 'medium'
+    if (!VALID_PRIORITIES.includes(priority)) throw new Error('Invalid priority')
+
     const projectIdValue = formData.get('projectId') as string | null
     const data: Record<string, unknown> = {
-      title: formData.get('title') as string,
-      description: formData.get('description') as string || null,
-      notes: formData.get('notes') as string || null,
-      priority: formData.get('priority') as string,
+      title,
+      description: (formData.get('description') as string || '').slice(0, MAX_TEXT_LENGTH) || null,
+      notes: (formData.get('notes') as string || '').slice(0, MAX_TEXT_LENGTH) || null,
+      priority,
       projectId: projectIdValue === 'none' ? null : projectIdValue || task.projectId,
       startDate: formData.get('startDate')
         ? new Date(formData.get('startDate') as string)
@@ -115,7 +129,14 @@ export async function updateTask(id: string, formData: FormData) {
     if (task.url) {
       const tagsRaw = formData.get('tags') as string | null
       if (tagsRaw !== null) {
-        data.tags = JSON.parse(tagsRaw)
+        try {
+          const parsed = JSON.parse(tagsRaw)
+          if (Array.isArray(parsed) && parsed.every(t => typeof t === 'string' && t.length <= 50)) {
+            data.tags = parsed.slice(0, 20)
+          }
+        } catch {
+          // Invalid JSON — ignore tags update
+        }
       }
 
       const thumbnailUrl = formData.get('thumbnailUrl') as string | null
@@ -290,7 +311,8 @@ export async function removeTaskImage(imageId: string) {
     })
 
     if (!image) return
-    if (image.task.userId !== userId && image.task.projectId) {
+    if (image.task.userId !== userId) {
+      if (!image.task.projectId) throw new Error('Not authorized')
       await requireProjectAccess(image.task.projectId, 'editor')
     }
 
@@ -353,7 +375,8 @@ export async function removeTaskFile(fileId: string) {
     })
 
     if (!file) return
-    if (file.task.userId !== userId && file.task.projectId) {
+    if (file.task.userId !== userId) {
+      if (!file.task.projectId) throw new Error('Not authorized')
       await requireProjectAccess(file.task.projectId, 'editor')
     }
 
@@ -666,7 +689,8 @@ export async function deleteTaskComment(commentId: string) {
     })
 
     if (!comment) return
-    if (comment.task.userId !== userId && comment.task.projectId) {
+    if (comment.task.userId !== userId) {
+      if (!comment.task.projectId) throw new Error('Not authorized')
       await requireProjectAccess(comment.task.projectId, 'editor')
     }
 

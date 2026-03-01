@@ -4,6 +4,15 @@ import { isAdminUser } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
   try {
+    // Verify webhook secret if configured
+    const webhookSecret = process.env.RESEND_WEBHOOK_SECRET
+    if (webhookSecret) {
+      const signature = request.headers.get('x-resend-signature') || request.headers.get('webhook-secret')
+      if (signature !== webhookSecret) {
+        return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
+      }
+    }
+
     const body = await request.json()
 
     // Resend inbound parse sends: from, to, subject, text, html

@@ -346,6 +346,10 @@ export async function updateInvoice(id: string, data: InvoiceInput) {
     if (!existing) throw new Error('Invoice not found')
     if (existing.status !== 'draft') throw new Error('Only draft invoices can be edited')
 
+    // Verify the client belongs to this user (prevent IDOR)
+    const client = await prisma.client.findFirst({ where: { id: data.clientId, userId } })
+    if (!client) throw new Error('Client not found')
+
     await prisma.$transaction(async (tx) => {
       // Delete existing items and recreate
       await tx.invoiceItem.deleteMany({ where: { invoiceId: id } })

@@ -5,6 +5,10 @@ import { requireUserId } from '@/lib/auth'
 import { checkLimit } from '@/lib/subscription'
 import { revalidatePath } from 'next/cache'
 
+const VALID_CLIENT_STATUSES = ['active', 'inactive']
+const MAX_NAME_LENGTH = 200
+const MAX_TEXT_LENGTH = 5000
+
 export async function getClients(search?: string, status?: string, sort?: string) {
   try {
     const userId = await requireUserId()
@@ -116,15 +120,20 @@ export async function createClient(formData: FormData) {
       throw new Error(`Free plan limit: ${limit.limit} client${limit.limit === 1 ? '' : 's'}. Upgrade to Pro for unlimited clients.`)
     }
 
+    const name = (formData.get('name') as string || '').slice(0, MAX_NAME_LENGTH)
+    if (!name.trim()) throw new Error('Name is required')
+    const status = formData.get('status') as string || 'active'
+    if (!VALID_CLIENT_STATUSES.includes(status)) throw new Error('Invalid status')
+
     const data = {
       userId,
-      name: formData.get('name') as string,
-      email: formData.get('email') as string || null,
-      phone: formData.get('phone') as string || null,
-      company: formData.get('company') as string || null,
-      logo: formData.get('logo') as string || null,
-      status: formData.get('status') as string || 'active',
-      notes: formData.get('notes') as string || null,
+      name,
+      email: (formData.get('email') as string || '').slice(0, 320) || null,
+      phone: (formData.get('phone') as string || '').slice(0, 50) || null,
+      company: (formData.get('company') as string || '').slice(0, MAX_NAME_LENGTH) || null,
+      logo: (formData.get('logo') as string || '').slice(0, 2000) || null,
+      status,
+      notes: (formData.get('notes') as string || '').slice(0, MAX_TEXT_LENGTH) || null,
     }
 
     const client = await prisma.client.create({ data })
@@ -142,14 +151,19 @@ export async function updateClient(id: string, formData: FormData) {
     const existing = await prisma.client.findFirst({ where: { id, userId } })
     if (!existing) return
 
+    const name = (formData.get('name') as string || '').slice(0, MAX_NAME_LENGTH)
+    if (!name.trim()) throw new Error('Name is required')
+    const status = formData.get('status') as string || 'active'
+    if (!VALID_CLIENT_STATUSES.includes(status)) throw new Error('Invalid status')
+
     const data = {
-      name: formData.get('name') as string,
-      email: formData.get('email') as string || null,
-      phone: formData.get('phone') as string || null,
-      company: formData.get('company') as string || null,
-      logo: formData.get('logo') as string || null,
-      status: formData.get('status') as string,
-      notes: formData.get('notes') as string || null,
+      name,
+      email: (formData.get('email') as string || '').slice(0, 320) || null,
+      phone: (formData.get('phone') as string || '').slice(0, 50) || null,
+      company: (formData.get('company') as string || '').slice(0, MAX_NAME_LENGTH) || null,
+      logo: (formData.get('logo') as string || '').slice(0, 2000) || null,
+      status,
+      notes: (formData.get('notes') as string || '').slice(0, MAX_TEXT_LENGTH) || null,
     }
 
     await prisma.client.update({

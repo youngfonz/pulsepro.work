@@ -16,17 +16,22 @@ function isUnsafeUrl(url: string): boolean {
     // Block non-http(s) protocols
     if (!['http:', 'https:'].includes(urlObj.protocol)) return true;
 
-    // Block private/internal IPs and localhost
+    // Block private/internal IPs, localhost, and cloud metadata endpoints
     if (
       hostname === 'localhost' ||
       hostname === '127.0.0.1' ||
       hostname === '0.0.0.0' ||
       hostname.startsWith('10.') ||
       hostname.startsWith('192.168.') ||
-      hostname.startsWith('172.') ||
+      hostname.startsWith('172.16.') || hostname.startsWith('172.17.') ||
+      hostname.startsWith('172.18.') || hostname.startsWith('172.19.') ||
+      hostname.startsWith('172.2') || hostname.startsWith('172.30.') ||
+      hostname.startsWith('172.31.') ||
+      hostname.startsWith('169.254.') ||
       hostname.endsWith('.local') ||
       hostname.endsWith('.internal') ||
-      hostname === '[::1]'
+      hostname === '[::1]' ||
+      hostname === 'metadata.google.internal'
     ) return true;
 
     return false;
@@ -150,52 +155,61 @@ async function fetchTwitterMetadata(url: string): Promise<BookmarkMetadata | nul
   }
 }
 
+function parseHtmlMetadata(url: string, html: string): BookmarkMetadata {
+  const ogTitleMatch = html.match(/<meta[^>]*property=["']og:title["'][^>]*content=["']([^"']+)["']/i) ||
+                       html.match(/<meta[^>]*content=["']([^"']+)["'][^>]*property=["']og:title["']/i);
+  const titleTagMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+  const title = ogTitleMatch?.[1] || titleTagMatch?.[1] || new URL(url).hostname;
+
+  const ogDescMatch = html.match(/<meta[^>]*property=["']og:description["'][^>]*content=["']([^"']+)["']/i) ||
+                      html.match(/<meta[^>]*content=["']([^"']+)["'][^>]*property=["']og:description["']/i);
+  const metaDescMatch = html.match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']+)["']/i) ||
+                        html.match(/<meta[^>]*content=["']([^"']+)["'][^>]*name=["']description["']/i);
+  const description = ogDescMatch?.[1] || metaDescMatch?.[1];
+
+  const ogImageMatch = html.match(/<meta[^>]*property=["']og:image["'][^>]*content=["']([^"']+)["']/i) ||
+                       html.match(/<meta[^>]*content=["']([^"']+)["'][^>]*property=["']og:image["']/i);
+  let thumbnailUrl = ogImageMatch?.[1];
+
+  if (thumbnailUrl && !thumbnailUrl.startsWith('http')) {
+    const urlObj = new URL(url);
+    thumbnailUrl = thumbnailUrl.startsWith('/')
+      ? `${urlObj.protocol}//${urlObj.host}${thumbnailUrl}`
+      : `${urlObj.protocol}//${urlObj.host}/${thumbnailUrl}`;
+  }
+
+  return { title: title.trim(), description: description?.trim(), thumbnailUrl, type: 'website' };
+}
+
 async function fetchWebsiteMetadata(url: string): Promise<BookmarkMetadata | null> {
   try {
     const response = await fetch(url, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
       },
+      redirect: 'manual',
     });
+
+    // Block redirects to prevent SSRF via redirect to internal IPs
+    if (response.status >= 300 && response.status < 400) {
+      const location = response.headers.get('location')
+      if (location && isUnsafeUrl(location)) return null
+      // For safe redirects, re-fetch the final URL
+      const redirectResponse = await fetch(location || url, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)' },
+        redirect: 'manual',
+      })
+      if (!redirectResponse.ok) return null
+      const html = await redirectResponse.text()
+      return parseHtmlMetadata(url, html)
+    }
 
     if (!response.ok) {
       return null;
     }
 
     const html = await response.text();
-
-    // Extract title (og:title > title tag)
-    const ogTitleMatch = html.match(/<meta[^>]*property=["']og:title["'][^>]*content=["']([^"']+)["']/i) ||
-                         html.match(/<meta[^>]*content=["']([^"']+)["'][^>]*property=["']og:title["']/i);
-    const titleTagMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
-    const title = ogTitleMatch?.[1] || titleTagMatch?.[1] || new URL(url).hostname;
-
-    // Extract description (og:description > meta description)
-    const ogDescMatch = html.match(/<meta[^>]*property=["']og:description["'][^>]*content=["']([^"']+)["']/i) ||
-                        html.match(/<meta[^>]*content=["']([^"']+)["'][^>]*property=["']og:description["']/i);
-    const metaDescMatch = html.match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']+)["']/i) ||
-                          html.match(/<meta[^>]*content=["']([^"']+)["'][^>]*name=["']description["']/i);
-    const description = ogDescMatch?.[1] || metaDescMatch?.[1];
-
-    // Extract thumbnail (og:image)
-    const ogImageMatch = html.match(/<meta[^>]*property=["']og:image["'][^>]*content=["']([^"']+)["']/i) ||
-                         html.match(/<meta[^>]*content=["']([^"']+)["'][^>]*property=["']og:image["']/i);
-    let thumbnailUrl = ogImageMatch?.[1];
-
-    // Make relative URLs absolute
-    if (thumbnailUrl && !thumbnailUrl.startsWith('http')) {
-      const urlObj = new URL(url);
-      thumbnailUrl = thumbnailUrl.startsWith('/')
-        ? `${urlObj.protocol}//${urlObj.host}${thumbnailUrl}`
-        : `${urlObj.protocol}//${urlObj.host}/${thumbnailUrl}`;
-    }
-
-    return {
-      title: title.trim(),
-      description: description?.trim(),
-      thumbnailUrl,
-      type: 'website',
-    };
+    return parseHtmlMetadata(url, html);
   } catch (error) {
     console.error('Error fetching website metadata:', error);
     return null;

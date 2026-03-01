@@ -6,6 +6,11 @@ import { checkLimit } from '@/lib/subscription'
 import { revalidatePath } from 'next/cache'
 import { getProjectWhereWithAccess, canAccessProject, requireProjectAccess } from '@/lib/access'
 
+const VALID_PROJECT_STATUSES = ['not_started', 'in_progress', 'on_hold', 'completed']
+const VALID_PRIORITIES = ['high', 'medium', 'low']
+const MAX_NAME_LENGTH = 200
+const MAX_TEXT_LENGTH = 10000
+
 export async function getProjects(filters?: {
   search?: string
   status?: string
@@ -235,13 +240,20 @@ export async function createProject(formData: FormData) {
       throw new Error(`Free plan limit: ${limit.limit} projects. Upgrade to Pro for unlimited projects.`)
     }
 
+    const name = (formData.get('name') as string || '').slice(0, MAX_NAME_LENGTH)
+    if (!name.trim()) throw new Error('Name is required')
+    const status = formData.get('status') as string || 'not_started'
+    if (!VALID_PROJECT_STATUSES.includes(status)) throw new Error('Invalid status')
+    const priority = formData.get('priority') as string || 'medium'
+    if (!VALID_PRIORITIES.includes(priority)) throw new Error('Invalid priority')
+
     const data = {
       userId,
-      name: formData.get('name') as string,
-      description: formData.get('description') as string || null,
-      notes: formData.get('notes') as string || null,
-      status: formData.get('status') as string || 'not_started',
-      priority: formData.get('priority') as string || 'medium',
+      name,
+      description: (formData.get('description') as string || '').slice(0, MAX_TEXT_LENGTH) || null,
+      notes: (formData.get('notes') as string || '').slice(0, MAX_TEXT_LENGTH) || null,
+      status,
+      priority,
       dueDate: formData.get('dueDate')
         ? new Date(formData.get('dueDate') as string)
         : null,
@@ -272,12 +284,27 @@ export async function updateProject(id: string, formData: FormData) {
       await requireProjectAccess(id, 'manager')
     }
 
+    const name = (formData.get('name') as string || '').slice(0, MAX_NAME_LENGTH)
+    if (!name.trim()) throw new Error('Name is required')
+    const status = formData.get('status') as string || 'not_started'
+    if (!VALID_PROJECT_STATUSES.includes(status)) throw new Error('Invalid status')
+    const priority = formData.get('priority') as string || 'medium'
+    if (!VALID_PRIORITIES.includes(priority)) throw new Error('Invalid priority')
+
+    // Verify the client belongs to the project owner (prevent IDOR)
+    const clientId = formData.get('clientId') as string
+    const projectOwner = existing?.userId ?? (await prisma.project.findUnique({ where: { id }, select: { userId: true } }))?.userId
+    if (projectOwner) {
+      const client = await prisma.client.findFirst({ where: { id: clientId, userId: projectOwner } })
+      if (!client) throw new Error('Client not found')
+    }
+
     const data = {
-      name: formData.get('name') as string,
-      description: formData.get('description') as string || null,
-      notes: formData.get('notes') as string || null,
-      status: formData.get('status') as string,
-      priority: formData.get('priority') as string,
+      name,
+      description: (formData.get('description') as string || '').slice(0, MAX_TEXT_LENGTH) || null,
+      notes: (formData.get('notes') as string || '').slice(0, MAX_TEXT_LENGTH) || null,
+      status,
+      priority,
       dueDate: formData.get('dueDate')
         ? new Date(formData.get('dueDate') as string)
         : null,
@@ -287,7 +314,7 @@ export async function updateProject(id: string, formData: FormData) {
       hourlyRate: formData.get('hourlyRate')
         ? parseFloat(formData.get('hourlyRate') as string)
         : null,
-      clientId: formData.get('clientId') as string,
+      clientId,
     }
 
     await prisma.project.update({

@@ -4,11 +4,16 @@ import { prisma } from '@/lib/prisma'
 import { requireUserId } from '@/lib/auth'
 import { revalidatePath } from 'next/cache'
 
+const VALID_TASK_STATUSES = ['todo', 'in_progress', 'done']
+
 export async function updateTaskStatus(
   taskId: string,
   status: string,
   sortOrder: number
 ) {
+  if (!VALID_TASK_STATUSES.includes(status)) {
+    throw new Error('Invalid status')
+  }
   const userId = await requireUserId()
   let task = await prisma.task.findFirst({
     where: { id: taskId, userId },

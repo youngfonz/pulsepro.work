@@ -9,6 +9,9 @@ const clerkEnabled = !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
  */
 export async function requireUserId(): Promise<string> {
   if (!clerkEnabled) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('CRITICAL: Clerk is not configured in production')
+    }
     return 'local-dev-user'
   }
 
