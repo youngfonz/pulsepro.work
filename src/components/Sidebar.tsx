@@ -236,21 +236,15 @@ export function Sidebar({ clientCount, clerkEnabled = false, isAdmin: isAdminPro
           {navigation.map((item) => {
             const isActive = pathname === item.href ||
               (item.href !== '/' && pathname.startsWith(item.href))
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                prefetch={false}
-                onClick={() => setIsOpen(false)}
-                title={isCollapsed ? item.name : undefined}
-                className={cn(
-                  'flex items-center gap-2.5 px-3 py-2.5 md:py-1.5 text-sm font-medium transition-colors rounded',
-                  isActive
-                    ? 'bg-muted text-foreground'
-                    : 'text-sidebar-foreground hover:bg-secondary hover:text-secondary-foreground',
-                  isCollapsed && 'justify-center'
-                )}
-              >
+            const linkClass = cn(
+              'flex items-center gap-2.5 px-3 py-2.5 md:py-1.5 text-sm font-medium transition-colors rounded',
+              isActive
+                ? 'bg-muted text-foreground'
+                : 'text-sidebar-foreground hover:bg-secondary hover:text-secondary-foreground',
+              isCollapsed && 'justify-center'
+            )
+            const linkContent = (
+              <>
                 {item.icon}
                 {!isCollapsed && (
                   <>
@@ -260,6 +254,19 @@ export function Sidebar({ clientCount, clerkEnabled = false, isAdmin: isAdminPro
                     )}
                   </>
                 )}
+              </>
+            )
+            // Use plain <a> for /kb to force full page load (bypasses client router cache)
+            if (item.href === '/kb') {
+              return (
+                <a key={item.name} href={item.href} onClick={() => setIsOpen(false)} title={isCollapsed ? item.name : undefined} className={linkClass}>
+                  {linkContent}
+                </a>
+              )
+            }
+            return (
+              <Link key={item.name} href={item.href} prefetch={false} onClick={() => setIsOpen(false)} title={isCollapsed ? item.name : undefined} className={linkClass}>
+                {linkContent}
               </Link>
             )
           })}
