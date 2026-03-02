@@ -1,4 +1,37 @@
+import dotenv from 'dotenv'
+dotenv.config({ path: '.env.local' })
+dotenv.config() // fallback to .env
+
 import { PrismaClient } from '@prisma/client'
+
+// ── Production Safety Guard ─────────────────────────────────────────
+// This script DELETES data. It must never run against production.
+const PRODUCTION_ENDPOINT = 'ep-delicate-queen-aiajl1lv'
+const dbUrl = process.env.DATABASE_URL || ''
+
+if (dbUrl.includes(PRODUCTION_ENDPOINT)) {
+  console.error('')
+  console.error('  ┌──────────────────────────────────────────────────┐')
+  console.error('  │  BLOCKED: Cannot seed the production database    │')
+  console.error('  └──────────────────────────────────────────────────┘')
+  console.error('')
+  console.error('  Your DATABASE_URL points to production.')
+  console.error('  Seeding would DELETE all data for the seed user.')
+  console.error('')
+  console.error('  To seed locally, use a Neon dev branch:')
+  console.error('  1. Go to https://console.neon.tech → Branches')
+  console.error('  2. Create a branch from "main"')
+  console.error('  3. Copy the new connection string')
+  console.error('  4. Update DATABASE_URL in .env.local')
+  console.error('')
+  process.exit(1)
+}
+
+if (process.env.VERCEL) {
+  console.error('BLOCKED: Seed script cannot run during Vercel builds.')
+  process.exit(1)
+}
+// ─────────────────────────────────────────────────────────────────────
 
 const prisma = new PrismaClient()
 
@@ -26,31 +59,31 @@ const projects = [
 ]
 
 const tasks = [
-  {"id":"cml4o6smz000e10vi362khv8x","title":"Finish Product Brief","description":null,"completed":false,"priority":"high","dueDate":null,"projectId":"cml4o3zho000a10viyw2b47uq","startDate":null,"notes":null},
-  {"id":"cml4ocnpw000m10viom2qdaq9","title":"Research building an AI clone to discuss the book","description":null,"completed":false,"priority":"low","dueDate":new Date(1772323200000),"projectId":"cml4oaxn3000i10vi053sa40b","startDate":null,"notes":null},
-  {"id":"cml5dhzk20004c4nelol8fpln","title":"Die Cut QR Code Stickers","description":null,"completed":false,"priority":"medium","dueDate":null,"projectId":"cml5dhiq00002c4neq6kyj9qw","startDate":null,"notes":null},
-  {"id":"cml5di5gy0006c4neu14nisuj","title":"Canopy Design","description":null,"completed":false,"priority":"medium","dueDate":null,"projectId":"cml5dhiq00002c4neq6kyj9qw","startDate":null,"notes":null},
-  {"id":"cml5dihrk0008c4ne0h91iaj9","title":"150ml Jar Design","description":null,"completed":false,"priority":"medium","dueDate":null,"projectId":"cml5dhiq00002c4neq6kyj9qw","startDate":null,"notes":null},
-  {"id":"cml5dl1oc000cc4ne225kbl29","title":"Setup ElevenLabs account","description":null,"completed":false,"priority":"medium","dueDate":null,"projectId":"cml5dkpd8000ac4neq51sirsf","startDate":null,"notes":null},
-  {"id":"cml5dlbg4000ec4net8jrt27j","title":"Create Self Design Manifesto poster","description":null,"completed":false,"priority":"medium","dueDate":null,"projectId":"cml5dkpd8000ac4neq51sirsf","startDate":null,"notes":null},
-  {"id":"cml5khjv60003wbf5covcyu4m","title":"IGM Logo","description":null,"completed":false,"priority":"medium","dueDate":null,"projectId":"cml4o2ur5000810vievam3wgs","startDate":null,"notes":null},
-  {"id":"cml5kmvou0007wbf55ey20ulk","title":"IGM Merch","description":null,"completed":false,"priority":"medium","dueDate":null,"projectId":"cml4o2ur5000810vievam3wgs","startDate":null,"notes":null},
-  {"id":"cml5knmnv000bwbf5jtcxcr0e","title":"Draft Project Brief for IGM Autos","description":null,"completed":false,"priority":"high","dueDate":null,"projectId":"cml4o2ur5000810vievam3wgs","startDate":null,"notes":null},
-  {"id":"cml5kuw6s000dwbf5zdjv369l","title":"Create AI Guidance Counselor","description":null,"completed":false,"priority":"medium","dueDate":null,"projectId":"cml5ey489000gc4nekkimzsx2","startDate":null,"notes":null},
-  {"id":"cml5l94qo000iwbf5vbjibguq","title":"Create Pitch Deck","description":null,"completed":true,"priority":"medium","dueDate":new Date(1769904000000),"projectId":"cml5l8r19000gwbf5l3g63wpe","startDate":new Date(1768953600000),"notes":null},
-  {"id":"cml5l9yaa000mwbf5924nikog","title":"Create Podax.ai website","description":"Launch info website for http://podax.ai","completed":true,"priority":"medium","dueDate":new Date(1769904000000),"projectId":"cml5l8r19000gwbf5l3g63wpe","startDate":new Date(1768953600000),"notes":null}
+  {"id":"cml4o6smz000e10vi362khv8x","title":"Finish Product Brief","description":null,"status":"todo","priority":"high","dueDate":null,"projectId":"cml4o3zho000a10viyw2b47uq","startDate":null,"notes":null},
+  {"id":"cml4ocnpw000m10viom2qdaq9","title":"Research building an AI clone to discuss the book","description":null,"status":"todo","priority":"low","dueDate":new Date(1772323200000),"projectId":"cml4oaxn3000i10vi053sa40b","startDate":null,"notes":null},
+  {"id":"cml5dhzk20004c4nelol8fpln","title":"Die Cut QR Code Stickers","description":null,"status":"todo","priority":"medium","dueDate":null,"projectId":"cml5dhiq00002c4neq6kyj9qw","startDate":null,"notes":null},
+  {"id":"cml5di5gy0006c4neu14nisuj","title":"Canopy Design","description":null,"status":"todo","priority":"medium","dueDate":null,"projectId":"cml5dhiq00002c4neq6kyj9qw","startDate":null,"notes":null},
+  {"id":"cml5dihrk0008c4ne0h91iaj9","title":"150ml Jar Design","description":null,"status":"todo","priority":"medium","dueDate":null,"projectId":"cml5dhiq00002c4neq6kyj9qw","startDate":null,"notes":null},
+  {"id":"cml5dl1oc000cc4ne225kbl29","title":"Setup ElevenLabs account","description":null,"status":"todo","priority":"medium","dueDate":null,"projectId":"cml5dkpd8000ac4neq51sirsf","startDate":null,"notes":null},
+  {"id":"cml5dlbg4000ec4net8jrt27j","title":"Create Self Design Manifesto poster","description":null,"status":"todo","priority":"medium","dueDate":null,"projectId":"cml5dkpd8000ac4neq51sirsf","startDate":null,"notes":null},
+  {"id":"cml5khjv60003wbf5covcyu4m","title":"IGM Logo","description":null,"status":"todo","priority":"medium","dueDate":null,"projectId":"cml4o2ur5000810vievam3wgs","startDate":null,"notes":null},
+  {"id":"cml5kmvou0007wbf55ey20ulk","title":"IGM Merch","description":null,"status":"todo","priority":"medium","dueDate":null,"projectId":"cml4o2ur5000810vievam3wgs","startDate":null,"notes":null},
+  {"id":"cml5knmnv000bwbf5jtcxcr0e","title":"Draft Project Brief for IGM Autos","description":null,"status":"todo","priority":"high","dueDate":null,"projectId":"cml4o2ur5000810vievam3wgs","startDate":null,"notes":null},
+  {"id":"cml5kuw6s000dwbf5zdjv369l","title":"Create AI Guidance Counselor","description":null,"status":"todo","priority":"medium","dueDate":null,"projectId":"cml5ey489000gc4nekkimzsx2","startDate":null,"notes":null},
+  {"id":"cml5l94qo000iwbf5vbjibguq","title":"Create Pitch Deck","description":null,"status":"done","priority":"medium","dueDate":new Date(1769904000000),"projectId":"cml5l8r19000gwbf5l3g63wpe","startDate":new Date(1768953600000),"notes":null},
+  {"id":"cml5l9yaa000mwbf5924nikog","title":"Create Podax.ai website","description":"Launch info website for http://podax.ai","status":"done","priority":"medium","dueDate":new Date(1769904000000),"projectId":"cml5l8r19000gwbf5l3g63wpe","startDate":new Date(1768953600000),"notes":null}
 ]
 
 async function main() {
   console.log('Seeding database...')
 
   // Clear existing data
-  await prisma.taskFile.deleteMany()
-  await prisma.taskImage.deleteMany()
-  await prisma.task.deleteMany()
-  await prisma.projectImage.deleteMany()
-  await prisma.project.deleteMany()
-  await prisma.client.deleteMany()
+  await prisma.taskFile.deleteMany({ where: { task: { userId: SEED_USER_ID } } })
+  await prisma.taskImage.deleteMany({ where: { task: { userId: SEED_USER_ID } } })
+  await prisma.task.deleteMany({ where: { userId: SEED_USER_ID } })
+  await prisma.projectImage.deleteMany({ where: { project: { userId: SEED_USER_ID } } })
+  await prisma.project.deleteMany({ where: { userId: SEED_USER_ID } })
+  await prisma.client.deleteMany({ where: { userId: SEED_USER_ID } })
 
   // Insert clients
   for (const client of clients) {

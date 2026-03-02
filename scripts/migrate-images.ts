@@ -1,7 +1,25 @@
+import dotenv from 'dotenv'
+dotenv.config({ path: '.env.local' })
+dotenv.config()
+
 import { put } from '@vercel/blob'
 import { PrismaClient } from '@prisma/client'
 import { readFile } from 'fs/promises'
 import path from 'path'
+
+// ── Production Safety Guard ─────────────────────────────────────────
+// This script MODIFIES database records. Block if pointing at production.
+const PRODUCTION_ENDPOINT = 'ep-delicate-queen-aiajl1lv'
+const dbUrl = process.env.DATABASE_URL || ''
+
+if (dbUrl.includes(PRODUCTION_ENDPOINT)) {
+  console.error('')
+  console.error('  BLOCKED: Cannot run image migration against production.')
+  console.error('  Use a Neon dev branch for local development.')
+  console.error('')
+  process.exit(1)
+}
+// ─────────────────────────────────────────────────────────────────────
 
 const prisma = new PrismaClient()
 

@@ -1,5 +1,5 @@
 /**
- * Production database deployment script.
+ * Production database deployment script — VERCEL BUILDS ONLY.
  *
  * Uses `prisma migrate deploy` to safely apply only pending migrations.
  * This NEVER drops data — it only runs forward migrations.
@@ -7,7 +7,25 @@
  * If the migration table doesn't exist yet (because the DB was previously
  * managed by `db push`), we baseline all existing migrations so they're
  * marked as applied without re-running them.
+ *
+ * Safety: This script refuses to run outside of Vercel builds.
+ * For local development, use `npx prisma migrate dev` instead.
  */
+
+// ── Vercel-Only Guard ───────────────────────────────────────────────
+if (!process.env.VERCEL) {
+  console.error('')
+  console.error('  ┌──────────────────────────────────────────────────┐')
+  console.error('  │  BLOCKED: deploy.mjs only runs on Vercel        │')
+  console.error('  └──────────────────────────────────────────────────┘')
+  console.error('')
+  console.error('  This script is for production deployments only.')
+  console.error('  For local development, use:')
+  console.error('    npx prisma migrate dev')
+  console.error('')
+  process.exit(1)
+}
+// ─────────────────────────────────────────────────────────────────────
 
 import { execSync } from 'child_process'
 import { PrismaClient } from '@prisma/client'
