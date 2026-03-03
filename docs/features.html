@@ -545,6 +545,15 @@
     <div class="subsection">Admin Panel</div>
     <div class="feature"><span class="dot"></span><span class="text">Admin-only route protected by <code>requireAdmin()</code> gate</span></div>
     <div class="feature"><span class="dot"></span><span class="text">Admin dashboard: 5 stat cards (users, subscriptions, projects, tasks, clients) + paginated user table with avatar, plan, counts</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Admin user management: change plan (Free/Pro/Team), suspend/unsuspend, wipe data, delete user — all with confirmation dialogs</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Maintenance mode kill switch: toggle locks all non-admin users to a maintenance page</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Admin docs hub at <code>/admin/docs</code>: quick links to QA checklist, feature catalog, and KB page</span></div>
+
+    <div class="subsection">Database Safety</div>
+    <div class="feature"><span class="dot"></span><span class="text">Safe deployment: <code>prisma migrate deploy</code> (forward-only, never drops data) with automatic migration baselining</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Deploy script locked to Vercel builds only — refuses to run locally</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Production guards on all database scripts: seed, db push, and image migration blocked against production URL</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Safe npm commands: <code>db:push</code>, <code>db:seed</code>, <code>db:migrate</code>, <code>db:studio</code> — all with production detection</span></div>
   </div>
 </div>
 

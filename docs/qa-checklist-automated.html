@@ -101,11 +101,11 @@
 <body>
 
 <div class="auto-banner">
-  <strong>Automated QA Results</strong> — 44 E2E tests passed + 218 items code-verified = 262/291 (90%), run on Feb 22, 2026<br>
+  <strong>Automated QA Results</strong> — 44 E2E tests passed + 225 items code-verified = 269/298 (90%), run on Mar 1, 2026<br>
   Blue = E2E test pass. Green = verified by reading source code. Yellow = needs manual testing.
   <div class="legend">
     <span><span class="dot auto"></span> E2E pass (44)</span>
-    <span><span class="dot code"></span> Code verified (218)</span>
+    <span><span class="dot code"></span> Code verified (225)</span>
     <span><span class="dot manual"></span> Needs human tester (29)</span>
   </div>
 </div>
@@ -1023,6 +1023,25 @@
   </div>
 </div>
 
+<div class="section">
+  <div class="section-header" onclick="this.parentElement.classList.toggle('open')">
+    <span class="section-title">3.10 Database Safety</span>
+    <div class="section-progress">
+      <span class="section-count"></span>
+      <div class="section-bar"><div class="section-bar-fill"></div></div>
+    </div>
+  </div>
+  <div class="section-items">
+    <div class="check-item auto-verified"><input type="checkbox" id="c356"><label for="c356">deploy.mjs uses <code>prisma migrate deploy</code> (not <code>db push</code>) <span class="auto-badge code">CODE VERIFIED — prisma/deploy.mjs: execSync('npx prisma migrate deploy')</span></label></div>
+    <div class="check-item auto-verified"><input type="checkbox" id="c357"><label for="c357">deploy.mjs blocks local execution — requires VERCEL env var <span class="auto-badge code">CODE VERIFIED — prisma/deploy.mjs: if (!process.env.VERCEL) process.exit(1)</span></label></div>
+    <div class="check-item auto-verified"><input type="checkbox" id="c358"><label for="c358">deploy.mjs auto-baselines migrations when _prisma_migrations table missing <span class="auto-badge code">CODE VERIFIED — prisma/deploy.mjs: baselineIfNeeded() checks information_schema, runs migrate resolve --applied</span></label></div>
+    <div class="check-item auto-verified"><input type="checkbox" id="c359"><label for="c359">seed.ts blocks execution against production DATABASE_URL <span class="auto-badge code">CODE VERIFIED — prisma/seed.ts: checks PRODUCTION_ENDPOINT in DATABASE_URL, exits</span></label></div>
+    <div class="check-item auto-verified"><input type="checkbox" id="c360"><label for="c360">safe-push.mjs blocks <code>prisma db push</code> against production <span class="auto-badge code">CODE VERIFIED — prisma/safe-push.mjs: checks PRODUCTION_ENDPOINT in DATABASE_URL, exits</span></label></div>
+    <div class="check-item auto-verified"><input type="checkbox" id="c361"><label for="c361">migrate-images.ts blocks execution against production DATABASE_URL <span class="auto-badge code">CODE VERIFIED — scripts/migrate-images.ts: checks PRODUCTION_ENDPOINT, exits</span></label></div>
+    <div class="check-item auto-verified"><input type="checkbox" id="c362"><label for="c362">All production guards load .env.local via dotenv before checking <span class="auto-badge code">CODE VERIFIED — seed.ts, safe-push.mjs, migrate-images.ts all call dotenv.config({ path: '.env.local' })</span></label></div>
+  </div>
+</div>
+
 </div>
 
 <!-- Celebration -->
@@ -1069,7 +1088,7 @@
     'c181','c183',
     // 3.6 Performance + 3.7 Error handling (E2E)
     'c193','c197',
-    // === CODE VERIFIED (180) ===
+    // === CODE VERIFIED (187) ===
     // 1.4 Onboarding — OnboardingOverlay.tsx (7)
     'c28','c29','c30','c31','c32','c33','c34',
     // 1.5 Quick Capture — QuickAdd.tsx + CommandBar.tsx (7)
@@ -1164,7 +1183,10 @@
     // 3.3b Security Headers — all 6 headers (6)
     'c348','c349','c350','c351','c352','c353',
     // 3.9 Account Lifecycle — KB auth-aware rendering (2)
-    'c354','c355'
+    'c354','c355',
+    // === PR #118 + #119: Database Safety ===
+    // 3.10 Database Safety — deploy guards, seed guard, push guard, dotenv loading (7)
+    'c356','c357','c358','c359','c360','c361','c362'
   ];
 
   function loadState() {
