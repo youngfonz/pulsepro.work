@@ -211,7 +211,7 @@ export default async function TasksPage({ searchParams }: Props) {
                             >
                               {task.title}
                             </Link>
-                            <div className="flex items-center gap-1.5 mt-0.5 text-xs text-muted-foreground">
+                            <div className="flex items-center gap-1.5 mt-0.5 text-xs text-muted-foreground min-w-0 overflow-hidden">
                               <Badge className={`${priorityColors[task.priority]} flex-shrink-0`}>
                                 {priorityLabels[task.priority]}
                               </Badge>
@@ -220,8 +220,8 @@ export default async function TasksPage({ searchParams }: Props) {
                               </span>
                               {task.dueDate && (
                                 <>
-                                  <span className="text-border">&middot;</span>
-                                  <span className={`flex-shrink-0 ${isOverdue ? 'text-destructive font-medium' : ''}`}>
+                                  <span className="text-border flex-shrink-0">&middot;</span>
+                                  <span className={`truncate ${isOverdue ? 'text-destructive font-medium' : ''}`}>
                                     {isOverdue ? 'Overdue' : 'Due'}: {formatDate(task.dueDate)}
                                   </span>
                                 </>

@@ -431,7 +431,7 @@ export default async function DashboardPage() {
                 </Link>
 
                 {/* Stats Legend */}
-                <div className="flex items-start justify-center gap-6">
+                <div className="flex flex-wrap items-start justify-center gap-x-6 gap-y-3">
                   <Link href="/projects" className="group flex items-center gap-2.5 p-1.5 rounded-lg hover:bg-muted/50 transition-colors">
                     <div className="w-2.5 h-2.5 rounded-full bg-rose-500 flex-shrink-0" />
                     <div>

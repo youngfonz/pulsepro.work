@@ -24,7 +24,7 @@ export function LayoutWrapper({ children, clientCount, clerkEnabled = false, isA
   }
 
   return (
-    <div className="flex h-screen bg-background overflow-x-clip overflow-y-hidden w-full max-w-full overscroll-x-none [touch-action:pan-y_pinch-zoom]">
+    <div className="flex h-screen bg-background overflow-hidden w-full max-w-full overscroll-none" style={{ touchAction: 'pan-y pinch-zoom' }}>
       <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-background focus:text-foreground">
         Skip to main content
       </a>
