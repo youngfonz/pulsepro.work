@@ -64,8 +64,29 @@ async function baselineIfNeeded() {
   }
 }
 
+async function resolveFailedMigrations() {
+  const prisma = new PrismaClient()
+  try {
+    const result = await prisma.$queryRawUnsafe(
+      `SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = '_prisma_migrations')`
+    )
+    if (!result[0]?.exists) return
+
+    const failed = await prisma.$queryRawUnsafe(
+      `SELECT migration_name FROM _prisma_migrations WHERE rolled_back_at IS NOT NULL OR (finished_at IS NULL AND started_at IS NOT NULL AND started_at < NOW() - INTERVAL '10 minutes')`
+    )
+    for (const row of failed) {
+      console.log(`[deploy] Resolving failed migration: ${row.migration_name}`)
+      execSync(`npx prisma migrate resolve --applied ${row.migration_name}`, { stdio: 'inherit' })
+    }
+  } finally {
+    await prisma.$disconnect()
+  }
+}
+
 async function run() {
   await baselineIfNeeded()
+  await resolveFailedMigrations()
 
   // Apply pending migrations safely — no data loss
   execSync('npx prisma migrate deploy', { stdio: 'inherit' })
