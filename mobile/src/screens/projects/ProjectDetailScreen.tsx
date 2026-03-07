@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, ScrollView, RefreshControl, StyleSheet } from 'react-native'
+import { View, Text, ScrollView, RefreshControl, ActivityIndicator, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { useProjectDetail } from '../../hooks/useProjects'
@@ -15,6 +15,16 @@ export function ProjectDetailScreen({ route }: Props) {
   const { id } = route.params
   const { data: project, isLoading, refetch } = useProjectDetail(id)
 
+  if (isLoading && !project) {
+    return (
+      <SafeAreaView style={styles.container} edges={['bottom']}>
+        <View style={styles.loading}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      </SafeAreaView>
+    )
+  }
+
   if (!project && !isLoading) {
     return (
       <SafeAreaView style={styles.container} edges={['bottom']}>
@@ -27,7 +37,7 @@ export function ProjectDetailScreen({ route }: Props) {
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <ScrollView
         contentContainerStyle={styles.content}
-        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor={colors.primary} />}
+        refreshControl={<RefreshControl refreshing={false} onRefresh={refetch} tintColor={colors.primary} />}
       >
         {project && (
           <>
@@ -95,5 +105,6 @@ const styles = StyleSheet.create({
   },
   taskDot: { width: 8, height: 8, borderRadius: 4, marginRight: spacing.md },
   taskTitle: { fontSize: 15, color: colors.textPrimary, flex: 1 },
+  loading: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   empty: { color: colors.textSecondary, textAlign: 'center', marginTop: 60, fontSize: 15 },
 })

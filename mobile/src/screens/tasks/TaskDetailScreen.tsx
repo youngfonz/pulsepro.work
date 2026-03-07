@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, ScrollView, RefreshControl, StyleSheet } from 'react-native'
+import { View, Text, ScrollView, RefreshControl, ActivityIndicator, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { useTaskDetail } from '../../hooks/useTasks'
@@ -15,6 +15,16 @@ export function TaskDetailScreen({ route }: Props) {
   const { id } = route.params
   const { data: task, isLoading, refetch } = useTaskDetail(id)
 
+  if (isLoading && !task) {
+    return (
+      <SafeAreaView style={styles.container} edges={['bottom']}>
+        <View style={styles.loading}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      </SafeAreaView>
+    )
+  }
+
   if (!task && !isLoading) {
     return (
       <SafeAreaView style={styles.container} edges={['bottom']}>
@@ -27,7 +37,7 @@ export function TaskDetailScreen({ route }: Props) {
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <ScrollView
         contentContainerStyle={styles.content}
-        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor={colors.primary} />}
+        refreshControl={<RefreshControl refreshing={false} onRefresh={refetch} tintColor={colors.primary} />}
       >
         {task && (
           <>
@@ -99,5 +109,6 @@ const styles = StyleSheet.create({
   },
   commentText: { fontSize: 15, color: colors.textPrimary },
   commentDate: { fontSize: 11, color: colors.textSecondary, marginTop: spacing.xs },
+  loading: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   empty: { color: colors.textSecondary, textAlign: 'center', marginTop: 60, fontSize: 15 },
 })

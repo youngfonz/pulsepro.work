@@ -12,7 +12,7 @@ import type { Project } from '../../types/api'
 type Props = { navigation: NativeStackNavigationProp<ProjectsStackParamList, 'ProjectsList'> }
 
 export function ProjectsListScreen({ navigation }: Props) {
-  const { data, isLoading, refetch } = useProjects()
+  const { data, isLoading, isFetching, refetch } = useProjects()
 
   const renderItem = ({ item }: { item: Project }) => (
     <TouchableOpacity
@@ -41,7 +41,7 @@ export function ProjectsListScreen({ navigation }: Props) {
         keyExtractor={item => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.list}
-        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor={colors.primary} />}
+        refreshControl={<RefreshControl refreshing={isFetching && !!data} onRefresh={refetch} tintColor={colors.primary} />}
         ListEmptyComponent={!isLoading ? <Text style={styles.empty}>No projects yet</Text> : null}
       />
     </SafeAreaView>

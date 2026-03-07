@@ -12,9 +12,9 @@ import type { RootStackParamList, AuthStackParamList } from '../types/navigation
 const RootStack = createNativeStackNavigator<RootStackParamList>()
 const AuthStackNav = createNativeStackNavigator<AuthStackParamList>()
 
-const darkTheme = {
+const appTheme = {
   ...DefaultTheme,
-  dark: true,
+  dark: false,
   colors: {
     ...DefaultTheme.colors,
     primary: colors.primary,
@@ -47,7 +47,7 @@ export function RootNavigator() {
   }
 
   return (
-    <NavigationContainer theme={darkTheme}>
+    <NavigationContainer theme={appTheme}>
       <RootStack.Navigator screenOptions={{ headerShown: false }}>
         {isSignedIn ? (
           <RootStack.Screen name="Main" component={TabNavigator} />

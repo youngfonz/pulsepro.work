@@ -15,7 +15,7 @@ import type { Task } from '../../types/api'
 type Props = { navigation: NativeStackNavigationProp<TasksStackParamList, 'TasksList'> }
 
 export function TasksListScreen({ navigation }: Props) {
-  const { data, isLoading, refetch } = useTasks()
+  const { data, isLoading, isFetching, refetch } = useTasks()
   const toggleMutation = useToggleTask()
 
   const handleToggle = async (id: string) => {
@@ -59,7 +59,7 @@ export function TasksListScreen({ navigation }: Props) {
         keyExtractor={item => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.list}
-        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor={colors.primary} />}
+        refreshControl={<RefreshControl refreshing={isFetching && !!data} onRefresh={refetch} tintColor={colors.primary} />}
         ListEmptyComponent={!isLoading ? <Text style={styles.empty}>No tasks yet</Text> : null}
       />
     </SafeAreaView>

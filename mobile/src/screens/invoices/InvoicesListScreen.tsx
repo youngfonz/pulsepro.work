@@ -12,7 +12,7 @@ import type { Invoice } from '../../types/api'
 type Props = { navigation: NativeStackNavigationProp<MoreStackParamList, 'InvoicesList'> }
 
 export function InvoicesListScreen({ navigation }: Props) {
-  const { data, isLoading, refetch } = useInvoices()
+  const { data, isLoading, isFetching, refetch } = useInvoices()
 
   const renderItem = ({ item }: { item: Invoice }) => (
     <TouchableOpacity
@@ -39,7 +39,7 @@ export function InvoicesListScreen({ navigation }: Props) {
         keyExtractor={item => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.list}
-        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor={colors.primary} />}
+        refreshControl={<RefreshControl refreshing={isFetching && !!data} onRefresh={refetch} tintColor={colors.primary} />}
         ListEmptyComponent={!isLoading ? <Text style={styles.empty}>No invoices yet</Text> : null}
       />
     </SafeAreaView>

@@ -11,7 +11,7 @@ import type { Client } from '../../types/api'
 type Props = { navigation: NativeStackNavigationProp<MoreStackParamList, 'ClientsList'> }
 
 export function ClientsListScreen({ navigation }: Props) {
-  const { data, isLoading, refetch } = useClients()
+  const { data, isLoading, isFetching, refetch } = useClients()
 
   const renderItem = ({ item }: { item: Client }) => (
     <TouchableOpacity
@@ -30,7 +30,7 @@ export function ClientsListScreen({ navigation }: Props) {
         keyExtractor={item => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.list}
-        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor={colors.primary} />}
+        refreshControl={<RefreshControl refreshing={isFetching && !!data} onRefresh={refetch} tintColor={colors.primary} />}
         ListEmptyComponent={!isLoading ? <Text style={styles.empty}>No clients yet</Text> : null}
       />
     </SafeAreaView>

@@ -17,7 +17,7 @@ export function ClientDetailScreen({ route }: Props) {
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <ScrollView
         contentContainerStyle={styles.content}
-        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor={colors.primary} />}
+        refreshControl={<RefreshControl refreshing={false} onRefresh={refetch} tintColor={colors.primary} />}
       >
         {client && (
           <>

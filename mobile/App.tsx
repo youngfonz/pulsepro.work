@@ -11,7 +11,8 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 1000 * 60 * 2,
-      retry: 2,
+      retry: 1,
+      refetchOnWindowFocus: false,
     },
   },
 })
@@ -21,7 +22,7 @@ const publishableKey = Constants.expoConfig?.extra?.clerkPublishableKey as strin
 export default function App() {
   return (
     <SafeAreaProvider>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle="dark-content" />
       <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
         <ClerkLoaded>
           <QueryClientProvider client={queryClient}>
