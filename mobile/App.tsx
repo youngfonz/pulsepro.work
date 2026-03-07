@@ -1,5 +1,6 @@
 import React from 'react'
 import { StatusBar } from 'react-native'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { ClerkProvider, ClerkLoaded } from '@clerk/expo'
 import { tokenCache } from '@clerk/expo/token-cache'
@@ -25,15 +26,17 @@ console.log('[Auth] Clerk key prefix:', publishableKey?.substring(0, 10))
 
 export default function App() {
   return (
-    <SafeAreaProvider>
-      <StatusBar barStyle="dark-content" />
-      <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
-        <ClerkLoaded>
-          <QueryClientProvider client={queryClient}>
-            <RootNavigator />
-          </QueryClientProvider>
-        </ClerkLoaded>
-      </ClerkProvider>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <StatusBar barStyle="dark-content" />
+        <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
+          <ClerkLoaded>
+            <QueryClientProvider client={queryClient}>
+              <RootNavigator />
+            </QueryClientProvider>
+          </ClerkLoaded>
+        </ClerkProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   )
 }

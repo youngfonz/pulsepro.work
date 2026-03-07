@@ -42,7 +42,13 @@ export function ClientsListScreen({ navigation }: Props) {
         renderItem={renderItem}
         contentContainerStyle={styles.list}
         refreshControl={<RefreshControl refreshing={isFetching && !!data} onRefresh={refetch} tintColor={colors.primary} />}
-        ListEmptyComponent={!isLoading ? <Text style={styles.empty}>No clients yet</Text> : null}
+        ListEmptyComponent={!isLoading ? (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyEmoji}>🤝</Text>
+            <Text style={styles.emptyTitle}>No clients yet</Text>
+            <Text style={styles.empty}>Tap + to add your first client.</Text>
+          </View>
+        ) : null}
       />
     </SafeAreaView>
   )
@@ -57,5 +63,8 @@ const styles = StyleSheet.create({
   },
   name: { fontSize: 17, fontWeight: '600', color: colors.textPrimary },
   company: { fontSize: 13, color: colors.textSecondary, marginTop: spacing.xs },
-  empty: { color: colors.textSecondary, textAlign: 'center', marginTop: 60, fontSize: 15 },
+  emptyContainer: { alignItems: 'center', marginTop: 80 },
+  emptyEmoji: { fontSize: 48, marginBottom: spacing.md },
+  emptyTitle: { fontSize: 20, fontWeight: '700', color: colors.textPrimary, marginBottom: spacing.xs },
+  empty: { color: colors.textSecondary, textAlign: 'center', fontSize: 15 },
 })

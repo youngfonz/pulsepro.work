@@ -67,7 +67,7 @@ export function SpeedDialFAB({ onAddTask, onAddProject, onAddClient }: SpeedDial
         {actions.map((action, index) => {
           const translateY = anim.interpolate({
             inputRange: [0, 1],
-            outputRange: [0, -(index + 1) * 60],
+            outputRange: [0, -((index + 1) * 52 + 16)],
           })
           const opacity = anim.interpolate({
             inputRange: [0, 0.5, 1],
@@ -91,14 +91,8 @@ export function SpeedDialFAB({ onAddTask, onAddProject, onAddClient }: SpeedDial
                 onPress={() => handleAction(action.onPress)}
                 activeOpacity={0.8}
               >
-                <Text style={styles.actionLabelText}>{action.label}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.actionBtn}
-                onPress={() => handleAction(action.onPress)}
-                activeOpacity={0.85}
-              >
                 {action.icon}
+                <Text style={styles.actionLabelText}>{action.label}</Text>
               </TouchableOpacity>
             </Animated.View>
           )
@@ -116,14 +110,16 @@ export function SpeedDialFAB({ onAddTask, onAddProject, onAddClient }: SpeedDial
 const styles = StyleSheet.create({
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.3)',
+    backgroundColor: 'rgba(0,0,0,0.5)',
     zIndex: 98,
   },
   container: {
     position: 'absolute',
     bottom: spacing.xl,
-    right: spacing.xl,
+    left: 0,
+    right: 0,
     alignItems: 'flex-end',
+    paddingRight: spacing.xl,
     zIndex: 99,
   },
   fab: {
@@ -140,36 +136,18 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   actionRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
     position: 'absolute',
     bottom: 0,
-    right: 6,
-    gap: spacing.sm,
+    right: spacing.xl,
   },
   actionLabel: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
     backgroundColor: colors.surface,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
-    borderRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.12,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  actionLabelText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.textPrimary,
-  },
-  actionBtn: {
-    width: 44,
-    height: 44,
     borderRadius: 22,
-    backgroundColor: colors.surface,
-    alignItems: 'center',
-    justifyContent: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.12,
@@ -177,5 +155,10 @@ const styles = StyleSheet.create({
     elevation: 3,
     borderWidth: 1,
     borderColor: colors.border,
+  },
+  actionLabelText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.textPrimary,
   },
 })

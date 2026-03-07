@@ -53,7 +53,13 @@ export function ProjectsListScreen({ navigation }: Props) {
         renderItem={renderItem}
         contentContainerStyle={styles.list}
         refreshControl={<RefreshControl refreshing={isFetching && !!data} onRefresh={refetch} tintColor={colors.primary} />}
-        ListEmptyComponent={!isLoading ? <Text style={styles.empty}>No projects yet</Text> : null}
+        ListEmptyComponent={!isLoading ? (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyEmoji}>📁</Text>
+            <Text style={styles.emptyTitle}>No projects yet</Text>
+            <Text style={styles.empty}>Tap + to start your first project.</Text>
+          </View>
+        ) : null}
       />
     </SafeAreaView>
   )
@@ -61,7 +67,7 @@ export function ProjectsListScreen({ navigation }: Props) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  list: { padding: spacing.lg },
+  list: { paddingVertical: spacing.lg, paddingHorizontal: spacing.xl },
   card: {
     backgroundColor: colors.surface, borderRadius: 12, padding: spacing.lg,
     borderWidth: 1, borderColor: colors.border, marginBottom: spacing.md,
@@ -75,5 +81,8 @@ const styles = StyleSheet.create({
   taskCount: { fontSize: 13, color: colors.textSecondary, marginLeft: 'auto' },
   badge: { paddingHorizontal: spacing.sm, paddingVertical: 2, borderRadius: 6 },
   badgeText: { fontSize: 11, fontWeight: '600', textTransform: 'capitalize' },
-  empty: { color: colors.textSecondary, textAlign: 'center', marginTop: 60, fontSize: 15 },
+  emptyContainer: { alignItems: 'center', marginTop: 80 },
+  emptyEmoji: { fontSize: 48, marginBottom: spacing.md },
+  emptyTitle: { fontSize: 20, fontWeight: '700', color: colors.textPrimary, marginBottom: spacing.xs },
+  empty: { color: colors.textSecondary, textAlign: 'center', fontSize: 15 },
 })

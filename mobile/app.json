@@ -8,11 +8,20 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
     "splash": {
-      "backgroundColor": "#09090b"
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#3b82f6"
     },
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "org.pulsepro.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#171717"
+      },
+      "package": "org.pulsepro.app"
     },
     "plugins": [
       "@clerk/expo"

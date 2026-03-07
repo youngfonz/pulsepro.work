@@ -1,8 +1,10 @@
-import React from 'react'
-import { View, Text, ScrollView, RefreshControl, ActivityIndicator, StyleSheet } from 'react-native'
+import React, { useEffect } from 'react'
+import { View, Text, ScrollView, RefreshControl, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { useNavigation, CommonActions } from '@react-navigation/native'
 import { useProjectDetail } from '../../hooks/useProjects'
+import { useRecentlyViewed } from '../../hooks/useRecentlyViewed'
 import { colors } from '../../theme/colors'
 import { spacing } from '../../theme/spacing'
 import { getStatusLabel, getStatusColor, getPriorityColor } from '../../utils/status'
@@ -13,7 +15,15 @@ type Props = NativeStackScreenProps<ProjectsStackParamList, 'ProjectDetail'>
 
 export function ProjectDetailScreen({ route }: Props) {
   const { id } = route.params
+  const navigation = useNavigation()
   const { data: project, isLoading, refetch } = useProjectDetail(id)
+  const { addItem } = useRecentlyViewed()
+
+  useEffect(() => {
+    if (project) {
+      addItem({ id: project.id, type: 'project', name: project.name, subtitle: project.client.name })
+    }
+  }, [project?.id])
 
   if (isLoading && !project) {
     return (
@@ -72,10 +82,15 @@ export function ProjectDetailScreen({ route }: Props) {
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Tasks ({project.tasks.length})</Text>
                 {project.tasks.map(task => (
-                  <View key={task.id} style={styles.taskRow}>
+                  <TouchableOpacity
+                    key={task.id}
+                    style={styles.taskRow}
+                    onPress={() => navigation.dispatch(CommonActions.navigate({ name: 'TasksTab', params: { screen: 'TaskDetail', params: { id: task.id } } }))}
+                    activeOpacity={0.7}
+                  >
                     <View style={[styles.taskDot, { backgroundColor: getStatusColor(task.status) }]} />
                     <Text style={styles.taskTitle} numberOfLines={1}>{task.title}</Text>
-                  </View>
+                  </TouchableOpacity>
                 ))}
               </View>
             )}

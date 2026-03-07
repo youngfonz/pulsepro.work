@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState } from 'react'
+import React, { useLayoutEffect, useState, useEffect } from 'react'
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import {
   Platform,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import * as Haptics from 'expo-haptics'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import {
   useTaskDetail,
@@ -21,6 +22,7 @@ import {
   useToggleTask,
   useAddComment,
 } from '../../hooks/useTasks'
+import { useRecentlyViewed } from '../../hooks/useRecentlyViewed'
 import { colors } from '../../theme/colors'
 import { spacing } from '../../theme/spacing'
 import { getStatusLabel, getStatusColor, getPriorityColor } from '../../utils/status'
@@ -44,6 +46,13 @@ const PRIORITY_OPTIONS = [
 export function TaskDetailScreen({ route, navigation }: Props) {
   const { id } = route.params
   const { data: task, isLoading, refetch } = useTaskDetail(id)
+  const { addItem } = useRecentlyViewed()
+
+  useEffect(() => {
+    if (task) {
+      addItem({ id: task.id, type: 'task', name: task.title, subtitle: task.project?.name ?? 'Quick task' })
+    }
+  }, [task?.id])
 
   const updateTask = useUpdateTask()
   const deleteTask = useDeleteTask()
@@ -119,15 +128,18 @@ export function TaskDetailScreen({ route, navigation }: Props) {
     setIsEditing(false)
   }
 
-  function handleToggle() {
+  async function handleToggle() {
+    await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
     toggleTask.mutate(id)
   }
 
-  function handleStatusChange(status: string) {
+  async function handleStatusChange(status: string) {
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
     updateTask.mutate({ id, data: { status } })
   }
 
-  function handlePriorityChange(priority: string) {
+  async function handlePriorityChange(priority: string) {
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
     updateTask.mutate({ id, data: { priority } })
   }
 
@@ -436,8 +448,8 @@ const styles = StyleSheet.create({
   empty: { color: colors.textSecondary, textAlign: 'center', marginTop: 60, fontSize: 15 },
 
   // Header actions
-  headerActions: { flexDirection: 'row', gap: spacing.md },
-  headerBtn: { paddingHorizontal: spacing.xs },
+  headerActions: { flexDirection: 'row', gap: spacing.sm },
+  headerBtn: { paddingHorizontal: 2 },
   headerBtnSave: { fontSize: 16, color: colors.primary, fontWeight: '600' },
   headerBtnCancel: { fontSize: 16, color: colors.textSecondary },
 

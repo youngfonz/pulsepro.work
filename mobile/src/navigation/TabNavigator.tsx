@@ -1,7 +1,8 @@
 import React from 'react'
+import { TouchableOpacity } from 'react-native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import { LayoutDashboard, FolderKanban, CheckSquare, Calendar, MoreHorizontal } from 'lucide-react-native'
+import { LayoutDashboard, FolderKanban, CheckSquare, Calendar, MoreHorizontal, ChevronLeft, X } from 'lucide-react-native'
 import { colors } from '../theme/colors'
 
 import { DashboardScreen } from '../screens/dashboard/DashboardScreen'
@@ -41,15 +42,44 @@ const screenOptions = {
   headerStyle: { backgroundColor: colors.surface },
   headerTintColor: colors.textPrimary,
   headerShadowVisible: false,
+  animation: 'slide_from_right' as const,
+}
+
+const modalOptions = {
+  presentation: 'modal' as const,
+  animation: 'slide_from_bottom' as const,
+  headerStyle: { backgroundColor: colors.surface },
+  headerTintColor: colors.textPrimary,
+  headerShadowVisible: false,
+}
+
+const backButton = (navigation: any) => ({
+  headerLeft: () => (
+    <TouchableOpacity onPress={() => navigation.goBack()} hitSlop={12} style={{ marginRight: 8 }}>
+      <ChevronLeft size={24} color={colors.primary} />
+    </TouchableOpacity>
+  ),
+})
+
+const closeButton = (navigation: any) => ({
+  headerLeft: () => (
+    <TouchableOpacity onPress={() => navigation.goBack()} hitSlop={12} style={{ marginRight: 8 }}>
+      <X size={22} color={colors.textSecondary} />
+    </TouchableOpacity>
+  ),
+})
+
+const detailOptions = {
+  animation: 'fade_from_bottom' as const,
 }
 
 function DashboardStackScreen() {
   return (
     <DashboardStack.Navigator screenOptions={screenOptions}>
-      <DashboardStack.Screen name="Dashboard" component={DashboardScreen} />
-      <DashboardStack.Screen name="CreateTask" component={CreateTaskScreen} options={{ title: 'New Task' }} />
-      <DashboardStack.Screen name="CreateProject" component={CreateProjectScreen} options={{ title: 'New Project' }} />
-      <DashboardStack.Screen name="CreateClient" component={CreateClientScreen} options={{ title: 'New Client' }} />
+      <DashboardStack.Screen name="Dashboard" component={DashboardScreen} options={{ headerShown: false }} />
+      <DashboardStack.Screen name="CreateTask" component={CreateTaskScreen} options={({ navigation }) => ({ title: 'New Task', ...modalOptions, ...closeButton(navigation) })} />
+      <DashboardStack.Screen name="CreateProject" component={CreateProjectScreen} options={({ navigation }) => ({ title: 'New Project', ...modalOptions, ...closeButton(navigation) })} />
+      <DashboardStack.Screen name="CreateClient" component={CreateClientScreen} options={({ navigation }) => ({ title: 'New Client', ...modalOptions, ...closeButton(navigation) })} />
     </DashboardStack.Navigator>
   )
 }
@@ -58,8 +88,8 @@ function ProjectsStackScreen() {
   return (
     <ProjectsStack.Navigator screenOptions={screenOptions}>
       <ProjectsStack.Screen name="ProjectsList" component={ProjectsListScreen} options={{ title: 'Projects' }} />
-      <ProjectsStack.Screen name="ProjectDetail" component={ProjectDetailScreen} options={{ title: 'Project' }} />
-      <ProjectsStack.Screen name="CreateProject" component={CreateProjectScreen} options={{ title: 'New Project' }} />
+      <ProjectsStack.Screen name="ProjectDetail" component={ProjectDetailScreen} options={({ navigation }) => ({ title: 'Project', ...detailOptions, ...backButton(navigation) })} />
+      <ProjectsStack.Screen name="CreateProject" component={CreateProjectScreen} options={({ navigation }) => ({ title: 'New Project', ...modalOptions, ...closeButton(navigation) })} />
     </ProjectsStack.Navigator>
   )
 }
@@ -68,8 +98,8 @@ function TasksStackScreen() {
   return (
     <TasksStack.Navigator screenOptions={screenOptions}>
       <TasksStack.Screen name="TasksList" component={TasksListScreen} options={{ title: 'Tasks' }} />
-      <TasksStack.Screen name="TaskDetail" component={TaskDetailScreen} options={{ title: 'Task' }} />
-      <TasksStack.Screen name="CreateTask" component={CreateTaskScreen} options={{ title: 'New Task' }} />
+      <TasksStack.Screen name="TaskDetail" component={TaskDetailScreen} options={({ navigation }) => ({ title: 'Task', ...detailOptions, ...backButton(navigation) })} />
+      <TasksStack.Screen name="CreateTask" component={CreateTaskScreen} options={({ navigation }) => ({ title: 'New Task', ...modalOptions, ...closeButton(navigation) })} />
     </TasksStack.Navigator>
   )
 }
@@ -86,13 +116,13 @@ function MoreStackScreen() {
   return (
     <MoreStack.Navigator screenOptions={screenOptions}>
       <MoreStack.Screen name="More" component={MoreScreen} />
-      <MoreStack.Screen name="ClientsList" component={ClientsListScreen} options={{ title: 'Clients' }} />
-      <MoreStack.Screen name="ClientDetail" component={ClientDetailScreen} options={{ title: 'Client' }} />
-      <MoreStack.Screen name="CreateClient" component={CreateClientScreen} options={{ title: 'New Client' }} />
-      <MoreStack.Screen name="InvoicesList" component={InvoicesListScreen} options={{ title: 'Invoices' }} />
-      <MoreStack.Screen name="InvoiceDetail" component={InvoiceDetailScreen} options={{ title: 'Invoice' }} />
-      <MoreStack.Screen name="Bookmarks" component={BookmarksScreen} />
-      <MoreStack.Screen name="Settings" component={SettingsScreen} />
+      <MoreStack.Screen name="ClientsList" component={ClientsListScreen} options={({ navigation }) => ({ title: 'Clients', ...backButton(navigation) })} />
+      <MoreStack.Screen name="ClientDetail" component={ClientDetailScreen} options={({ navigation }) => ({ title: 'Client', ...detailOptions, ...backButton(navigation) })} />
+      <MoreStack.Screen name="CreateClient" component={CreateClientScreen} options={({ navigation }) => ({ title: 'New Client', ...modalOptions, ...closeButton(navigation) })} />
+      <MoreStack.Screen name="InvoicesList" component={InvoicesListScreen} options={({ navigation }) => ({ title: 'Invoices', ...backButton(navigation) })} />
+      <MoreStack.Screen name="InvoiceDetail" component={InvoiceDetailScreen} options={({ navigation }) => ({ title: 'Invoice', ...detailOptions, ...backButton(navigation) })} />
+      <MoreStack.Screen name="Bookmarks" component={BookmarksScreen} options={({ navigation }) => ({ ...backButton(navigation) })} />
+      <MoreStack.Screen name="Settings" component={SettingsScreen} options={({ navigation }) => ({ ...backButton(navigation) })} />
     </MoreStack.Navigator>
   )
 }
@@ -102,12 +132,12 @@ export function TabNavigator() {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
+        animation: 'fade',
         tabBarStyle: {
           backgroundColor: colors.surface,
           borderTopColor: colors.border,
           borderTopWidth: 0.5,
-          paddingLeft: 10,
-          paddingRight: 4,
+          paddingHorizontal: 12,
         },
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textSecondary,

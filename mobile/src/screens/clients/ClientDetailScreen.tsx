@@ -1,8 +1,10 @@
-import React from 'react'
-import { Text, ScrollView, RefreshControl, StyleSheet, View } from 'react-native'
+import React, { useEffect } from 'react'
+import { Text, ScrollView, RefreshControl, StyleSheet, View, TouchableOpacity } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { useNavigation, CommonActions } from '@react-navigation/native'
 import { useClientDetail } from '../../hooks/useClients'
+import { useRecentlyViewed } from '../../hooks/useRecentlyViewed'
 import { colors } from '../../theme/colors'
 import { spacing } from '../../theme/spacing'
 import type { MoreStackParamList } from '../../types/navigation'
@@ -11,7 +13,15 @@ type Props = NativeStackScreenProps<MoreStackParamList, 'ClientDetail'>
 
 export function ClientDetailScreen({ route }: Props) {
   const { id } = route.params
+  const navigation = useNavigation()
   const { data: client, isLoading, refetch } = useClientDetail(id)
+  const { addItem } = useRecentlyViewed()
+
+  useEffect(() => {
+    if (client) {
+      addItem({ id: client.id, type: 'client', name: client.name, subtitle: client.company })
+    }
+  }, [client?.id])
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
@@ -30,9 +40,14 @@ export function ClientDetailScreen({ route }: Props) {
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Projects ({client.projects.length})</Text>
                 {client.projects.map(p => (
-                  <View key={p.id} style={styles.projectRow}>
+                  <TouchableOpacity
+                    key={p.id}
+                    style={styles.projectRow}
+                    onPress={() => navigation.dispatch(CommonActions.navigate({ name: 'ProjectsTab', params: { screen: 'ProjectDetail', params: { id: p.id } } }))}
+                    activeOpacity={0.7}
+                  >
                     <Text style={styles.projectName}>{p.name}</Text>
-                  </View>
+                  </TouchableOpacity>
                 ))}
               </View>
             )}
