@@ -1,5 +1,5 @@
 import React from 'react'
-import { Text, ScrollView, StyleSheet, View, TouchableOpacity } from 'react-native'
+import { Text, ScrollView, StyleSheet, View, TouchableOpacity, ActivityIndicator } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useAuth, useUser } from '@clerk/expo'
 import { useSubscription } from '../../hooks/useSubscription'
@@ -9,7 +9,7 @@ import { spacing } from '../../theme/spacing'
 export function SettingsScreen() {
   const { signOut } = useAuth()
   const { user } = useUser()
-  const { data: sub } = useSubscription()
+  const { data: sub, isLoading } = useSubscription()
 
   const plan = sub?.plan ?? 'free'
   const status = sub?.status ?? 'active'
@@ -37,31 +37,37 @@ export function SettingsScreen() {
         </View>
 
         {/* Plan */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Plan</Text>
-          <View style={styles.infoCard}>
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Current plan</Text>
-              <View style={[styles.planBadge, plan === 'pro' && styles.planPro]}>
-                <Text style={[styles.planText, plan === 'pro' && styles.planProText]}>{planLabel}</Text>
+        {sub ? (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Plan</Text>
+            <View style={styles.infoCard}>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Current plan</Text>
+                <View style={[styles.planBadge, plan === 'pro' && styles.planPro]}>
+                  <Text style={[styles.planText, plan === 'pro' && styles.planProText]}>{planLabel}</Text>
+                </View>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Status</Text>
+                <Text style={styles.infoValue}>{status === 'active' ? 'Active' : status}</Text>
               </View>
             </View>
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Status</Text>
-              <Text style={styles.infoValue}>{status === 'active' ? 'Active' : status}</Text>
-            </View>
           </View>
-        </View>
+        ) : isLoading ? (
+          <ActivityIndicator size="small" color={colors.primary} style={{ marginVertical: spacing.xl }} />
+        ) : null}
 
         {/* Usage */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Usage</Text>
-          <View style={styles.infoCard}>
-            <UsageRow label="Projects" current={sub?.usage.projects.current ?? 0} limit={sub?.usage.projects.limit ?? 0} />
-            <UsageRow label="Tasks" current={sub?.usage.tasks.current ?? 0} limit={sub?.usage.tasks.limit ?? 0} />
-            <UsageRow label="Clients" current={sub?.usage.clients.current ?? 0} limit={sub?.usage.clients.limit ?? 0} />
+        {sub && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Usage</Text>
+            <View style={styles.infoCard}>
+              <UsageRow label="Projects" current={sub.usage.projects.current} limit={sub.usage.projects.limit} />
+              <UsageRow label="Tasks" current={sub.usage.tasks.current} limit={sub.usage.tasks.limit} />
+              <UsageRow label="Clients" current={sub.usage.clients.current} limit={sub.usage.clients.limit} />
+            </View>
           </View>
-        </View>
+        )}
 
         {/* App Info */}
         <View style={styles.section}>

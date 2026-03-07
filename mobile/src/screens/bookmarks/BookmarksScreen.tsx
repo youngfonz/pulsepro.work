@@ -45,6 +45,14 @@ export function BookmarksScreen() {
     </TouchableOpacity>
   )
 
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.container} edges={['bottom']}>
+        <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 60 }} />
+      </SafeAreaView>
+    )
+  }
+
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <FlatList
@@ -53,11 +61,7 @@ export function BookmarksScreen() {
         renderItem={renderItem}
         contentContainerStyle={styles.list}
         refreshControl={<RefreshControl refreshing={isFetching && !!data} onRefresh={refetch} tintColor={colors.primary} />}
-        ListEmptyComponent={
-          isLoading
-            ? <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 60 }} />
-            : <Text style={styles.empty}>No bookmarks yet</Text>
-        }
+        ListEmptyComponent={<Text style={styles.empty}>No bookmarks yet</Text>}
       />
     </SafeAreaView>
   )
