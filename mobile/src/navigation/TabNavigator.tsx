@@ -9,6 +9,7 @@ import { ProjectsListScreen } from '../screens/projects/ProjectsListScreen'
 import { ProjectDetailScreen } from '../screens/projects/ProjectDetailScreen'
 import { TasksListScreen } from '../screens/tasks/TasksListScreen'
 import { TaskDetailScreen } from '../screens/tasks/TaskDetailScreen'
+import { CreateTaskScreen } from '../screens/tasks/CreateTaskScreen'
 import { CalendarScreen } from '../screens/calendar/CalendarScreen'
 import { MoreScreen } from '../screens/more/MoreScreen'
 import { ClientsListScreen } from '../screens/clients/ClientsListScreen'
@@ -62,6 +63,7 @@ function TasksStackScreen() {
     <TasksStack.Navigator screenOptions={screenOptions}>
       <TasksStack.Screen name="TasksList" component={TasksListScreen} options={{ title: 'Tasks' }} />
       <TasksStack.Screen name="TaskDetail" component={TaskDetailScreen} options={{ title: 'Task' }} />
+      <TasksStack.Screen name="CreateTask" component={CreateTaskScreen} options={{ title: 'New Task' }} />
     </TasksStack.Navigator>
   )
 }

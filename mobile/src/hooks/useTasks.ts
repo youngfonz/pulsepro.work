@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '@clerk/expo'
-import { fetchTasks, fetchTask, createTask, updateTask, deleteTask, toggleTask } from '../api/tasks'
+import { fetchTasks, fetchTask, createTask, updateTask, deleteTask, toggleTask, addComment } from '../api/tasks'
 import { Task } from '../types/api'
 
 export function useTasks(filters?: Record<string, string>) {
@@ -67,6 +67,18 @@ export function useToggleTask() {
       qc.invalidateQueries({ queryKey: ['tasks'] })
       qc.invalidateQueries({ queryKey: ['dashboard'] })
       qc.invalidateQueries({ queryKey: ['projects'] })
+    },
+  })
+}
+
+export function useAddComment() {
+  const { getToken } = useAuth()
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ taskId, content }: { taskId: string; content: string }) =>
+      addComment(getToken, taskId, content),
+    onSuccess: (_, { taskId }) => {
+      qc.invalidateQueries({ queryKey: ['task', taskId] })
     },
   })
 }

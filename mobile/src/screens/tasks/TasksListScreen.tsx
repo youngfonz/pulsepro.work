@@ -1,8 +1,8 @@
-import React from 'react'
+import React, { useLayoutEffect } from 'react'
 import { View, Text, FlatList, TouchableOpacity, RefreshControl, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { CheckSquare, Square } from 'lucide-react-native'
+import { CheckSquare, Square, Plus } from 'lucide-react-native'
 import * as Haptics from 'expo-haptics'
 import { useTasks, useToggleTask } from '../../hooks/useTasks'
 import { colors } from '../../theme/colors'
@@ -17,6 +17,20 @@ type Props = { navigation: NativeStackNavigationProp<TasksStackParamList, 'Tasks
 export function TasksListScreen({ navigation }: Props) {
   const { data, isLoading, isFetching, refetch } = useTasks()
   const toggleMutation = useToggleTask()
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          onPress={() => navigation.navigate('CreateTask')}
+          hitSlop={8}
+          style={{ marginRight: spacing.xs }}
+        >
+          <Plus size={24} color={colors.primary} />
+        </TouchableOpacity>
+      ),
+    })
+  }, [navigation])
 
   const handleToggle = async (id: string) => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
@@ -62,6 +76,13 @@ export function TasksListScreen({ navigation }: Props) {
         refreshControl={<RefreshControl refreshing={isFetching && !!data} onRefresh={refetch} tintColor={colors.primary} />}
         ListEmptyComponent={!isLoading ? <Text style={styles.empty}>No tasks yet</Text> : null}
       />
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={() => navigation.navigate('CreateTask')}
+        activeOpacity={0.85}
+      >
+        <Plus size={24} color={colors.surface} />
+      </TouchableOpacity>
     </SafeAreaView>
   )
 }
@@ -83,4 +104,20 @@ const styles = StyleSheet.create({
   overdue: { color: colors.destructive },
   priorityDot: { width: 8, height: 8, borderRadius: 4 },
   empty: { color: colors.textSecondary, textAlign: 'center', marginTop: 60, fontSize: 15 },
+  fab: {
+    position: 'absolute',
+    bottom: spacing.xl,
+    right: spacing.xl,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.18,
+    shadowRadius: 6,
+    elevation: 4,
+  },
 })

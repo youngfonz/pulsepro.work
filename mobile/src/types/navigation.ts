@@ -28,6 +28,7 @@ export type ProjectsStackParamList = {
 export type TasksStackParamList = {
   TasksList: undefined
   TaskDetail: { id: string }
+  CreateTask: undefined
 }
 
 export type CalendarStackParamList = {
