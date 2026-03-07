@@ -18,6 +18,7 @@ export type TabParamList = {
 
 export type DashboardStackParamList = {
   Dashboard: undefined
+  CreateTask: undefined
 }
 
 export type ProjectsStackParamList = {

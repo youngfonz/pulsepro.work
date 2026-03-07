@@ -45,6 +45,7 @@ function DashboardStackScreen() {
   return (
     <DashboardStack.Navigator screenOptions={screenOptions}>
       <DashboardStack.Screen name="Dashboard" component={DashboardScreen} />
+      <DashboardStack.Screen name="CreateTask" component={CreateTaskScreen} options={{ title: 'New Task' }} />
     </DashboardStack.Navigator>
   )
 }

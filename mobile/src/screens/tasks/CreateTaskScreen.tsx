@@ -13,17 +13,14 @@ import {
   Platform,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { useNavigation } from '@react-navigation/native'
 import { X, ChevronDown, Check } from 'lucide-react-native'
 import * as Haptics from 'expo-haptics'
 import { useCreateTask } from '../../hooks/useTasks'
 import { useProjects } from '../../hooks/useProjects'
 import { colors } from '../../theme/colors'
 import { spacing } from '../../theme/spacing'
-import type { TasksStackParamList } from '../../types/navigation'
 import type { Project } from '../../types/api'
-
-type Props = { navigation: NativeStackNavigationProp<TasksStackParamList, 'CreateTask'> }
 
 type Priority = 'low' | 'medium' | 'high'
 
@@ -38,7 +35,8 @@ function isValidISODate(value: string): boolean {
   return /^\d{4}-\d{2}-\d{2}$/.test(value)
 }
 
-export function CreateTaskScreen({ navigation }: Props) {
+export function CreateTaskScreen() {
+  const navigation = useNavigation()
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [priority, setPriority] = useState<Priority>('medium')
