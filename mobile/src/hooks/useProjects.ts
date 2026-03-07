@@ -2,26 +2,21 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '@clerk/expo'
 import { fetchProjects, fetchProject, createProject, updateProject, deleteProject } from '../api/projects'
 import { Project } from '../types/api'
-import { mockProjects } from '../data/mock'
 
 export function useProjects(filters?: Record<string, string>) {
   const { getToken } = useAuth()
   return useQuery({
     queryKey: ['projects', filters],
     queryFn: () => fetchProjects(getToken, filters),
-    initialData: { projects: mockProjects },
-    initialDataUpdatedAt: 0,
   })
 }
 
 export function useProjectDetail(id: string) {
   const { getToken } = useAuth()
-  const mock = mockProjects.find(p => p.id === id)
   return useQuery({
     queryKey: ['project', id],
     queryFn: () => fetchProject(getToken, id),
     enabled: !!id,
-    ...(mock ? { initialData: mock, initialDataUpdatedAt: 0 } : {}),
   })
 }
 

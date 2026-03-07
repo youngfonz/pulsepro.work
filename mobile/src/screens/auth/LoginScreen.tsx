@@ -4,6 +4,7 @@ import { useSignIn } from '@clerk/expo/legacy'
 import { useOAuth } from '@clerk/expo'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import * as WebBrowser from 'expo-web-browser'
+import * as Linking from 'expo-linking'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { colors } from '../../theme/colors'
 import { spacing } from '../../theme/spacing'
@@ -28,7 +29,8 @@ export function LoginScreen({ navigation }: Props) {
     setError('')
     setGoogleLoading(true)
     try {
-      const { createdSessionId, setActive: setActiveSession } = await startOAuthFlow()
+      const redirectUrl = Linking.createURL('oauth-native-callback')
+      const { createdSessionId, setActive: setActiveSession } = await startOAuthFlow({ redirectUrl })
       if (createdSessionId && setActiveSession) {
         await setActiveSession({ session: createdSessionId })
       }

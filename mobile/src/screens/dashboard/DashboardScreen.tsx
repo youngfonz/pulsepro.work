@@ -1,7 +1,8 @@
 import React from 'react'
-import { View, Text, ScrollView, RefreshControl, ActivityIndicator, StyleSheet } from 'react-native'
+import { View, Text, ScrollView, RefreshControl, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Svg, { Circle, Defs, LinearGradient, Stop } from 'react-native-svg'
+import { useAuth } from '@clerk/expo'
 import { useDashboard } from '../../hooks/useDashboard'
 import { colors } from '../../theme/colors'
 import { spacing } from '../../theme/spacing'
@@ -14,6 +15,7 @@ const RING = {
 }
 
 export function DashboardScreen() {
+  const { signOut } = useAuth()
   const { data, isLoading, isFetching, error, refetch } = useDashboard()
   const stats = data?.stats
   const completed = stats ? stats.totalTasks - stats.pendingTasks : 0
@@ -35,11 +37,16 @@ export function DashboardScreen() {
           </View>
         )}
 
-        {error && !data && (
+        {error && (
           <View style={styles.centered}>
             <Text style={styles.errorTitle}>Couldn't load dashboard</Text>
             <Text style={styles.errorMessage}>{error.message}</Text>
             <Text style={styles.errorHint}>Pull down to retry</Text>
+            {error.message === 'Not authenticated' && (
+              <TouchableOpacity style={styles.signOutBtn} onPress={() => signOut()}>
+                <Text style={styles.signOutText}>Sign Out & Re-Login</Text>
+              </TouchableOpacity>
+            )}
           </View>
         )}
 
@@ -199,4 +206,9 @@ const styles = StyleSheet.create({
   errorTitle: { color: colors.textPrimary, fontSize: 17, fontWeight: '600', marginBottom: spacing.sm },
   errorMessage: { color: colors.textSecondary, fontSize: 13, textAlign: 'center', marginBottom: spacing.md },
   errorHint: { color: colors.primary, fontSize: 13 },
+  signOutBtn: {
+    marginTop: spacing.lg, backgroundColor: colors.destructive, borderRadius: 8,
+    paddingHorizontal: spacing.xl, paddingVertical: spacing.md,
+  },
+  signOutText: { color: '#fff', fontSize: 15, fontWeight: '600' },
 })

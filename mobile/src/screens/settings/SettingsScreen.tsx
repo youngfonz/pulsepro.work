@@ -2,16 +2,18 @@ import React from 'react'
 import { Text, ScrollView, StyleSheet, View, TouchableOpacity } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useAuth, useUser } from '@clerk/expo'
+import { useSubscription } from '../../hooks/useSubscription'
 import { colors } from '../../theme/colors'
 import { spacing } from '../../theme/spacing'
-import { mockMe } from '../../data/mock'
 
 export function SettingsScreen() {
   const { signOut } = useAuth()
   const { user } = useUser()
-  const me = mockMe
+  const { data: sub } = useSubscription()
 
-  const planLabel = me.plan === 'pro' ? 'Pro' : me.plan === 'team' ? 'Team' : 'Free'
+  const plan = sub?.plan ?? 'free'
+  const status = sub?.status ?? 'active'
+  const planLabel = plan === 'pro' ? 'Pro' : plan === 'team' ? 'Team' : 'Free'
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
@@ -40,13 +42,13 @@ export function SettingsScreen() {
           <View style={styles.infoCard}>
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Current plan</Text>
-              <View style={[styles.planBadge, me.plan === 'pro' && styles.planPro]}>
-                <Text style={[styles.planText, me.plan === 'pro' && styles.planProText]}>{planLabel}</Text>
+              <View style={[styles.planBadge, plan === 'pro' && styles.planPro]}>
+                <Text style={[styles.planText, plan === 'pro' && styles.planProText]}>{planLabel}</Text>
               </View>
             </View>
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Status</Text>
-              <Text style={styles.infoValue}>{me.status === 'active' ? 'Active' : me.status}</Text>
+              <Text style={styles.infoValue}>{status === 'active' ? 'Active' : status}</Text>
             </View>
           </View>
         </View>
@@ -55,9 +57,9 @@ export function SettingsScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Usage</Text>
           <View style={styles.infoCard}>
-            <UsageRow label="Projects" current={me.usage.projects.current} limit={me.usage.projects.limit} />
-            <UsageRow label="Tasks" current={me.usage.tasks.current} limit={me.usage.tasks.limit} />
-            <UsageRow label="Clients" current={me.usage.clients.current} limit={me.usage.clients.limit} />
+            <UsageRow label="Projects" current={sub?.usage.projects.current ?? 0} limit={sub?.usage.projects.limit ?? 0} />
+            <UsageRow label="Tasks" current={sub?.usage.tasks.current ?? 0} limit={sub?.usage.tasks.limit ?? 0} />
+            <UsageRow label="Clients" current={sub?.usage.clients.current ?? 0} limit={sub?.usage.clients.limit ?? 0} />
           </View>
         </View>
 
@@ -81,8 +83,8 @@ export function SettingsScreen() {
   )
 }
 
-function UsageRow({ label, current, limit }: { label: string; current: number; limit: number }) {
-  const isUnlimited = limit === -1
+function UsageRow({ label, current, limit }: { label: string; current: number; limit: number | null }) {
+  const isUnlimited = limit === null || limit === -1 || !isFinite(limit)
   return (
     <View style={styles.infoRow}>
       <Text style={styles.infoLabel}>{label}</Text>
