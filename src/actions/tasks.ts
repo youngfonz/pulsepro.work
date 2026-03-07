@@ -83,7 +83,15 @@ export async function createTask(projectId: string | null, formData: FormData) {
     }
 
     await prisma.task.create({ data })
-    if (projectId) revalidatePath(`/projects/${projectId}`)
+
+    // Reopen completed projects when a new task is added
+    if (projectId) {
+      await prisma.project.updateMany({
+        where: { id: projectId, status: 'completed' },
+        data: { status: 'in_progress' },
+      })
+      revalidatePath(`/projects/${projectId}`)
+    }
     revalidatePath('/tasks')
   } catch (error) {
     console.error('createTask:', error)

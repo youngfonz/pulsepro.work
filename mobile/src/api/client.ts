@@ -1,4 +1,4 @@
-const API_BASE = 'https://pulsepro.work/api/v1'
+const API_BASE = 'https://www.pulsepro.work/api/v1'
 
 export type GetToken = () => Promise<string | null>
 
@@ -8,7 +8,10 @@ export async function apiFetch<T>(
   options?: RequestInit
 ): Promise<T> {
   const token = await getToken()
-  if (!token) throw new Error('Not authenticated')
+  if (!token) {
+    console.log(`[API] No token — user not authenticated. Path: ${path}`)
+    throw new Error('Not authenticated')
+  }
 
   const url = `${API_BASE}${path}`
   console.log(`[API] ${options?.method ?? 'GET'} ${url}`)

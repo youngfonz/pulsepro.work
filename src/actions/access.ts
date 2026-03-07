@@ -53,6 +53,68 @@ export async function grantProjectAccess(
   revalidatePath(`/projects/${projectId}`)
 }
 
+export async function grantProjectAccessByEmail(
+  projectId: string,
+  email: string,
+  role: 'viewer' | 'editor' | 'manager'
+) {
+  const userId = await requireUserId()
+  await requireProjectAccess(projectId, role === 'manager' ? 'owner' : 'manager')
+
+  const emailTrimmed = email.trim().toLowerCase()
+  if (!emailTrimmed || !emailTrimmed.includes('@')) throw new Error('Invalid email address')
+
+  const project = await prisma.project.findUnique({
+    where: { id: projectId },
+    select: { id: true, userId: true },
+  })
+  if (!project) throw new Error('Project not found')
+
+  // Look up Clerk user by email
+  const clerk = await clerkClient()
+  const users = await clerk.users.getUserList({
+    emailAddress: [emailTrimmed],
+    limit: 1,
+  })
+
+  if (users.data.length === 0) {
+    throw new Error(`No Pulse Pro account found for ${emailTrimmed}. They need to sign up first at pulsepro.org.`)
+  }
+
+  const targetUser = users.data[0]
+  if (targetUser.id === userId) throw new Error('Cannot add yourself as a team member')
+  if (targetUser.id === project.userId) throw new Error('That user is already the project owner')
+
+  // Check collaborator limit
+  const existing = await prisma.projectAccess.findUnique({
+    where: { projectId_userId: { projectId, userId: targetUser.id } },
+  })
+  if (!existing) {
+    const collabLimit = await checkCollaboratorLimit(projectId)
+    if (!collabLimit.allowed) {
+      if (collabLimit.limit === 0) {
+        throw new Error('Upgrade to Pro to share projects with collaborators.')
+      }
+      throw new Error(
+        collabLimit.plan === 'team'
+          ? `You've reached the maximum of ${collabLimit.limit} collaborators per project.`
+          : `Your ${collabLimit.plan} plan allows ${collabLimit.limit} collaborators per project. Upgrade to Team for up to 10.`
+      )
+    }
+  }
+
+  await prisma.projectAccess.upsert({
+    where: { projectId_userId: { projectId, userId: targetUser.id } },
+    create: { projectId, userId: targetUser.id, role, grantedBy: userId },
+    update: { role },
+  })
+
+  revalidatePath(`/projects/${projectId}`)
+
+  const name = [targetUser.firstName, targetUser.lastName].filter(Boolean).join(' ') || emailTrimmed
+  return { name, email: emailTrimmed }
+}
+
 export async function revokeProjectAccess(
   projectId: string,
   targetUserId: string

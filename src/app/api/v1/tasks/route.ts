@@ -109,6 +109,14 @@ export async function POST(request: NextRequest) {
       },
     })
 
+    // Reopen completed projects when a new task is added
+    if (projectId) {
+      await prisma.project.updateMany({
+        where: { id: projectId, status: 'completed' },
+        data: { status: 'in_progress' },
+      })
+    }
+
     // Build human-readable confirmation
     const parts = [task.title]
     if (projectName) parts.push(`in ${projectName}`)

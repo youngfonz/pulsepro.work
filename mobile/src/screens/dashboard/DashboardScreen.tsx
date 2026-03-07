@@ -1,8 +1,11 @@
 import React from 'react'
-import { View, Text, ScrollView, RefreshControl, ActivityIndicator, StyleSheet } from 'react-native'
+import { View, Text, ScrollView, RefreshControl, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Svg, { Circle, Defs, LinearGradient, Stop } from 'react-native-svg'
+import { useAuth } from '@clerk/expo'
 import { useDashboard } from '../../hooks/useDashboard'
+import { useInsights } from '../../hooks/useInsights'
+import type { Insight } from '../../api/insights'
 import { colors } from '../../theme/colors'
 import { spacing } from '../../theme/spacing'
 import { getHealthColor } from '../../utils/status'
@@ -13,8 +16,26 @@ const RING = {
   due:      { a: '#4ade80', b: '#22c55e', bg: 'rgba(34,197,94,0.12)' },
 }
 
+const insightDotColor: Record<string, string> = {
+  red: '#f43f5e',
+  amber: '#f59e0b',
+  blue: '#3b82f6',
+  green: '#22c55e',
+}
+
+function useGreeting() {
+  const now = new Date()
+  const hour = now.getHours()
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
+  const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
+  return { greeting, dateStr }
+}
+
 export function DashboardScreen() {
+  const { signOut } = useAuth()
   const { data, isLoading, isFetching, error, refetch } = useDashboard()
+  const { data: insightsData } = useInsights()
+  const { greeting, dateStr } = useGreeting()
   const stats = data?.stats
   const completed = stats ? stats.totalTasks - stats.pendingTasks : 0
 
@@ -28,6 +49,12 @@ export function DashboardScreen() {
         contentContainerStyle={[styles.content, (!data && !isLoading) && styles.contentCenter]}
         refreshControl={<RefreshControl refreshing={isFetching && !!data} onRefresh={refetch} tintColor={colors.primary} />}
       >
+        {/* Greeting */}
+        <View style={styles.greetingSection}>
+          <Text style={styles.greetingText}>{greeting}</Text>
+          <Text style={styles.greetingDate}>{dateStr}</Text>
+        </View>
+
         {isLoading && !data && (
           <View style={styles.centered}>
             <ActivityIndicator size="large" color={colors.primary} />
@@ -35,11 +62,29 @@ export function DashboardScreen() {
           </View>
         )}
 
-        {error && !data && (
+        {error && (
           <View style={styles.centered}>
             <Text style={styles.errorTitle}>Couldn't load dashboard</Text>
             <Text style={styles.errorMessage}>{error.message}</Text>
             <Text style={styles.errorHint}>Pull down to retry</Text>
+            {error.message === 'Not authenticated' && (
+              <TouchableOpacity style={styles.signOutBtn} onPress={() => signOut()}>
+                <Text style={styles.signOutText}>Sign Out & Re-Login</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
+
+        {/* Insights */}
+        {insightsData?.insights && insightsData.insights.length > 0 && (
+          <View style={styles.insightsCard}>
+            <Text style={styles.insightsTitle}>Insights</Text>
+            {insightsData.insights.map((insight: Insight) => (
+              <View key={insight.id} style={styles.insightRow}>
+                <View style={[styles.insightDot, { backgroundColor: insightDotColor[insight.color] ?? insightDotColor.blue }]} />
+                <Text style={styles.insightMessage}>{insight.message}</Text>
+              </View>
+            ))}
           </View>
         )}
 
@@ -48,7 +93,7 @@ export function DashboardScreen() {
           <View style={styles.ringsCard}>
             <View style={styles.ringsRow}>
               <View style={styles.ringsWrap}>
-                <Svg width={150} height={150} viewBox="0 0 100 100">
+                <Svg width={180} height={180} viewBox="0 0 100 100">
                   <Defs>
                     <LinearGradient id="pg" x1="0%" y1="0%" x2="100%" y2="0%">
                       <Stop offset="0%" stopColor={RING.projects.a} />
@@ -153,15 +198,26 @@ function LegendRow({ color, label, value }: { color: string; label: string; valu
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   content: { padding: spacing.lg },
+  greetingSection: { marginBottom: spacing.xl },
+  greetingText: { fontSize: 28, fontWeight: '700', color: colors.textPrimary },
+  greetingDate: { fontSize: 15, color: colors.textSecondary, marginTop: 2 },
+  insightsCard: {
+    backgroundColor: colors.surface, borderRadius: 12, borderWidth: 1, borderColor: colors.border,
+    padding: spacing.lg, marginBottom: spacing.xl,
+  },
+  insightsTitle: { fontSize: 13, fontWeight: '600', color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: spacing.md },
+  insightRow: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm, marginBottom: spacing.sm },
+  insightDot: { width: 8, height: 8, borderRadius: 4, marginTop: 5 },
+  insightMessage: { flex: 1, fontSize: 14, color: colors.textPrimary, lineHeight: 20 },
   ringsCard: {
     backgroundColor: colors.surface, borderRadius: 16, padding: spacing.xl,
     borderWidth: 1, borderColor: colors.border, marginBottom: spacing.xl,
   },
   ringsRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.lg },
-  ringsWrap: { position: 'relative', width: 150, height: 150 },
+  ringsWrap: { position: 'relative', width: 180, height: 180 },
   ringCenter: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, justifyContent: 'center', alignItems: 'center' },
   ringCenterNum: { fontSize: 26, fontWeight: '700', color: colors.textPrimary },
-  ringCenterSub: { fontSize: 11, color: colors.textSecondary, marginTop: -2 },
+  ringCenterSub: { fontSize: 12, color: colors.textSecondary, marginTop: -1 },
   legendCol: { flex: 1, gap: spacing.lg },
   legendRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   legendDot: { width: 10, height: 10, borderRadius: 5 },
@@ -199,4 +255,9 @@ const styles = StyleSheet.create({
   errorTitle: { color: colors.textPrimary, fontSize: 17, fontWeight: '600', marginBottom: spacing.sm },
   errorMessage: { color: colors.textSecondary, fontSize: 13, textAlign: 'center', marginBottom: spacing.md },
   errorHint: { color: colors.primary, fontSize: 13 },
+  signOutBtn: {
+    marginTop: spacing.lg, backgroundColor: colors.destructive, borderRadius: 8,
+    paddingHorizontal: spacing.xl, paddingVertical: spacing.md,
+  },
+  signOutText: { color: '#fff', fontSize: 15, fontWeight: '600' },
 })

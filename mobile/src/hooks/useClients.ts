@@ -2,26 +2,21 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '@clerk/expo'
 import { fetchClients, fetchClient, createClient, updateClient, deleteClient } from '../api/clients'
 import { Client } from '../types/api'
-import { mockClients } from '../data/mock'
 
 export function useClients(filters?: Record<string, string>) {
   const { getToken } = useAuth()
   return useQuery({
     queryKey: ['clients', filters],
     queryFn: () => fetchClients(getToken, filters),
-    initialData: { clients: mockClients },
-    initialDataUpdatedAt: 0,
   })
 }
 
 export function useClientDetail(id: string) {
   const { getToken } = useAuth()
-  const mock = mockClients.find(c => c.id === id)
   return useQuery({
     queryKey: ['client', id],
     queryFn: () => fetchClient(getToken, id),
     enabled: !!id,
-    ...(mock ? { initialData: mock, initialDataUpdatedAt: 0 } : {}),
   })
 }
 

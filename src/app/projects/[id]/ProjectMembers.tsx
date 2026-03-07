@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { grantProjectAccess, revokeProjectAccess } from '@/actions/access'
+import { grantProjectAccess, grantProjectAccessByEmail, revokeProjectAccess } from '@/actions/access'
 import { Badge } from '@/components/ui/Badge'
 
 interface MemberUser {
@@ -43,8 +43,12 @@ export function ProjectMembers({
 }: ProjectMembersProps) {
   const [isPending, startTransition] = useTransition()
   const [showAddForm, setShowAddForm] = useState(false)
+  const [showEmailForm, setShowEmailForm] = useState(false)
   const [selectedUserId, setSelectedUserId] = useState('')
   const [selectedRole, setSelectedRole] = useState<'viewer' | 'editor' | 'manager'>('viewer')
+  const [inviteEmail, setInviteEmail] = useState('')
+  const [emailRole, setEmailRole] = useState<'viewer' | 'editor' | 'manager'>('editor')
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   // Filter out users who already have access
@@ -75,6 +79,25 @@ export function ProjectMembers({
         await revokeProjectAccess(projectId, targetUserId)
       } catch (err) {
         const msg = err instanceof Error ? err.message : 'Failed to remove team member.'
+        setError(msg)
+      }
+    })
+  }
+
+  const handleEmailInvite = () => {
+    if (!inviteEmail.trim()) return
+    setError(null)
+    setSuccessMessage(null)
+    startTransition(async () => {
+      try {
+        const result = await grantProjectAccessByEmail(projectId, inviteEmail, emailRole)
+        setShowEmailForm(false)
+        setInviteEmail('')
+        setEmailRole('editor')
+        setSuccessMessage(`${result.name} added as ${emailRole}`)
+        setTimeout(() => setSuccessMessage(null), 4000)
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'Failed to add team member.'
         setError(msg)
       }
     })
@@ -170,38 +193,38 @@ export function ProjectMembers({
         </div>
       )}
 
-      {/* Empty state */}
-      {members.length === 0 && (
-        <div className="py-4 text-center">
-          {hasOrg ? (
-            <p className="text-sm text-muted-foreground">No team members have access to this project yet.</p>
-          ) : (
-            <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">
-                Set up a Clerk organization to share projects with your team.
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Team sharing requires a Pro or Team plan and a Clerk organization.
-              </p>
-            </div>
-          )}
+      {/* Success message */}
+      {successMessage && (
+        <div className="flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/5 px-4 py-3">
+          <svg className="w-4 h-4 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p className="text-sm text-emerald-500">{successMessage}</p>
         </div>
       )}
 
-      {/* Add member */}
-      {isOwnerOrManager && hasOrg && (
-        <div>
-          {availableMembers.length > 0 ? (
+      {/* Empty state */}
+      {members.length === 0 && !isOwnerOrManager && (
+        <div className="py-4 text-center">
+          <p className="text-sm text-muted-foreground">No team members have access to this project yet.</p>
+        </div>
+      )}
+
+      {/* Add member by email — always available for owners/managers */}
+      {isOwnerOrManager && (
+        <div className="space-y-3">
+          {/* Org member picker (if org exists and has available members) */}
+          {hasOrg && availableMembers.length > 0 && (
             <>
               {!showAddForm ? (
                 <button
-                  onClick={() => { setShowAddForm(true); setError(null) }}
+                  onClick={() => { setShowAddForm(true); setShowEmailForm(false); setError(null) }}
                   className="inline-flex items-center gap-2 text-sm text-primary hover:text-primary/80"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                   </svg>
-                  Add team member
+                  Add from organization
                 </button>
               ) : (
                 <div className="space-y-3 rounded-lg border border-border p-4">
@@ -250,9 +273,64 @@ export function ProjectMembers({
                 </div>
               )}
             </>
-          ) : members.length > 0 ? (
-            <p className="text-xs text-muted-foreground">All organization members already have access to this project.</p>
-          ) : null}
+          )}
+
+          {/* Email invite — always available */}
+          {!showEmailForm ? (
+            <button
+              onClick={() => { setShowEmailForm(true); setShowAddForm(false); setError(null) }}
+              className="inline-flex items-center gap-2 text-sm text-primary hover:text-primary/80"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+              </svg>
+              Add team member by email
+            </button>
+          ) : (
+            <div className="space-y-3 rounded-lg border border-border p-4">
+              <div className="space-y-2">
+                <label className="text-xs font-medium text-muted-foreground">Email Address</label>
+                <input
+                  type="email"
+                  value={inviteEmail}
+                  onChange={(e) => setInviteEmail(e.target.value)}
+                  placeholder="teammate@example.com"
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground"
+                  onKeyDown={(e) => e.key === 'Enter' && handleEmailInvite()}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-medium text-muted-foreground">Role</label>
+                <select
+                  value={emailRole}
+                  onChange={(e) => setEmailRole(e.target.value as 'viewer' | 'editor' | 'manager')}
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                >
+                  <option value="viewer">Viewer — can view tasks and files, cannot edit</option>
+                  <option value="editor">Editor — can create, edit, and delete tasks</option>
+                  <option value="manager">Manager — full access plus manage team members</option>
+                </select>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleEmailInvite}
+                  disabled={!inviteEmail.trim() || isPending}
+                  className="inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground px-3 py-1.5 text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
+                >
+                  {isPending ? 'Adding...' : 'Add'}
+                </button>
+                <button
+                  onClick={() => { setShowEmailForm(false); setInviteEmail(''); setError(null) }}
+                  className="text-sm text-muted-foreground hover:text-foreground"
+                >
+                  Cancel
+                </button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                They must have a Pulse Pro account. If they don&apos;t, ask them to sign up at pulsepro.org first.
+              </p>
+            </div>
+          )}
         </div>
       )}
     </div>
