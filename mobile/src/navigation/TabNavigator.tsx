@@ -59,6 +59,7 @@ function ProjectsStackScreen() {
     <ProjectsStack.Navigator screenOptions={screenOptions}>
       <ProjectsStack.Screen name="ProjectsList" component={ProjectsListScreen} options={{ title: 'Projects' }} />
       <ProjectsStack.Screen name="ProjectDetail" component={ProjectDetailScreen} options={{ title: 'Project' }} />
+      <ProjectsStack.Screen name="CreateProject" component={CreateProjectScreen} options={{ title: 'New Project' }} />
     </ProjectsStack.Navigator>
   )
 }
@@ -87,6 +88,7 @@ function MoreStackScreen() {
       <MoreStack.Screen name="More" component={MoreScreen} />
       <MoreStack.Screen name="ClientsList" component={ClientsListScreen} options={{ title: 'Clients' }} />
       <MoreStack.Screen name="ClientDetail" component={ClientDetailScreen} options={{ title: 'Client' }} />
+      <MoreStack.Screen name="CreateClient" component={CreateClientScreen} options={{ title: 'New Client' }} />
       <MoreStack.Screen name="InvoicesList" component={InvoicesListScreen} options={{ title: 'Invoices' }} />
       <MoreStack.Screen name="InvoiceDetail" component={InvoiceDetailScreen} options={{ title: 'Invoice' }} />
       <MoreStack.Screen name="Bookmarks" component={BookmarksScreen} />

@@ -1,8 +1,8 @@
-import React from 'react'
+import React, { useLayoutEffect } from 'react'
 import { View, Text, FlatList, TouchableOpacity, RefreshControl, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { CheckSquare, Square } from 'lucide-react-native'
+import { CheckSquare, Square, Plus } from 'lucide-react-native'
 import * as Haptics from 'expo-haptics'
 import { useTasks, useToggleTask } from '../../hooks/useTasks'
 import { colors } from '../../theme/colors'
@@ -17,6 +17,16 @@ type Props = { navigation: NativeStackNavigationProp<TasksStackParamList, 'Tasks
 export function TasksListScreen({ navigation }: Props) {
   const { data, isLoading, isFetching, refetch } = useTasks()
   const toggleMutation = useToggleTask()
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity onPress={() => navigation.navigate('CreateTask')} hitSlop={8}>
+          <Plus size={24} color={colors.primary} />
+        </TouchableOpacity>
+      ),
+    })
+  }, [navigation])
 
   const handleToggle = async (id: string) => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
