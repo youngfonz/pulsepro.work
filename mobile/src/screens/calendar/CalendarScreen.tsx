@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react'
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Dimensions } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { useNavigation, CommonActions } from '@react-navigation/native'
 import { ChevronLeft, ChevronRight } from 'lucide-react-native'
 import { useCalendar } from '../../hooks/useCalendar'
 import { colors } from '../../theme/colors'
@@ -11,13 +12,14 @@ import type { Task } from '../../types/api'
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December']
-const CELL_SIZE = Math.floor((Dimensions.get('window').width - spacing.lg * 2) / 7)
+const CELL_SIZE = Math.floor((Dimensions.get('window').width - spacing.xl * 2) / 7)
 
 function isSameDay(d1: Date, d2: Date) {
   return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate()
 }
 
 export function CalendarScreen() {
+  const navigation = useNavigation()
   const today = new Date()
   const [year, setYear] = useState(today.getFullYear())
   const [month, setMonth] = useState(today.getMonth())
@@ -127,10 +129,15 @@ export function CalendarScreen() {
             {isSameDay(selectedDate, today) ? 'Today' : selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
           </Text>
           {selectedTasks.length === 0 ? (
-            <Text style={styles.noTasks}>No tasks scheduled</Text>
+            <Text style={styles.noTasks}>Nothing scheduled. Enjoy the free time.</Text>
           ) : (
             selectedTasks.map(task => (
-              <View key={task.id} style={styles.taskRow}>
+              <TouchableOpacity
+                key={task.id}
+                style={styles.taskRow}
+                onPress={() => navigation.dispatch(CommonActions.navigate({ name: 'TasksTab', params: { screen: 'TaskDetail', params: { id: task.id } } }))}
+                activeOpacity={0.7}
+              >
                 <View style={[styles.taskDot, { backgroundColor: getStatusColor(task.status) }]} />
                 <View style={styles.taskInfo}>
                   <Text style={styles.taskTitle} numberOfLines={1}>{task.title}</Text>
@@ -139,7 +146,7 @@ export function CalendarScreen() {
                 <View style={[styles.priorityBadge, { backgroundColor: getPriorityColor(task.priority) + '20' }]}>
                   <Text style={[styles.priorityText, { color: getPriorityColor(task.priority) }]}>{task.priority}</Text>
                 </View>
-              </View>
+              </TouchableOpacity>
             ))
           )}
         </View>
@@ -152,13 +159,13 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: spacing.lg, paddingVertical: spacing.md,
+    paddingHorizontal: spacing.xl, paddingVertical: spacing.md,
   },
   monthTitle: { fontSize: 20, fontWeight: '700', color: colors.textPrimary },
-  dayHeaders: { flexDirection: 'row', paddingHorizontal: spacing.lg },
+  dayHeaders: { flexDirection: 'row', paddingHorizontal: spacing.xl },
   dayHeaderCell: { width: CELL_SIZE, alignItems: 'center', paddingVertical: spacing.xs },
   dayHeaderText: { fontSize: 12, fontWeight: '600', color: colors.textSecondary },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: spacing.lg },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: spacing.xl },
   cell: {
     width: CELL_SIZE, height: CELL_SIZE, alignItems: 'center', justifyContent: 'center',
     borderRadius: CELL_SIZE / 2,
@@ -169,7 +176,7 @@ const styles = StyleSheet.create({
   daySelectedText: { color: '#fff', fontWeight: '700' },
   dots: { flexDirection: 'row', gap: 2, marginTop: 2 },
   dot: { width: 4, height: 4, borderRadius: 2 },
-  taskSection: { padding: spacing.lg, marginTop: spacing.sm },
+  taskSection: { paddingVertical: spacing.lg, paddingHorizontal: spacing.xl, marginTop: spacing.sm },
   taskSectionTitle: { fontSize: 17, fontWeight: '600', color: colors.textPrimary, marginBottom: spacing.md },
   noTasks: { fontSize: 15, color: colors.textSecondary },
   taskRow: {

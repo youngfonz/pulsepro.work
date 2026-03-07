@@ -14,8 +14,9 @@ import {
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useNavigation } from '@react-navigation/native'
-import { X, ChevronDown, Check } from 'lucide-react-native'
+import { X, ChevronDown, Check, Calendar } from 'lucide-react-native'
 import * as Haptics from 'expo-haptics'
+import DateTimePicker from '@react-native-community/datetimepicker'
 import { useCreateTask } from '../../hooks/useTasks'
 import { useProjects } from '../../hooks/useProjects'
 import { colors } from '../../theme/colors'
@@ -30,9 +31,12 @@ const PRIORITY_OPTIONS: { value: Priority; label: string; color: string }[] = [
   { value: 'high', label: 'High', color: colors.destructive },
 ]
 
-// Validates that a string looks like YYYY-MM-DD
-function isValidISODate(value: string): boolean {
-  return /^\d{4}-\d{2}-\d{2}$/.test(value)
+function formatDateDisplay(date: Date): string {
+  return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
+}
+
+function toISODate(date: Date): string {
+  return date.toISOString().split('T')[0]
 }
 
 export function CreateTaskScreen() {
@@ -40,8 +44,8 @@ export function CreateTaskScreen() {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [priority, setPriority] = useState<Priority>('medium')
-  const [dueDate, setDueDate] = useState('')
-  const [dueDateError, setDueDateError] = useState('')
+  const [dueDate, setDueDate] = useState<Date | null>(null)
+  const [showDatePicker, setShowDatePicker] = useState(false)
   const [selectedProject, setSelectedProject] = useState<Pick<Project, 'id' | 'name'> | null>(null)
   const [projectModalVisible, setProjectModalVisible] = useState(false)
 
@@ -49,13 +53,16 @@ export function CreateTaskScreen() {
   const { data: projectsData } = useProjects()
   const projects = projectsData?.projects ?? []
 
-  const handleDueDateChange = (value: string) => {
-    setDueDate(value)
-    if (value.length > 0 && !isValidISODate(value)) {
-      setDueDateError('Use YYYY-MM-DD format, e.g. 2026-04-01')
-    } else {
-      setDueDateError('')
+  const handleDateChange = (_event: unknown, selectedDate?: Date) => {
+    if (selectedDate) {
+      setDueDate(selectedDate)
     }
+  }
+
+  const handleClearDate = async () => {
+    await Haptics.selectionAsync()
+    setDueDate(null)
+    setShowDatePicker(false)
   }
 
   const handlePrioritySelect = useCallback(async (value: Priority) => {
@@ -69,7 +76,7 @@ export function CreateTaskScreen() {
     setProjectModalVisible(false)
   }, [])
 
-  const canSubmit = title.trim().length > 0 && !dueDateError && !createTask.isPending
+  const canSubmit = title.trim().length > 0 && !createTask.isPending
 
   const handleCreate = async () => {
     if (!canSubmit) return
@@ -80,7 +87,7 @@ export function CreateTaskScreen() {
     }
     if (description.trim()) payload.description = description.trim()
     if (priority) payload.priority = priority
-    if (dueDate && isValidISODate(dueDate)) payload.dueDate = dueDate
+    if (dueDate) payload.dueDate = toISODate(dueDate)
     if (selectedProject) payload.projectId = selectedProject.id
 
     createTask.mutate(payload, {
@@ -162,19 +169,40 @@ export function CreateTaskScreen() {
           {/* Due Date */}
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>Due Date</Text>
-            <TextInput
-              style={[styles.input, dueDateError ? styles.inputError : null]}
-              placeholder="YYYY-MM-DD"
-              placeholderTextColor={colors.textSecondary}
-              value={dueDate}
-              onChangeText={handleDueDateChange}
-              keyboardType="numbers-and-punctuation"
-              maxLength={10}
-              returnKeyType="done"
-            />
-            {dueDateError ? (
-              <Text style={styles.errorText}>{dueDateError}</Text>
-            ) : null}
+            <TouchableOpacity
+              style={styles.selector}
+              onPress={async () => {
+                await Haptics.selectionAsync()
+                setShowDatePicker(!showDatePicker)
+              }}
+              activeOpacity={0.7}
+            >
+              <View style={styles.dateRow}>
+                <Calendar size={18} color={dueDate ? colors.primary : colors.textSecondary} />
+                <Text style={dueDate ? styles.selectorValue : styles.selectorPlaceholder}>
+                  {dueDate ? formatDateDisplay(dueDate) : 'No due date'}
+                </Text>
+              </View>
+              {dueDate ? (
+                <TouchableOpacity onPress={handleClearDate} hitSlop={8}>
+                  <X size={16} color={colors.textSecondary} />
+                </TouchableOpacity>
+              ) : (
+                <ChevronDown size={18} color={colors.textSecondary} />
+              )}
+            </TouchableOpacity>
+            {showDatePicker && (
+              <DateTimePicker
+                value={dueDate ?? new Date()}
+                mode="date"
+                display="inline"
+                minimumDate={new Date()}
+                onChange={handleDateChange}
+                themeVariant="dark"
+                accentColor={colors.primary}
+                style={styles.datePicker}
+              />
+            )}
           </View>
 
           {/* Project */}
@@ -300,19 +328,10 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.textPrimary,
   },
-  inputError: {
-    borderColor: colors.destructive,
-  },
   textArea: {
     minHeight: 96,
     paddingTop: spacing.md,
   },
-  errorText: {
-    fontSize: 12,
-    color: colors.destructive,
-    marginTop: spacing.xs,
-  },
-
   // Priority chips
   chipRow: { flexDirection: 'row', gap: spacing.sm },
   chip: {
@@ -344,6 +363,8 @@ const styles = StyleSheet.create({
   },
   selectorValue: { fontSize: 15, color: colors.textPrimary, flex: 1 },
   selectorPlaceholder: { fontSize: 15, color: colors.textSecondary, flex: 1 },
+  dateRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, flex: 1 },
+  datePicker: { marginTop: spacing.sm },
 
   // Mutation error banner
   mutationError: {
