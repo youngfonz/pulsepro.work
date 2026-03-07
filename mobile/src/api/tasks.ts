@@ -1,5 +1,5 @@
 import { apiFetch, GetToken } from './client'
-import { Task } from '../types/api'
+import { Task, TaskComment } from '../types/api'
 
 interface TasksResponse { tasks: Task[] }
 
@@ -32,4 +32,11 @@ export function deleteTask(getToken: GetToken, id: string) {
 
 export function toggleTask(getToken: GetToken, id: string) {
   return apiFetch<Task>(`/tasks/${id}/toggle`, getToken, { method: 'POST' })
+}
+
+export function addComment(getToken: GetToken, taskId: string, content: string) {
+  return apiFetch<TaskComment>(`/tasks/${taskId}/comments`, getToken, {
+    method: 'POST',
+    body: JSON.stringify({ content }),
+  })
 }

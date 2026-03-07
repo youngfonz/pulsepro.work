@@ -136,7 +136,7 @@ export interface ProjectHealth {
   projectName: string
   clientName: string
   score: number
-  label: 'healthy' | 'at_risk' | 'critical'
+  label: 'healthy' | 'at_risk' | 'critical' | 'completed'
   overdueTasks: number
   totalTasks: number
   completedTasks: number

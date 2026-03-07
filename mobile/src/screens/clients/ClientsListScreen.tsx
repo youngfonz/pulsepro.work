@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useLayoutEffect } from 'react'
 import { Text, FlatList, TouchableOpacity, RefreshControl, StyleSheet, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { Plus } from 'lucide-react-native'
 import { useClients } from '../../hooks/useClients'
 import { colors } from '../../theme/colors'
 import { spacing } from '../../theme/spacing'
@@ -12,6 +13,16 @@ type Props = { navigation: NativeStackNavigationProp<MoreStackParamList, 'Client
 
 export function ClientsListScreen({ navigation }: Props) {
   const { data, isLoading, isFetching, refetch } = useClients()
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity onPress={() => navigation.navigate('CreateClient')} hitSlop={8}>
+          <Plus size={24} color={colors.primary} />
+        </TouchableOpacity>
+      ),
+    })
+  }, [navigation])
 
   const renderItem = ({ item }: { item: Client }) => (
     <TouchableOpacity

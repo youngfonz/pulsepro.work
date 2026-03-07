@@ -1,8 +1,8 @@
-import React from 'react'
-import { View, Text, FlatList, TouchableOpacity, RefreshControl, StyleSheet } from 'react-native'
+import React, { useLayoutEffect, useRef, useCallback } from 'react'
+import { View, Text, FlatList, TouchableOpacity, RefreshControl, StyleSheet, Animated } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { CheckSquare, Square } from 'lucide-react-native'
+import { CheckSquare, Square, Plus } from 'lucide-react-native'
 import * as Haptics from 'expo-haptics'
 import { useTasks, useToggleTask } from '../../hooks/useTasks'
 import { colors } from '../../theme/colors'
@@ -14,23 +14,26 @@ import type { Task } from '../../types/api'
 
 type Props = { navigation: NativeStackNavigationProp<TasksStackParamList, 'TasksList'> }
 
-export function TasksListScreen({ navigation }: Props) {
-  const { data, isLoading, isFetching, refetch } = useTasks()
-  const toggleMutation = useToggleTask()
+function TaskRow({ item, onToggle, onPress }: { item: Task; onToggle: (id: string) => void; onPress: (id: string) => void }) {
+  const scale = useRef(new Animated.Value(1)).current
+  const overdue = isOverdue(item.dueDate, item.status)
 
-  const handleToggle = async (id: string) => {
-    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
-    toggleMutation.mutate(id)
+  const handleToggle = () => {
+    Animated.sequence([
+      Animated.spring(scale, { toValue: 0.92, useNativeDriver: true, friction: 3, tension: 200 }),
+      Animated.spring(scale, { toValue: 1, useNativeDriver: true, friction: 3, tension: 80 }),
+    ]).start()
+    onToggle(item.id)
   }
 
-  const renderItem = ({ item }: { item: Task }) => {
-    const overdue = isOverdue(item.dueDate, item.status)
-    return (
+  return (
+    <Animated.View style={{ transform: [{ scale }] }}>
       <TouchableOpacity
         style={styles.row}
-        onPress={() => navigation.navigate('TaskDetail', { id: item.id })}
+        onPress={() => onPress(item.id)}
+        activeOpacity={0.7}
       >
-        <TouchableOpacity onPress={() => handleToggle(item.id)} hitSlop={8}>
+        <TouchableOpacity onPress={handleToggle} hitSlop={8}>
           {item.status === 'done'
             ? <CheckSquare size={22} color={colors.success} />
             : <Square size={22} color={colors.textSecondary} />
@@ -49,8 +52,36 @@ export function TasksListScreen({ navigation }: Props) {
         </View>
         <View style={[styles.priorityDot, { backgroundColor: getPriorityColor(item.priority) }]} />
       </TouchableOpacity>
-    )
-  }
+    </Animated.View>
+  )
+}
+
+export function TasksListScreen({ navigation }: Props) {
+  const { data, isLoading, isFetching, refetch } = useTasks()
+  const toggleMutation = useToggleTask()
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity onPress={() => navigation.navigate('CreateTask')} hitSlop={8}>
+          <Plus size={24} color={colors.primary} />
+        </TouchableOpacity>
+      ),
+    })
+  }, [navigation])
+
+  const handleToggle = useCallback(async (id: string) => {
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
+    toggleMutation.mutate(id)
+  }, [toggleMutation])
+
+  const handlePress = useCallback((id: string) => {
+    navigation.navigate('TaskDetail', { id })
+  }, [navigation])
+
+  const renderItem = useCallback(({ item }: { item: Task }) => (
+    <TaskRow item={item} onToggle={handleToggle} onPress={handlePress} />
+  ), [handleToggle, handlePress])
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>

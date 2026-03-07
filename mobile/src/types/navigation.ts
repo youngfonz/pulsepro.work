@@ -18,16 +18,21 @@ export type TabParamList = {
 
 export type DashboardStackParamList = {
   Dashboard: undefined
+  CreateTask: undefined
+  CreateProject: undefined
+  CreateClient: undefined
 }
 
 export type ProjectsStackParamList = {
   ProjectsList: undefined
   ProjectDetail: { id: string }
+  CreateProject: undefined
 }
 
 export type TasksStackParamList = {
   TasksList: undefined
   TaskDetail: { id: string }
+  CreateTask: undefined
 }
 
 export type CalendarStackParamList = {
@@ -38,6 +43,7 @@ export type MoreStackParamList = {
   More: undefined
   ClientsList: undefined
   ClientDetail: { id: string }
+  CreateClient: undefined
   InvoicesList: undefined
   InvoiceDetail: { id: string }
   Bookmarks: undefined

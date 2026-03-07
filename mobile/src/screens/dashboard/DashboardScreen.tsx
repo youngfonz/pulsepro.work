@@ -2,6 +2,10 @@ import React from 'react'
 import { View, Text, ScrollView, RefreshControl, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Svg, { Circle, Defs, LinearGradient, Stop } from 'react-native-svg'
+import { useNavigation } from '@react-navigation/native'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { SpeedDialFAB } from '../../components/SpeedDialFAB'
+import { AnimatedEntry } from '../../components/AnimatedEntry'
 import { useAuth } from '@clerk/expo'
 import { useDashboard } from '../../hooks/useDashboard'
 import { useInsights } from '../../hooks/useInsights'
@@ -9,6 +13,7 @@ import type { Insight } from '../../api/insights'
 import { colors } from '../../theme/colors'
 import { spacing } from '../../theme/spacing'
 import { getHealthColor } from '../../utils/status'
+import type { DashboardStackParamList } from '../../types/navigation'
 
 const RING = {
   projects: { a: '#fb7185', b: '#f43f5e', bg: 'rgba(244,63,94,0.12)' },
@@ -32,6 +37,7 @@ function useGreeting() {
 }
 
 export function DashboardScreen() {
+  const navigation = useNavigation<NativeStackNavigationProp<DashboardStackParamList>>()
   const { signOut } = useAuth()
   const { data, isLoading, isFetching, error, refetch } = useDashboard()
   const { data: insightsData } = useInsights()
@@ -50,10 +56,12 @@ export function DashboardScreen() {
         refreshControl={<RefreshControl refreshing={isFetching && !!data} onRefresh={refetch} tintColor={colors.primary} />}
       >
         {/* Greeting */}
-        <View style={styles.greetingSection}>
-          <Text style={styles.greetingText}>{greeting}</Text>
-          <Text style={styles.greetingDate}>{dateStr}</Text>
-        </View>
+        <AnimatedEntry delay={0}>
+          <View style={styles.greetingSection}>
+            <Text style={styles.greetingText}>{greeting}</Text>
+            <Text style={styles.greetingDate}>{dateStr}</Text>
+          </View>
+        </AnimatedEntry>
 
         {isLoading && !data && (
           <View style={styles.centered}>
@@ -77,6 +85,7 @@ export function DashboardScreen() {
 
         {/* Insights */}
         {insightsData?.insights && insightsData.insights.length > 0 && (
+          <AnimatedEntry delay={80}>
           <View style={styles.insightsCard}>
             <Text style={styles.insightsTitle}>Insights</Text>
             {insightsData.insights.map((insight: Insight) => (
@@ -86,14 +95,16 @@ export function DashboardScreen() {
               </View>
             ))}
           </View>
+          </AnimatedEntry>
         )}
 
         {/* Activity Rings */}
         {stats && (
+          <AnimatedEntry delay={160}>
           <View style={styles.ringsCard}>
-            <View style={styles.ringsRow}>
+            <View style={styles.ringsCenter}>
               <View style={styles.ringsWrap}>
-                <Svg width={180} height={180} viewBox="0 0 100 100">
+                <Svg width={160} height={160} viewBox="0 0 100 100">
                   <Defs>
                     <LinearGradient id="pg" x1="0%" y1="0%" x2="100%" y2="0%">
                       <Stop offset="0%" stopColor={RING.projects.a} />
@@ -109,41 +120,45 @@ export function DashboardScreen() {
                     </LinearGradient>
                   </Defs>
                   {/* Background */}
-                  <Circle cx={50} cy={50} r={42} fill="none" stroke={RING.projects.bg} strokeWidth={6} />
-                  <Circle cx={50} cy={50} r={32} fill="none" stroke={RING.tasks.bg} strokeWidth={6} />
-                  <Circle cx={50} cy={50} r={22} fill="none" stroke={RING.due.bg} strokeWidth={6} />
+                  <Circle cx={50} cy={50} r={44} fill="none" stroke={RING.projects.bg} strokeWidth={5} />
+                  <Circle cx={50} cy={50} r={36} fill="none" stroke={RING.tasks.bg} strokeWidth={5} />
+                  <Circle cx={50} cy={50} r={28} fill="none" stroke={RING.due.bg} strokeWidth={5} />
                   {/* Progress */}
-                  <Circle cx={50} cy={50} r={42} fill="none" stroke="url(#pg)" strokeWidth={6}
-                    strokeLinecap="round" strokeDasharray={`${pProg * 264} 264`} rotation={-90} origin="50,50" />
-                  <Circle cx={50} cy={50} r={32} fill="none" stroke="url(#tg)" strokeWidth={6}
-                    strokeLinecap="round" strokeDasharray={`${tProg * 201} 201`} rotation={-90} origin="50,50" />
-                  <Circle cx={50} cy={50} r={22} fill="none" stroke="url(#dg)" strokeWidth={6}
-                    strokeLinecap="round" strokeDasharray={`${cProg * 138} 138`} rotation={-90} origin="50,50" />
+                  <Circle cx={50} cy={50} r={44} fill="none" stroke="url(#pg)" strokeWidth={5}
+                    strokeLinecap="round" strokeDasharray={`${pProg * 276} 276`} rotation={-90} origin="50,50" />
+                  <Circle cx={50} cy={50} r={36} fill="none" stroke="url(#tg)" strokeWidth={5}
+                    strokeLinecap="round" strokeDasharray={`${tProg * 226} 226`} rotation={-90} origin="50,50" />
+                  <Circle cx={50} cy={50} r={28} fill="none" stroke="url(#dg)" strokeWidth={5}
+                    strokeLinecap="round" strokeDasharray={`${cProg * 176} 176`} rotation={-90} origin="50,50" />
                 </Svg>
                 <View style={styles.ringCenter}>
                   <Text style={styles.ringCenterNum}>{stats.pendingTasks}</Text>
                   <Text style={styles.ringCenterSub}>pending</Text>
                 </View>
               </View>
-              <View style={styles.legendCol}>
-                <LegendRow color={RING.projects.b} label="Projects" value={`${stats.activeProjects}/${stats.totalProjects}`} />
-                <LegendRow color={RING.tasks.b} label="Completed" value={`${completed}/${stats.totalTasks}`} />
-                <LegendRow color={RING.due.b} label="Clients" value={`${stats.activeClients}/${stats.totalClients}`} />
-              </View>
+            </View>
+            <View style={styles.legendRow3}>
+              <LegendItem color={RING.projects.b} label="Projects" value={`${stats.activeProjects}/${stats.totalProjects}`} />
+              <LegendItem color={RING.tasks.b} label="Completed" value={`${completed}/${stats.totalTasks}`} />
+              <LegendItem color={RING.due.b} label="Clients" value={`${stats.activeClients}/${stats.totalClients}`} />
             </View>
           </View>
+          </AnimatedEntry>
         )}
 
         {/* Stats Cards */}
         {stats && (
+          <AnimatedEntry delay={240}>
           <View style={styles.statsGrid}>
             <StatCard label="Projects" value={stats.activeProjects} subtitle={`${stats.totalProjects} total`} />
             <StatCard label="Tasks" value={stats.pendingTasks} subtitle={`${stats.totalTasks} total`} />
             <StatCard label="Clients" value={stats.activeClients} subtitle={`${stats.totalClients} total`} />
           </View>
+          </AnimatedEntry>
         )}
 
         {data?.overdueTasks && data.overdueTasks.length > 0 && (
+          <AnimatedEntry delay={320}>
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Overdue Tasks</Text>
             {data.overdueTasks.map(task => (
@@ -153,24 +168,41 @@ export function DashboardScreen() {
               </View>
             ))}
           </View>
+          </AnimatedEntry>
         )}
 
         {data?.projectHealth && data.projectHealth.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Project Health</Text>
-            {data.projectHealth.map(p => (
-              <View key={p.projectId} style={styles.healthRow}>
-                <View style={[styles.healthDot, { backgroundColor: getHealthColor(p.label) }]} />
-                <View style={styles.healthInfo}>
-                  <Text style={styles.healthName} numberOfLines={1}>{p.projectName}</Text>
-                  <Text style={styles.healthMeta}>{p.completedTasks}/{p.totalTasks} tasks</Text>
+          <AnimatedEntry delay={400}>
+          <View style={styles.healthCard}>
+            <Text style={styles.healthCardTitle}>Project Health</Text>
+            {data.projectHealth.slice(0, 6).map(p => {
+              const healthLabel = p.label === 'completed' ? 'Done' : p.label === 'healthy' ? 'Healthy' : p.label === 'at_risk' ? 'At Risk' : 'Critical'
+              const healthColor = getHealthColor(p.label)
+              return (
+                <View key={p.projectId} style={styles.healthRow}>
+                  <View style={[styles.healthBadge, { backgroundColor: healthColor + '18' }]}>
+                    <View style={[styles.healthBadgeDot, { backgroundColor: healthColor }]} />
+                    <Text style={[styles.healthBadgeText, { color: healthColor }]}>{healthLabel}</Text>
+                  </View>
+                  <View style={styles.healthInfo}>
+                    <Text style={styles.healthName} numberOfLines={1}>{p.projectName}</Text>
+                    {p.clientName ? <Text style={styles.healthClient} numberOfLines={1}>{p.clientName}</Text> : null}
+                  </View>
+                  <Text style={styles.healthMeta}>
+                    {p.label === 'completed' ? 'Done' : p.overdueTasks > 0 ? `${p.overdueTasks} overdue` : `${p.completedTasks}/${p.totalTasks}`}
+                  </Text>
                 </View>
-                <Text style={[styles.healthScore, { color: getHealthColor(p.label) }]}>{p.score}</Text>
-              </View>
-            ))}
+              )
+            })}
           </View>
+          </AnimatedEntry>
         )}
       </ScrollView>
+      <SpeedDialFAB
+        onAddTask={() => navigation.navigate('CreateTask')}
+        onAddProject={() => navigation.navigate('CreateProject')}
+        onAddClient={() => navigation.navigate('CreateClient')}
+      />
     </SafeAreaView>
   )
 }
@@ -185,9 +217,9 @@ function StatCard({ label, value, subtitle }: { label: string; value: number; su
   )
 }
 
-function LegendRow({ color, label, value }: { color: string; label: string; value: string }) {
+function LegendItem({ color, label, value }: { color: string; label: string; value: string }) {
   return (
-    <View style={styles.legendRow}>
+    <View style={styles.legendItem}>
       <View style={[styles.legendDot, { backgroundColor: color }]} />
       <Text style={styles.legendLabel}>{label}</Text>
       <Text style={styles.legendValue}>{value}</Text>
@@ -213,15 +245,15 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface, borderRadius: 16, padding: spacing.xl,
     borderWidth: 1, borderColor: colors.border, marginBottom: spacing.xl,
   },
-  ringsRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.lg },
-  ringsWrap: { position: 'relative', width: 180, height: 180 },
+  ringsCenter: { alignItems: 'center', marginBottom: spacing.lg },
+  ringsWrap: { position: 'relative', width: 160, height: 160 },
   ringCenter: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, justifyContent: 'center', alignItems: 'center' },
-  ringCenterNum: { fontSize: 26, fontWeight: '700', color: colors.textPrimary },
+  ringCenterNum: { fontSize: 24, fontWeight: '700', color: colors.textPrimary },
   ringCenterSub: { fontSize: 12, color: colors.textSecondary, marginTop: -1 },
-  legendCol: { flex: 1, gap: spacing.lg },
-  legendRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  legendDot: { width: 10, height: 10, borderRadius: 5 },
-  legendLabel: { flex: 1, fontSize: 14, color: colors.textSecondary },
+  legendRow3: { flexDirection: 'row', justifyContent: 'space-around' },
+  legendItem: { alignItems: 'center', gap: 4 },
+  legendDot: { width: 8, height: 8, borderRadius: 4 },
+  legendLabel: { fontSize: 12, color: colors.textSecondary },
   legendValue: { fontSize: 15, fontWeight: '600', color: colors.textPrimary },
   statsGrid: { flexDirection: 'row', gap: spacing.md, marginBottom: spacing.xl },
   statCard: {
@@ -239,16 +271,25 @@ const styles = StyleSheet.create({
   },
   overdueTitle: { fontSize: 15, color: colors.textPrimary, marginBottom: spacing.xs },
   overdueProject: { fontSize: 13, color: colors.textSecondary },
-  healthRow: {
-    flexDirection: 'row', alignItems: 'center', backgroundColor: colors.surface,
-    borderRadius: 10, padding: spacing.md, borderWidth: 1, borderColor: colors.border,
-    marginBottom: spacing.sm,
+  healthCard: {
+    backgroundColor: colors.surface, borderRadius: 12, borderWidth: 1, borderColor: colors.border,
+    padding: spacing.lg, marginBottom: spacing.xl,
   },
-  healthDot: { width: 10, height: 10, borderRadius: 5, marginRight: spacing.md },
+  healthCardTitle: { fontSize: 17, fontWeight: '600', color: colors.textPrimary, marginBottom: spacing.md },
+  healthRow: {
+    flexDirection: 'row', alignItems: 'center', paddingVertical: spacing.sm + 2,
+    borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.border, gap: spacing.sm,
+  },
+  healthBadge: {
+    flexDirection: 'row', alignItems: 'center', gap: 4,
+    paddingHorizontal: 6, paddingVertical: 3, borderRadius: 4,
+  },
+  healthBadgeDot: { width: 5, height: 5, borderRadius: 3 },
+  healthBadgeText: { fontSize: 10, fontWeight: '600' },
   healthInfo: { flex: 1 },
-  healthName: { fontSize: 15, color: colors.textPrimary },
-  healthMeta: { fontSize: 13, color: colors.textSecondary },
-  healthScore: { fontSize: 17, fontWeight: '600' },
+  healthName: { fontSize: 14, fontWeight: '500', color: colors.textPrimary },
+  healthClient: { fontSize: 12, color: colors.textSecondary },
+  healthMeta: { fontSize: 12, color: colors.textSecondary },
   contentCenter: { flexGrow: 1, justifyContent: 'center' },
   centered: { alignItems: 'center', paddingVertical: spacing.xxxl },
   loadingText: { color: colors.textSecondary, fontSize: 15, marginTop: spacing.md },

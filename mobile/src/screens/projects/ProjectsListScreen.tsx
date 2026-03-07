@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useLayoutEffect } from 'react'
 import { View, Text, FlatList, TouchableOpacity, RefreshControl, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { Plus } from 'lucide-react-native'
 import { useProjects } from '../../hooks/useProjects'
 import { colors } from '../../theme/colors'
 import { spacing } from '../../theme/spacing'
@@ -13,6 +14,16 @@ type Props = { navigation: NativeStackNavigationProp<ProjectsStackParamList, 'Pr
 
 export function ProjectsListScreen({ navigation }: Props) {
   const { data, isLoading, isFetching, refetch } = useProjects()
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity onPress={() => navigation.navigate('CreateProject')} hitSlop={8}>
+          <Plus size={24} color={colors.primary} />
+        </TouchableOpacity>
+      ),
+    })
+  }, [navigation])
 
   const renderItem = ({ item }: { item: Project }) => (
     <TouchableOpacity
