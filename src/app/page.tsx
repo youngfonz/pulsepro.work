@@ -7,6 +7,7 @@ import { Features } from '@/components/marketing/sections/Features'
 import { Testimonials } from '@/components/marketing/sections/Testimonials'
 import { Pricing } from '@/components/marketing/sections/Pricing'
 import { FAQ } from '@/components/marketing/sections/FAQ'
+import { MobileApp } from '@/components/marketing/sections/MobileApp'
 import { TelegramFeature } from '@/components/marketing/sections/TelegramFeature'
 import { WhySwitch } from '@/components/marketing/sections/WhySwitch'
 import { StatsImpact } from '@/components/marketing/sections/StatsImpact'
@@ -27,6 +28,7 @@ export default async function MarketingPage() {
         <Hero />
         <StatsImpact />
         <Features />
+        <MobileApp />
         <TelegramFeature />
         <Testimonials />
         <WhySwitch />
