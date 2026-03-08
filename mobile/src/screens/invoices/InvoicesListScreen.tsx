@@ -1,11 +1,13 @@
-import React from 'react'
+import React, { useLayoutEffect } from 'react'
 import { Text, FlatList, TouchableOpacity, RefreshControl, StyleSheet, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { Plus } from 'lucide-react-native'
 import { useInvoices } from '../../hooks/useInvoices'
 import { colors } from '../../theme/colors'
 import { spacing } from '../../theme/spacing'
 import { getStatusColor, getStatusLabel } from '../../utils/status'
+import { formatDate } from '../../utils/dates'
 import type { MoreStackParamList } from '../../types/navigation'
 import type { Invoice } from '../../types/api'
 
@@ -13,6 +15,16 @@ type Props = { navigation: NativeStackNavigationProp<MoreStackParamList, 'Invoic
 
 export function InvoicesListScreen({ navigation }: Props) {
   const { data, isLoading, isFetching, refetch } = useInvoices()
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity onPress={() => navigation.navigate('CreateInvoice')} hitSlop={8}>
+          <Plus size={24} color={colors.primary} />
+        </TouchableOpacity>
+      ),
+    })
+  }, [navigation])
 
   const renderItem = ({ item }: { item: Invoice }) => (
     <TouchableOpacity
@@ -25,7 +37,10 @@ export function InvoicesListScreen({ navigation }: Props) {
           <Text style={[styles.badgeText, { color: getStatusColor(item.status) }]}>{getStatusLabel(item.status)}</Text>
         </View>
       </View>
-      <Text style={styles.client}>{item.client?.name}</Text>
+      <View style={styles.rowMeta}>
+        <Text style={styles.client}>{item.client?.name}</Text>
+        {item.dueDate && <Text style={styles.due}>{formatDate(item.dueDate)}</Text>}
+      </View>
       {item.total !== undefined && (
         <Text style={styles.total}>${item.total.toFixed(2)}</Text>
       )}
@@ -40,7 +55,7 @@ export function InvoicesListScreen({ navigation }: Props) {
         renderItem={renderItem}
         contentContainerStyle={styles.list}
         refreshControl={<RefreshControl refreshing={isFetching && !!data} onRefresh={refetch} tintColor={colors.primary} />}
-        ListEmptyComponent={!isLoading ? <Text style={styles.empty}>No invoices yet</Text> : null}
+        ListEmptyComponent={!isLoading ? <Text style={styles.empty}>No invoices yet. Tap + to create one.</Text> : null}
       />
     </SafeAreaView>
   )
@@ -55,7 +70,9 @@ const styles = StyleSheet.create({
   },
   rowHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   number: { fontSize: 17, fontWeight: '600', color: colors.textPrimary },
-  client: { fontSize: 13, color: colors.textSecondary, marginTop: spacing.xs },
+  rowMeta: { flexDirection: 'row', justifyContent: 'space-between', marginTop: spacing.xs },
+  client: { fontSize: 13, color: colors.textSecondary },
+  due: { fontSize: 13, color: colors.textSecondary },
   total: { fontSize: 17, fontWeight: '600', color: colors.textPrimary, marginTop: spacing.sm },
   badge: { paddingHorizontal: spacing.sm, paddingVertical: 2, borderRadius: 6 },
   badgeText: { fontSize: 11, fontWeight: '600', textTransform: 'capitalize' },
