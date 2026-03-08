@@ -63,7 +63,7 @@ export function MarketingFooter() {
             <span className="text-lg font-bold text-foreground">Pulse Pro</span>
           </Link>
           <p className="text-sm text-muted-foreground">
-            © 2026 Pulse Pro. All rights reserved.
+            © {new Date().getFullYear()} Pulse Pro. All rights reserved.
           </p>
         </div>
       </div>

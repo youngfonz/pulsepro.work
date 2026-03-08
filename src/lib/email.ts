@@ -67,7 +67,7 @@ export async function sendInvoiceEmail(invoice: {
     throw new Error(`Failed to send invoice email: ${error.message}`)
   }
 
-  console.log('sendInvoiceEmail: sent successfully, id:', data?.id)
+  // Invoice email sent successfully
 }
 
 function buildInvoiceHtml(data: {

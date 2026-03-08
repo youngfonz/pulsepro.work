@@ -8,7 +8,7 @@ const COOLDOWN_MS = 5 * 60 * 1000 // 5 minutes between LLM calls per user
 const MAX_DAILY_CALLS = 20 // Hard cap: max LLM calls per user per day
 
 function logLLM(userId: string, reason: string, extra?: Record<string, unknown>) {
-  console.log(JSON.stringify({
+  console.info(JSON.stringify({
     type: 'llm_call',
     userId,
     reason,
@@ -18,7 +18,7 @@ function logLLM(userId: string, reason: string, extra?: Record<string, unknown>)
 }
 
 function logLLMSkip(userId: string, reason: string) {
-  console.log(JSON.stringify({
+  console.info(JSON.stringify({
     type: 'llm_skip',
     userId,
     reason,

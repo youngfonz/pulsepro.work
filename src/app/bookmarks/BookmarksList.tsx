@@ -244,7 +244,7 @@ function BookmarkEditModal({
           <label className="block text-sm font-medium text-foreground">Thumbnail</label>
           {thumbnailUrl ? (
             <div className="relative inline-block">
-              <img src={thumbnailUrl} alt="" className="w-32 h-20 object-cover rounded border border-border" />
+              <img src={thumbnailUrl} alt="Bookmark thumbnail" className="w-32 h-20 object-cover rounded border border-border" />
               <button
                 type="button"
                 onClick={() => setThumbnailUrl(null)}
@@ -381,7 +381,7 @@ function ImageCard({ bookmark }: { bookmark: Bookmark }) {
           <div className="aspect-video bg-muted relative overflow-hidden">
             <img
               src={bookmark.thumbnailUrl!}
-              alt=""
+              alt="Bookmark thumbnail"
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
             <div className="absolute top-2 left-2">

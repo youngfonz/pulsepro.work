@@ -117,7 +117,7 @@ export default async function RootLayout({
                   if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                     document.documentElement.classList.add('dark');
                   }
-                } catch(e) {}
+                } catch(e) { /* localStorage unavailable in private browsing */ }
               })();
             `,
           }}

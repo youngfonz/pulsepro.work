@@ -109,7 +109,7 @@ function TaskItem({ task, canEdit = true }: { task: Task; canEdit?: boolean }) {
             >
               <img
                 src={task.thumbnailUrl}
-                alt=""
+                alt="Task thumbnail"
                 className="w-full h-full object-cover"
               />
             </button>
@@ -425,7 +425,7 @@ function TaskEditForm({ task, onClose }: { task: Task; onClose: () => void }) {
             <label className="block text-sm font-medium text-foreground">Thumbnail</label>
             {thumbnailUrl ? (
               <div className="relative inline-block">
-                <img src={thumbnailUrl} alt="" className="w-32 h-20 object-cover rounded border border-border" />
+                <img src={thumbnailUrl} alt="Task thumbnail" className="w-32 h-20 object-cover rounded border border-border" />
                 <button
                   type="button"
                   onClick={() => setThumbnailUrl(null)}

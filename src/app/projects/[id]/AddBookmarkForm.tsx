@@ -192,7 +192,7 @@ export function AddBookmarkForm({ projectId }: AddBookmarkFormProps) {
               {metadata.thumbnailUrl && (
                 <img
                   src={metadata.thumbnailUrl}
-                  alt=""
+                  alt="Link preview"
                   className="w-24 h-24 object-cover rounded"
                 />
               )}
