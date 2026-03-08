@@ -129,7 +129,7 @@ export function Sidebar({ clientCount, clerkEnabled = false, isAdmin: isAdminPro
   return (
     <>
       {/* Mobile header */}
-      <div className="fixed top-0 left-0 right-0 z-40 flex h-14 items-center justify-between border-b border-sidebar-border bg-sidebar px-4 md:hidden">
+      <div className="fixed top-0 left-0 right-0 z-50 flex h-14 items-center justify-between border-b border-sidebar-border bg-sidebar backdrop-blur-md supports-[backdrop-filter]:bg-sidebar/95 px-4 md:hidden">
         <div className="flex items-center gap-2">
           <PulseLogo />
           <span className="text-lg font-bold text-sidebar-foreground">Pulse Pro</span>
