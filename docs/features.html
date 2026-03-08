@@ -68,10 +68,10 @@
 <div class="header">
   <div class="header-inner">
     <h1>Pulse Pro — Feature Catalog</h1>
-    <p>Complete inventory of every feature, organized by domain. Last updated Feb 22, 2026.</p>
+    <p>Complete inventory of every feature, organized by domain. Last updated Mar 7, 2026.</p>
     <div class="header-stats">
       <div class="header-stat">
-        <div class="stat-value">12</div>
+        <div class="stat-value">13</div>
         <div class="stat-label">Categories</div>
       </div>
       <div class="header-stat">
@@ -557,6 +557,101 @@
   </div>
 </div>
 
+<!-- 13. Mobile App (iOS) -->
+<div class="section">
+  <div class="section-header" onclick="this.closest('.section').classList.toggle('open')">
+    <div class="section-title"><span class="icon">13</span> Mobile App (iOS)</div>
+    <div class="section-meta">
+      <span class="section-count">62 features</span>
+      <svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="subsection">Platform</div>
+    <div class="feature"><span class="dot"></span><span class="text">Native iOS app built with Expo SDK 54 / React Native 0.81 <span class="plan-badge free">FREE</span></span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Custom splash screen with Pulse Pro branding</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Custom app icon (adaptive icon for all sizes)</span></div>
+    <div class="feature"><span class="dot"></span><span class="text"><code>pulsepro://</code> deep link scheme for OAuth callbacks</span></div>
+
+    <div class="subsection">Authentication</div>
+    <div class="feature"><span class="dot"></span><span class="text">Sign in with email + password via Clerk</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Sign in with Google OAuth (native browser flow)</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Sign up with email or Google OAuth</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Secure token storage via <code>expo-secure-store</code></span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Sign out from settings</span></div>
+
+    <div class="subsection">Navigation</div>
+    <div class="feature"><span class="dot"></span><span class="text">5-tab bottom navigation: Dashboard, Projects, Tasks, Calendar, More</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Native stack navigators per tab with slide transitions</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Modal presentation for create screens (slide from bottom)</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Cross-tab deep navigation (e.g., project tasks → task detail in Tasks tab)</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Custom back (ChevronLeft) and close (X) header buttons</span></div>
+
+    <div class="subsection">Dashboard</div>
+    <div class="feature"><span class="dot"></span><span class="text">Time-aware greeting ("Good morning", "Happy Friday", "New week, let's go")</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">SVG activity rings with gradient colors (projects, tasks, clients)</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Animated number counters on stat cards</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">AI-powered insights panel with color-coded dots</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Overdue tasks section with tap-to-navigate</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Recently viewed items (projects, tasks, clients) — persisted locally</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Project health cards with color-coded badges (healthy/at risk/critical/done)</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Speed dial FAB — quick create task, project, or client</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Staggered animated entry for all dashboard sections</span></div>
+
+    <div class="subsection">Tasks</div>
+    <div class="feature"><span class="dot"></span><span class="text">Full task list with checkbox toggle, priority dots, due dates</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Filter chips: status (All/Active/Done), priority (Any/High/Medium/Low), sort (Newest/Due Date/Priority)</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Swipe-to-complete gesture with animated green action bar</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Bounce animation on checkbox toggle</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Task detail: edit title/description, change status/priority via chips, set due date, add comments, delete</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Create task screen with full form</span></div>
+
+    <div class="subsection">Projects</div>
+    <div class="feature"><span class="dot"></span><span class="text">Project list with status badges and client names</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Project detail with 4-tab layout: Overview, Tasks, Time, Budget</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Overview tab: description, stats (tasks done, hours tracked, budget)</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Tasks tab: full task list with status/priority dots, tap to navigate</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Time tab: time entry list with hours summary and earnings calculation</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Budget tab: budget, hourly rate, earned, remaining (green/red indicator)</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Create project screen with full form</span></div>
+
+    <div class="subsection">Clients</div>
+    <div class="feature"><span class="dot"></span><span class="text">Client list and detail screens</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Create client screen with full form</span></div>
+
+    <div class="subsection">Invoices</div>
+    <div class="feature"><span class="dot"></span><span class="text">Invoice list with number, status badge, client, due date, total</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Invoice detail with line items (qty x rate), subtotal, tax, total</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Send invoice action (draft → sent) with confirmation alert</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Mark as paid action (sent/overdue → paid) with confirmation alert</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Create invoice: client chip selector, optional project, DateTimePicker for due date</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Create invoice: dynamic line items (add/remove) with live subtotal/tax/total</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Create invoice: from name/email, tax rate, notes fields</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Validation: requires client and at least one valid line item</span></div>
+
+    <div class="subsection">Search</div>
+    <div class="feature"><span class="dot"></span><span class="text">Global search from dashboard (magnifying glass button)</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Search across projects, tasks, clients, bookmarks with 2-char minimum</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Color-coded type icons per result (blue/green/orange/purple)</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Tap result to navigate to detail screen</span></div>
+
+    <div class="subsection">UX Polish</div>
+    <div class="feature"><span class="dot"></span><span class="text">Haptic feedback on 8+ interaction types (toggle, swipe, filter, send, create)</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Pull-to-refresh on all data screens (8 screens)</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">FlatList virtualization for large lists (tasks, invoices)</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">KeyboardAvoidingView on all form screens (iOS padding behavior)</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Safe area insets for notch and home indicator</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Loading spinners and empty state messages on all screens</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Error states with retry hints (dashboard)</span></div>
+
+    <div class="subsection">Other</div>
+    <div class="feature"><span class="dot"></span><span class="text">Calendar screen with monthly view</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Bookmarks screen</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Settings screen with sign out</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">More menu hub: Clients, Invoices, Bookmarks, Settings</span></div>
+  </div>
+</div>
+
 </div>
 
 <script>
@@ -572,7 +667,7 @@
 
   // Total feature count
   const total = document.querySelectorAll('.feature').length;
-  document.querySelector('.header-stat .stat-value').textContent = '12';
+  document.querySelector('.header-stat .stat-value').textContent = '13';
   document.querySelectorAll('.header-stat')[1].querySelector('.stat-value').textContent = total;
 </script>
 
