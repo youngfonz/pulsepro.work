@@ -511,6 +511,479 @@ Mark each item: PASS / FAIL / SKIP (with reason)
 
 ---
 
+## PERSONA 4: MOBILE APP (iOS / Expo Go)
+
+**Test device:** iPhone (Expo Go)
+**Branch:** youngfonz/ios-capacitor
+**Auth:** Clerk (email/password + Google OAuth)
+
+### 4.1 App Launch & Splash Screen
+
+- [ ] App opens in Expo Go without crash
+- [ ] Splash screen displays Pulse Pro logo
+- [ ] Splash screen text renders in black (not white) on light background
+- [ ] App transitions from splash to auth or dashboard smoothly
+
+### 4.2 Authentication
+
+- [ ] Login screen renders — "Pulse Pro" title, subtitle, email/password fields
+- [ ] Sign in with email + password — works, redirects to dashboard
+- [ ] Sign in with Google OAuth — OAuth flow opens, redirects back via `pulsepro://` scheme
+- [ ] Google OAuth error handling — cancel dismisses without error, real errors show message
+- [ ] Sign up screen renders — navigable from login via "Don't have an account?" link
+- [ ] Sign up with email — account created, redirected to dashboard
+- [ ] Sign up with Google OAuth — works
+- [ ] Error messages display correctly (wrong password, invalid email, etc.)
+- [ ] Loading states show during auth (button text changes, ActivityIndicator)
+- [ ] Sign out — works (from Settings or dashboard error state)
+
+### 4.3 Bottom Tab Navigation
+
+- [ ] 5 tabs visible: Dashboard, Projects, Tasks, Calendar, More
+- [ ] Each tab icon renders correctly (LayoutDashboard, FolderKanban, CheckSquare, Calendar, MoreHorizontal)
+- [ ] Active tab highlights with primary color
+- [ ] Tab switching is instant with fade animation
+- [ ] Tab labels display correctly (font size 11)
+
+### 4.4 Dashboard
+
+- [ ] Greeting displays correctly ("Good morning/afternoon/evening" based on time)
+- [ ] Date displays correctly (e.g., "Friday, March 7")
+- [ ] Special greetings work: "Happy Friday" (Fri afternoon), "New week, let's go" (Mon morning)
+- [ ] User avatar shows initials in primary-colored circle
+- [ ] Search button (magnifying glass) visible next to avatar
+- [ ] Tapping avatar navigates to Settings (via More tab)
+- [ ] Pull-to-refresh works — data reloads
+- [ ] Loading state: ActivityIndicator + "Loading dashboard..." text
+- [ ] Error state: title, message, "Pull down to retry" hint
+- [ ] "Sign Out & Re-Login" button shows on auth errors
+
+#### 4.4.1 Dashboard — Activity Rings
+
+- [ ] Activity rings card renders with 3 concentric rings (Projects, Tasks, Clients)
+- [ ] Rings have gradient colors (red, blue, green)
+- [ ] Ring progress reflects actual data ratios
+- [ ] Center shows pending task count with animated number
+- [ ] Tapping center navigates to Tasks tab
+- [ ] Legend row: Projects (active/total), Completed (done/total), Clients (active/total)
+- [ ] Tapping legend items navigates to respective tabs
+
+#### 4.4.2 Dashboard — Stats Cards
+
+- [ ] 3 stat cards: Projects, Tasks, Clients
+- [ ] Numbers animate up on load (AnimatedNumber)
+- [ ] Each card shows active count + "X total" subtitle
+- [ ] Tapping each card navigates to correct section
+
+#### 4.4.3 Dashboard — Insights
+
+- [ ] Insights card renders when data available
+- [ ] Color-coded dots (red, amber, blue, green) display per insight
+- [ ] Insight messages display correctly
+
+#### 4.4.4 Dashboard — Overdue Tasks
+
+- [ ] Overdue tasks section appears when overdue tasks exist
+- [ ] Each row shows task title + project name (or "Quick task")
+- [ ] Tapping a row navigates to TaskDetail
+
+#### 4.4.5 Dashboard — Recently Viewed
+
+- [ ] Recently viewed card shows up to 5 items
+- [ ] Items show type icon (FolderKanban/CheckSquare/Users) in colored circle
+- [ ] Name and subtitle display correctly
+- [ ] Type label (project/task/client) shows on right
+- [ ] Tapping navigates to correct detail screen
+
+#### 4.4.6 Dashboard — Project Health
+
+- [ ] Project health card renders with health badges
+- [ ] Health labels: Healthy (green), At Risk (yellow), Critical (red), Done
+- [ ] Project name and client name display
+- [ ] Meta text: overdue count or completed/total ratio
+- [ ] Tapping navigates to ProjectDetail
+
+#### 4.4.7 Dashboard — Speed Dial FAB
+
+- [ ] Floating action button visible on dashboard
+- [ ] Tapping opens speed dial with 3 options
+- [ ] "New Task" — opens CreateTask screen (modal, slide from bottom)
+- [ ] "New Project" — opens CreateProject screen (modal)
+- [ ] "New Client" — opens CreateClient screen (modal)
+- [ ] Speed dial doesn't clip behind tab bar
+- [ ] Backdrop darkens when speed dial is open
+
+#### 4.4.8 Dashboard — Animated Entries
+
+- [ ] Dashboard sections animate in with staggered delays
+- [ ] Animations are smooth, no jank
+
+### 4.5 Tasks List
+
+- [ ] Tasks list loads with all tasks from API
+- [ ] Header "+" button visible — navigates to CreateTask
+- [ ] Empty state: "All clear" title + "No tasks yet. Tap + to create one."
+- [ ] Pull-to-refresh works
+
+#### 4.5.1 Tasks — Filter Chips
+
+- [ ] Status filter chips: All, Active, Done
+- [ ] Tapping "Active" shows only non-done tasks
+- [ ] Tapping "Done" shows only completed tasks
+- [ ] Priority filter chips: Any, High (red dot), Medium (orange dot), Low (green dot)
+- [ ] Priority filter correctly filters tasks
+- [ ] Sort chips: Newest, Due Date, Priority
+- [ ] "Newest" sorts by creation date descending
+- [ ] "Due Date" sorts by due date ascending (no-date tasks at bottom)
+- [ ] "Priority" sorts high > medium > low
+- [ ] Dividers separate filter groups visually
+- [ ] Filter chips scroll horizontally if they overflow
+- [ ] Haptic feedback (selection) on filter/sort changes
+- [ ] "No matches" empty state when filters return 0 results
+
+#### 4.5.2 Tasks — Task Row
+
+- [ ] Each row shows: checkbox, title, project name (or "Quick task"), priority dot
+- [ ] Due date displays when set
+- [ ] Overdue dates render in red
+- [ ] Completed tasks show checkmark icon + strikethrough title
+- [ ] Tapping checkbox toggles task status with haptic feedback + bounce animation
+- [ ] Tapping row navigates to TaskDetail
+
+#### 4.5.3 Tasks — Swipe to Complete
+
+- [ ] Swipe right reveals green "Done" action
+- [ ] Swiping a completed task shows "Reopen"
+- [ ] Completing swipe toggles the task
+- [ ] Swipe action has fade-in opacity animation
+
+### 4.6 Task Detail
+
+- [ ] Task detail loads with spinner, then shows full task
+- [ ] "Task not found" message for invalid IDs
+- [ ] Pull-to-refresh works
+- [ ] Recently viewed tracking: task appears in dashboard "Recently Viewed"
+
+#### 4.6.1 Task Detail — Toggle Completion
+
+- [ ] "Mark Complete" button (green border, green text)
+- [ ] Tapping toggles to done with haptic feedback
+- [ ] Button changes to "Mark Incomplete" (muted style) when done
+- [ ] Title gets strikethrough when completed
+
+#### 4.6.2 Task Detail — Edit Mode
+
+- [ ] "Edit" button in header
+- [ ] Tapping "Edit" shows editable title input + description input
+- [ ] Header changes to "Cancel" + "Save" buttons
+- [ ] "Save" persists changes via API
+- [ ] "Cancel" reverts without saving
+- [ ] Empty title shows validation alert
+- [ ] "Saving..." text during mutation
+
+#### 4.6.3 Task Detail — Status & Priority
+
+- [ ] Status chips: To Do, In Progress, Done
+- [ ] Active status chip is filled with status color
+- [ ] Tapping changes status with haptic feedback
+- [ ] Priority chips: Low, Medium, High
+- [ ] Active priority chip is filled with priority color
+- [ ] Tapping changes priority with haptic feedback
+
+#### 4.6.4 Task Detail — Due Date
+
+- [ ] Due date displays when set
+- [ ] "Tap to set a due date" placeholder when not set
+- [ ] Tapping opens inline YYYY-MM-DD text input
+- [ ] "Set" button saves the date
+- [ ] "Clear" button removes the due date
+- [ ] Invalid format shows alert
+
+#### 4.6.5 Task Detail — Description & Notes
+
+- [ ] Description section shows text or "No description" placeholder
+- [ ] In edit mode: multiline description input
+- [ ] Notes section shows when notes exist
+
+#### 4.6.6 Task Detail — Comments
+
+- [ ] Comment count shows in section title
+- [ ] Existing comments render with text + date
+- [ ] "Add a comment..." input at bottom
+- [ ] "Post" button sends comment
+- [ ] Button disabled when input empty or submitting
+- [ ] New comment appears after posting
+- [ ] Keyboard avoiding works on iOS
+
+#### 4.6.7 Task Detail — Delete
+
+- [ ] "Delete Task" button at bottom (red border, destructive style)
+- [ ] Confirmation alert with Cancel/Delete options
+- [ ] Delete removes task and navigates back
+- [ ] "Deleting..." text during mutation
+
+### 4.7 Create Task
+
+- [ ] Modal slides up from bottom with "New Task" title
+- [ ] Close (X) button in header dismisses modal
+- [ ] Title field required
+- [ ] Task creates successfully and navigates back
+- [ ] New task appears in tasks list after creation
+
+### 4.8 Projects List
+
+- [ ] Projects list loads from API
+- [ ] Project rows display name, client, status badge
+- [ ] Tapping a project navigates to ProjectDetail
+- [ ] Create project button available
+- [ ] Pull-to-refresh works
+- [ ] Empty state message when no projects
+
+### 4.9 Project Detail
+
+- [ ] Project detail loads with name, client name, status badge, priority badge
+- [ ] Pull-to-refresh works
+- [ ] Recently viewed tracking: project appears in dashboard
+- [ ] "Project not found" for invalid IDs
+
+#### 4.9.1 Project Detail — Tab Bar
+
+- [ ] 4 tabs: Overview, Tasks (count), Time, Budget
+- [ ] Active tab has primary color underline
+- [ ] Tab switching works
+
+#### 4.9.2 Project Detail — Overview Tab
+
+- [ ] Due date displays when set
+- [ ] Description section with title and text
+- [ ] Stats row: Tasks Done (completed/total), Tracked (hours), Budget ($)
+- [ ] Stats render in bordered cards
+
+#### 4.9.3 Project Detail — Tasks Tab
+
+- [ ] Full task list with status dot, title, due date, priority dot
+- [ ] Completed tasks show strikethrough
+- [ ] Tapping a task navigates to TaskDetail (cross-tab navigation to TasksTab)
+- [ ] "No tasks for this project yet." empty state
+
+#### 4.9.4 Project Detail — Time Tab
+
+- [ ] Time summary bar: clock icon, total hours, earnings (if hourly rate set)
+- [ ] Time entry rows: hours, description, date
+- [ ] "No time entries yet." empty state
+
+#### 4.9.5 Project Detail — Budget Tab
+
+- [ ] Budget card: Budget amount (or "Not set"), Hourly Rate (or "Not set")
+- [ ] When hourly rate + hours exist: Time Billed, Earned, Remaining
+- [ ] Remaining shows green when positive, red when over budget
+
+### 4.10 Create Project
+
+- [ ] Modal with "New Project" title and close button
+- [ ] Project creates successfully and navigates back
+
+### 4.11 Calendar
+
+- [ ] Calendar screen loads
+- [ ] Tasks with due dates appear on correct dates
+- [ ] Navigation between months works
+
+### 4.12 More Menu
+
+- [ ] 4 menu items: Clients, Invoices, Bookmarks, Settings
+- [ ] Each item has correct icon (Users, FileText, Bookmark, Settings)
+- [ ] Tapping each navigates to correct screen
+- [ ] Back navigation works from all sub-screens
+
+### 4.13 Clients
+
+- [ ] Clients list loads from API
+- [ ] Client rows display name and details
+- [ ] Tapping navigates to ClientDetail
+- [ ] ClientDetail shows client info + related projects
+- [ ] Pull-to-refresh works
+- [ ] Empty state when no clients
+
+### 4.14 Create Client
+
+- [ ] Modal with "New Client" title and close button
+- [ ] Client creates successfully and navigates back
+
+### 4.15 Invoices List
+
+- [ ] Invoices list loads from API
+- [ ] Header "+" button visible — navigates to CreateInvoice
+- [ ] Each row shows: invoice number, status badge, client name, due date, total
+- [ ] Status badge color-coded (draft/sent/paid/overdue)
+- [ ] Tapping navigates to InvoiceDetail
+- [ ] Pull-to-refresh works
+- [ ] "No invoices yet. Tap + to create one." empty state
+
+### 4.16 Invoice Detail
+
+- [ ] Invoice number (large, bold)
+- [ ] Status badge with correct color
+- [ ] Client name and optional project name
+- [ ] Due date displayed
+- [ ] From section: name and email when set
+- [ ] Line items: description, quantity x rate, amount
+- [ ] Totals: subtotal, tax (if > 0), grand total
+- [ ] Notes section when present
+- [ ] "Paid on [date]" shown for paid invoices
+
+#### 4.16.1 Invoice Detail — Actions
+
+- [ ] "Send Invoice" button visible for draft invoices
+- [ ] Tapping shows confirmation alert with invoice number + client name
+- [ ] Sending shows ActivityIndicator, success triggers haptic
+- [ ] "Mark as Paid" button visible for sent/overdue invoices
+- [ ] Tapping shows confirmation alert
+- [ ] Marking paid shows ActivityIndicator, success triggers haptic
+- [ ] No action buttons for already-paid invoices
+- [ ] Error alerts on failure
+
+### 4.17 Create Invoice
+
+- [ ] Modal with "New Invoice" title and close button
+- [ ] KeyboardAvoidingView works on iOS
+
+#### 4.17.1 Create Invoice — Client Selection
+
+- [ ] Client chips render for all clients
+- [ ] Tapping selects client (highlighted with primary color)
+- [ ] Selecting client resets project selection
+
+#### 4.17.2 Create Invoice — Project Selection
+
+- [ ] Project chips appear after client selected (filtered by client)
+- [ ] "None" option available
+- [ ] Only shows if filtered projects exist
+
+#### 4.17.3 Create Invoice — Due Date
+
+- [ ] Defaults to 30 days from today
+- [ ] Tapping opens DateTimePicker
+- [ ] Selected date displays correctly
+
+#### 4.17.4 Create Invoice — From Info
+
+- [ ] From Name and From Email fields side by side
+- [ ] Email field has email keyboard type
+
+#### 4.17.5 Create Invoice — Line Items
+
+- [ ] Starts with 1 line item
+- [ ] "+" button adds new line items with haptic
+- [ ] Each item: description, quantity, rate fields
+- [ ] Trash icon removes line items (min 1 required)
+- [ ] Quantity and rate have decimal-pad keyboard
+
+#### 4.17.6 Create Invoice — Totals
+
+- [ ] Live subtotal calculates as items change
+- [ ] Tax rate field (%) with decimal-pad keyboard
+- [ ] Tax amount shows when tax > 0
+- [ ] Grand total updates in real-time
+
+#### 4.17.7 Create Invoice — Validation & Submit
+
+- [ ] Missing client — alert "Missing Client"
+- [ ] No valid line items — alert "Missing Items"
+- [ ] Notes field (optional, multiline)
+- [ ] "Create Invoice" button submits
+- [ ] "Creating..." text during mutation
+- [ ] Button disabled during submission
+- [ ] Success: haptic feedback + navigate back
+- [ ] Error: alert with message
+
+### 4.18 Search
+
+- [ ] Search screen accessible from dashboard search button
+- [ ] Search bar renders with placeholder "Search projects, tasks, clients..."
+- [ ] Initial state: "Search Pulse Pro" title + instruction text
+- [ ] Typing < 2 chars shows instruction (minimum 2 characters)
+- [ ] Typing 2+ chars triggers search with loading indicator
+- [ ] Results grouped by type with color-coded icons:
+  - [ ] Projects — FolderKanban (primary blue)
+  - [ ] Tasks — CheckSquare (green)
+  - [ ] Clients — Users (orange/warning)
+  - [ ] Bookmarks — Bookmark (purple)
+- [ ] Each result shows title, subtitle, status/priority dot
+- [ ] Tapping result navigates to correct detail screen
+- [ ] "No results" message when nothing matches
+- [ ] Keyboard stays open while scrolling results (`keyboardShouldPersistTaps`)
+- [ ] Back button returns to dashboard
+
+### 4.19 Bookmarks
+
+- [ ] Bookmarks screen loads from More menu
+- [ ] Bookmark list renders from API
+- [ ] Pull-to-refresh works
+
+### 4.20 Settings
+
+- [ ] Settings screen accessible from More menu
+- [ ] Sign out functionality works
+- [ ] Settings content loads
+
+### 4.21 Navigation & UX Polish
+
+- [ ] All detail screens: slide-from-right animation
+- [ ] All modal screens: slide-from-bottom animation
+- [ ] Detail screens: fade-from-bottom animation
+- [ ] Back buttons (ChevronLeft) work on all detail screens
+- [ ] Close buttons (X) work on all modal screens
+- [ ] Cross-tab navigation works (e.g., project tasks → TasksTab → TaskDetail)
+- [ ] Deep linking between tabs maintains correct stack
+- [ ] Tab bar visible on all main screens
+- [ ] Tab bar hidden appropriately on modals
+- [ ] No horizontal scroll issues on any screen
+- [ ] Safe area insets respected (notch, home indicator)
+
+### 4.22 Haptic Feedback
+
+- [ ] Task toggle (checkbox tap): Medium impact
+- [ ] Task swipe-to-complete: triggers on swipe
+- [ ] Filter/sort chip selection: Selection haptic
+- [ ] Invoice send success: Notification success
+- [ ] Invoice mark paid success: Notification success
+- [ ] Create invoice add/remove line item: Light impact
+- [ ] Task detail status/priority change: Light impact
+- [ ] Task detail mark complete: Notification success
+
+### 4.23 Pull-to-Refresh
+
+- [ ] Dashboard: refresh control with primary tint color
+- [ ] Tasks list: refresh control
+- [ ] Projects list: refresh control
+- [ ] Project detail: refresh control
+- [ ] Task detail: refresh control
+- [ ] Invoices list: refresh control
+- [ ] Invoice detail: refresh control
+- [ ] Clients list: refresh control
+
+### 4.24 Mobile Performance
+
+- [ ] Dashboard loads under 2 seconds
+- [ ] Task list with 50+ tasks scrolls smoothly (FlatList virtualization)
+- [ ] Tab switching is instant
+- [ ] Animations don't cause frame drops
+- [ ] No memory warnings during extended use
+- [ ] App resumes correctly after backgrounding
+
+### 4.25 Mobile Edge Cases
+
+- [ ] Empty data: all screens handle zero data gracefully
+- [ ] Network error: dashboard shows error state with retry
+- [ ] Long task titles: truncated with ellipsis (numberOfLines={1})
+- [ ] Long project/client names: truncated properly
+- [ ] Rotate to landscape: no layout breaks (if supported)
+- [ ] Keyboard dismissal: tapping outside inputs dismisses keyboard
+- [ ] Back gesture (iOS swipe from left edge): works on all screens
+
+---
+
 ## SIGN-OFF
 
 | Persona | Tester | Date | Status |
@@ -518,6 +991,7 @@ Mark each item: PASS / FAIL / SKIP (with reason)
 | New User (Free) | | | |
 | Admin (Pro) | | | |
 | Super Admin | | | |
+| Mobile App (iOS) | | | |
 
 **Notes:**
 

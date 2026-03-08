@@ -21,6 +21,8 @@ import { InvoicesListScreen } from '../screens/invoices/InvoicesListScreen'
 import { InvoiceDetailScreen } from '../screens/invoices/InvoiceDetailScreen'
 import { BookmarksScreen } from '../screens/bookmarks/BookmarksScreen'
 import { SettingsScreen } from '../screens/settings/SettingsScreen'
+import { SearchScreen } from '../screens/search/SearchScreen'
+import { CreateInvoiceScreen } from '../screens/invoices/CreateInvoiceScreen'
 
 import type {
   TabParamList,
@@ -80,6 +82,7 @@ function DashboardStackScreen() {
       <DashboardStack.Screen name="CreateTask" component={CreateTaskScreen} options={({ navigation }) => ({ title: 'New Task', ...modalOptions, ...closeButton(navigation) })} />
       <DashboardStack.Screen name="CreateProject" component={CreateProjectScreen} options={({ navigation }) => ({ title: 'New Project', ...modalOptions, ...closeButton(navigation) })} />
       <DashboardStack.Screen name="CreateClient" component={CreateClientScreen} options={({ navigation }) => ({ title: 'New Client', ...modalOptions, ...closeButton(navigation) })} />
+      <DashboardStack.Screen name="Search" component={SearchScreen} options={({ navigation }) => ({ title: 'Search', ...detailOptions, ...backButton(navigation) })} />
     </DashboardStack.Navigator>
   )
 }
@@ -121,6 +124,7 @@ function MoreStackScreen() {
       <MoreStack.Screen name="CreateClient" component={CreateClientScreen} options={({ navigation }) => ({ title: 'New Client', ...modalOptions, ...closeButton(navigation) })} />
       <MoreStack.Screen name="InvoicesList" component={InvoicesListScreen} options={({ navigation }) => ({ title: 'Invoices', ...backButton(navigation) })} />
       <MoreStack.Screen name="InvoiceDetail" component={InvoiceDetailScreen} options={({ navigation }) => ({ title: 'Invoice', ...detailOptions, ...backButton(navigation) })} />
+      <MoreStack.Screen name="CreateInvoice" component={CreateInvoiceScreen} options={({ navigation }) => ({ title: 'New Invoice', ...modalOptions, ...closeButton(navigation) })} />
       <MoreStack.Screen name="Bookmarks" component={BookmarksScreen} options={({ navigation }) => ({ ...backButton(navigation) })} />
       <MoreStack.Screen name="Settings" component={SettingsScreen} options={({ navigation }) => ({ ...backButton(navigation) })} />
     </MoreStack.Navigator>

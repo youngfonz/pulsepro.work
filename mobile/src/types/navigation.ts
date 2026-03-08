@@ -21,6 +21,7 @@ export type DashboardStackParamList = {
   CreateTask: undefined
   CreateProject: undefined
   CreateClient: undefined
+  Search: undefined
 }
 
 export type ProjectsStackParamList = {
@@ -46,6 +47,7 @@ export type MoreStackParamList = {
   CreateClient: undefined
   InvoicesList: undefined
   InvoiceDetail: { id: string }
+  CreateInvoice: undefined
   Bookmarks: undefined
   Settings: undefined
 }

@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import Svg, { Circle, Defs, LinearGradient, Stop } from 'react-native-svg'
 import { useNavigation, CommonActions } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { FolderKanban, CheckSquare, Users } from 'lucide-react-native'
+import { FolderKanban, CheckSquare, Users, Search } from 'lucide-react-native'
 import { SpeedDialFAB } from '../../components/SpeedDialFAB'
 import { AnimatedEntry } from '../../components/AnimatedEntry'
 import { useAuth, useUser } from '@clerk/expo'
@@ -126,6 +126,9 @@ export function DashboardScreen() {
               <Text style={styles.greetingText}>{greeting}</Text>
               <Text style={styles.greetingDate}>{dateStr}</Text>
             </View>
+            <TouchableOpacity style={styles.searchBtn} onPress={() => navigation.navigate('Search')} activeOpacity={0.7}>
+              <Search size={20} color={colors.textSecondary} />
+            </TouchableOpacity>
             <TouchableOpacity style={styles.avatar} onPress={goToSettings} activeOpacity={0.7}>
               <Text style={styles.avatarText}>{initials}</Text>
             </TouchableOpacity>
@@ -329,6 +332,10 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   avatarText: { fontSize: 15, fontWeight: '700', color: '#fff' },
+  searchBtn: {
+    width: 40, height: 40, borderRadius: 20, backgroundColor: colors.surfaceAlt,
+    alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: colors.border,
+  },
   insightsCard: {
     backgroundColor: colors.surface, borderRadius: 12, borderWidth: 1, borderColor: colors.border,
     padding: spacing.lg, marginBottom: spacing.xl,
