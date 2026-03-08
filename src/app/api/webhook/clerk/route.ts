@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     if (primaryEmail) {
       try {
         await sendWelcomeEmail(first_name, primaryEmail)
-        console.log(`Welcome email sent to ${primaryEmail}`)
+        // Welcome email sent successfully
       } catch (err) {
         console.error('Failed to send welcome email:', err)
         // Don't fail the webhook — email is best-effort

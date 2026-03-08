@@ -158,7 +158,7 @@ export function AdminUsersTable({ users, currentAdminId, adminUserIds }: Props) 
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-3">
                     {user.imageUrl ? (
-                      <img src={user.imageUrl} alt="" className="w-8 h-8 rounded-full flex-shrink-0" />
+                      <img src={user.imageUrl} alt="User avatar" className="w-8 h-8 rounded-full flex-shrink-0" />
                     ) : (
                       <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center flex-shrink-0 text-xs font-medium text-muted-foreground">
                         {(user.firstName?.[0] || user.email[0] || '?').toUpperCase()}

@@ -236,7 +236,7 @@ export function AddBookmarkButton({ projects, defaultOpen = false }: { projects:
                 <div className="flex items-start gap-3">
                   {(uploadedImageUrl || metadata.thumbnailUrl) ? (
                     <div className="relative flex-shrink-0">
-                      <img src={uploadedImageUrl || metadata.thumbnailUrl!} alt="" className="w-20 h-20 object-cover rounded" />
+                      <img src={uploadedImageUrl || metadata.thumbnailUrl!} alt="Bookmark thumbnail" className="w-20 h-20 object-cover rounded" />
                       {uploadedImageUrl && (
                         <button
                           type="button"

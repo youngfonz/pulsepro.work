@@ -140,7 +140,7 @@ async function fetchTwitterMetadata(url: string): Promise<BookmarkMetadata | nul
         }
       }
     } catch (e) {
-      console.log('Could not fetch Twitter page for thumbnail:', e);
+      console.error('Could not fetch Twitter page for thumbnail:', e);
     }
 
     return {

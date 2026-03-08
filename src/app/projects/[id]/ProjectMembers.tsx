@@ -143,7 +143,7 @@ export function ProjectMembers({
       {owner && (
         <div className="flex items-center gap-3 px-4 py-3 rounded-lg border border-border">
           {owner.imageUrl ? (
-            <img src={owner.imageUrl} alt="" className="w-8 h-8 rounded-full flex-shrink-0" />
+            <img src={owner.imageUrl} alt="Project owner" className="w-8 h-8 rounded-full flex-shrink-0" />
           ) : (
             <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center flex-shrink-0 text-xs font-medium text-muted-foreground">
               {(owner.name[0] || '?').toUpperCase()}
@@ -163,7 +163,7 @@ export function ProjectMembers({
           {members.map((member) => (
             <div key={member.userId} className="flex items-center gap-3 px-4 py-3 rounded-lg border border-border">
               {member.user.imageUrl ? (
-                <img src={member.user.imageUrl} alt="" className="w-8 h-8 rounded-full flex-shrink-0" />
+                <img src={member.user.imageUrl} alt="Team member" className="w-8 h-8 rounded-full flex-shrink-0" />
               ) : (
                 <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center flex-shrink-0 text-xs font-medium text-muted-foreground">
                   {(member.user.name[0] || '?').toUpperCase()}

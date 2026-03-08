@@ -437,7 +437,7 @@ function TaskEditForm({ task, projects, onClose }: { task: Task; projects: Proje
                 <label className="block text-sm font-medium text-foreground">Thumbnail</label>
                 {thumbnailUrl ? (
                   <div className="relative inline-block">
-                    <img src={thumbnailUrl} alt="" className="w-32 h-20 object-cover rounded border border-border" />
+                    <img src={thumbnailUrl} alt="Bookmark thumbnail" className="w-32 h-20 object-cover rounded border border-border" />
                     <button
                       type="button"
                       onClick={() => setThumbnailUrl(null)}
