@@ -1,7 +1,6 @@
 'use client';
 
 import { ScrollReveal } from '../ScrollReveal';
-import { PhoneMock } from './MobileApp';
 
 const features = [
   {
@@ -59,6 +58,94 @@ const features = [
     description: 'Daily email and Telegram reminders. Calendar view. Priority sorting across everything.',
   },
 ];
+
+function StaticPhoneMock() {
+  return (
+    <div className="w-[200px] shrink-0">
+      <div className="rounded-[2rem] border-[3px] border-foreground/15 bg-white overflow-hidden shadow-2xl">
+        {/* Status bar */}
+        <div className="flex items-center justify-between px-5 pt-2.5 pb-0.5">
+          <span className="text-[9px] font-semibold text-gray-900">9:41</span>
+          <div className="flex items-center gap-1">
+            <svg className="w-3 h-3 text-gray-900" fill="currentColor" viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3a4.237 4.237 0 00-6 0zm-4-4l2 2a7.074 7.074 0 0110 0l2-2C15.14 9.14 8.87 9.14 5 13z" /></svg>
+            <svg className="w-3 h-3 text-gray-900" fill="currentColor" viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z" /></svg>
+          </div>
+        </div>
+
+        {/* Dashboard content */}
+        <div className="px-4 pt-1.5 pb-2">
+          <p className="text-[11px] font-semibold text-gray-900">Good morning</p>
+          <p className="text-[8px] text-gray-400 mt-0.5">3 tasks due today</p>
+        </div>
+        <div className="mx-4 bg-gray-50 rounded-lg p-3">
+          <div className="flex items-center justify-center">
+            <svg viewBox="0 0 100 100" className="w-16 h-16">
+              <circle cx="50" cy="50" r="44" fill="none" stroke="#fecdd3" strokeWidth="7" />
+              <circle cx="50" cy="50" r="44" fill="none" stroke="#f43f5e" strokeWidth="7" strokeDasharray="276" strokeDashoffset="83" strokeLinecap="round" transform="rotate(-90 50 50)" />
+              <circle cx="50" cy="50" r="34" fill="none" stroke="#bfdbfe" strokeWidth="7" />
+              <circle cx="50" cy="50" r="34" fill="none" stroke="#3b82f6" strokeWidth="7" strokeDasharray="214" strokeDashoffset="43" strokeLinecap="round" transform="rotate(-90 50 50)" />
+              <circle cx="50" cy="50" r="24" fill="none" stroke="#bbf7d0" strokeWidth="7" />
+              <circle cx="50" cy="50" r="24" fill="none" stroke="#22c55e" strokeWidth="7" strokeDasharray="151" strokeDashoffset="75" strokeLinecap="round" transform="rotate(-90 50 50)" />
+            </svg>
+          </div>
+          <div className="grid grid-cols-3 gap-1 mt-2">
+            <div className="text-center">
+              <p className="text-[10px] font-semibold text-gray-900">5</p>
+              <p className="text-[7px] text-gray-400">Active</p>
+            </div>
+            <div className="text-center">
+              <p className="text-[10px] font-semibold text-gray-900">12</p>
+              <p className="text-[7px] text-gray-400">Done</p>
+            </div>
+            <div className="text-center">
+              <p className="text-[10px] font-semibold text-gray-900">3</p>
+              <p className="text-[7px] text-gray-400">Due</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Task list */}
+        <div className="px-4 pt-3 pb-2">
+          <p className="text-[8px] font-medium text-gray-400 mb-1.5">Due Today</p>
+          <div className="space-y-1.5">
+            {[
+              { task: 'Finalize brand guidelines', dot: 'bg-red-400' },
+              { task: 'Review wireframes', dot: 'bg-amber-400' },
+              { task: 'Send invoice #1042', dot: 'bg-red-400' },
+            ].map((item) => (
+              <div key={item.task} className="bg-white rounded-md border border-gray-100 px-2.5 py-1.5">
+                <div className="flex items-center gap-1.5">
+                  <div className={`w-1 h-1 rounded-full ${item.dot}`} />
+                  <span className="text-[9px] text-gray-800 font-medium">{item.task}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Bottom nav */}
+        <div className="flex items-center justify-around px-3 py-2 mt-1 border-t border-gray-100">
+          {[
+            { label: 'Home', active: true },
+            { label: 'Projects', active: false },
+            { label: 'Tasks', active: false },
+            { label: 'More', active: false },
+          ].map((item) => (
+            <div key={item.label} className="flex flex-col items-center gap-0.5">
+              <div className={`w-3 h-3 rounded-full ${item.active ? 'bg-blue-600' : 'bg-gray-200'}`} />
+              <span className={`text-[7px] ${item.active ? 'text-blue-600 font-medium' : 'text-gray-400'}`}>{item.label}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Home indicator */}
+        <div className="flex justify-center pb-1.5">
+          <div className="w-16 h-0.5 rounded-full bg-gray-200" />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function DashboardMock() {
   return (
@@ -211,14 +298,12 @@ export function Features() {
         </div>
 
         <ScrollReveal delay={0}>
-          <div className="mt-12 relative flex flex-col lg:flex-row items-center lg:items-end justify-center gap-6 lg:gap-0">
-            {/* Desktop dashboard — scaled down on large screens */}
-            <div className="w-full lg:w-[65%] lg:shrink-0">
+          <div className="mt-12 flex flex-col lg:flex-row items-center lg:items-end justify-center gap-6 lg:gap-8">
+            <div className="w-full lg:flex-1 min-w-0">
               <DashboardMock />
             </div>
-            {/* Mobile phone mock — overlaps dashboard on large screens */}
-            <div className="lg:absolute lg:right-0 lg:bottom-0 lg:translate-x-4 lg:translate-y-4">
-              <PhoneMock />
+            <div className="hidden lg:block">
+              <StaticPhoneMock />
             </div>
           </div>
         </ScrollReveal>
