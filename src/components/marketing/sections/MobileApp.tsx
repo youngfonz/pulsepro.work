@@ -287,7 +287,7 @@ function ProjectScreen() {
 
 const screens = [DashboardScreen, TasksScreen, InvoiceScreen, ProjectScreen];
 
-function PhoneMock() {
+export function PhoneMock() {
   const [activeScreen, setActiveScreen] = useState(0);
 
   useEffect(() => {
