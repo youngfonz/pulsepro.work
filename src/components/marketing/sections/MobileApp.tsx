@@ -289,15 +289,10 @@ const screens = [DashboardScreen, TasksScreen, InvoiceScreen, ProjectScreen];
 
 function PhoneMock() {
   const [activeScreen, setActiveScreen] = useState(0);
-  const [fading, setFading] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setFading(true);
-      setTimeout(() => {
-        setActiveScreen((prev) => (prev + 1) % screens.length);
-        setFading(false);
-      }, 300);
+      setActiveScreen((prev) => (prev + 1) % screens.length);
     }, 4000);
     return () => clearInterval(interval);
   }, []);
@@ -322,11 +317,9 @@ function PhoneMock() {
           </div>
         </div>
 
-        {/* Screen content with fade — fixed height prevents layout shift during transition */}
-        <div className="h-[340px] overflow-hidden bg-white">
-          <div className={`transition-opacity duration-300 ${fading ? 'opacity-0' : 'opacity-100'}`}>
-            <Screen />
-          </div>
+        {/* Screen content — fixed height prevents layout shift between screens */}
+        <div className="h-[340px] overflow-hidden">
+          <Screen />
         </div>
 
         {/* Bottom nav */}
@@ -353,7 +346,7 @@ function PhoneMock() {
         {screenLabels.map((label, i) => (
           <button
             key={label}
-            onClick={() => { setFading(true); setTimeout(() => { setActiveScreen(i); setFading(false); }, 300); }}
+            onClick={() => setActiveScreen(i)}
             className={`transition-all duration-200 rounded-full ${i === activeScreen ? 'w-5 h-1.5 bg-primary' : 'w-1.5 h-1.5 bg-foreground/20 hover:bg-foreground/40'}`}
           />
         ))}
