@@ -1,6 +1,7 @@
 'use client';
 
 import { ScrollReveal } from '../ScrollReveal';
+import { PhoneMock } from './MobileApp';
 
 const features = [
   {
@@ -210,8 +211,15 @@ export function Features() {
         </div>
 
         <ScrollReveal delay={0}>
-          <div className="mt-12">
-            <DashboardMock />
+          <div className="mt-12 relative flex flex-col lg:flex-row items-center lg:items-end justify-center gap-6 lg:gap-0">
+            {/* Desktop dashboard — scaled down on large screens */}
+            <div className="w-full lg:w-[65%] lg:shrink-0">
+              <DashboardMock />
+            </div>
+            {/* Mobile phone mock — overlaps dashboard on large screens */}
+            <div className="lg:absolute lg:right-0 lg:bottom-0 lg:translate-x-4 lg:translate-y-4">
+              <PhoneMock />
+            </div>
           </div>
         </ScrollReveal>
 
