@@ -323,7 +323,7 @@ function PhoneMock() {
         </div>
 
         {/* Screen content with fade — fixed height prevents layout shift during transition */}
-        <div className="h-[340px] overflow-hidden">
+        <div className="h-[340px] overflow-hidden bg-white">
           <div className={`transition-opacity duration-300 ${fading ? 'opacity-0' : 'opacity-100'}`}>
             <Screen />
           </div>
