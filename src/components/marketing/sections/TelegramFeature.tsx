@@ -99,39 +99,25 @@ const features = [
 
 export function TelegramFeature() {
   const [active, setActive] = useState(0);
-  const [visible, setVisible] = useState(true);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval>>(null);
-
-  const cycle = useCallback(() => {
-    setVisible(false);
-    timeoutRef.current = setTimeout(() => {
-      setActive((prev) => (prev + 1) % features.length);
-      setVisible(true);
-    }, 150);
-  }, []);
 
   const startInterval = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
-    intervalRef.current = setInterval(cycle, 6000);
-  }, [cycle]);
+    intervalRef.current = setInterval(() => {
+      setActive((prev) => (prev + 1) % features.length);
+    }, 6000);
+  }, []);
 
   useEffect(() => {
     startInterval();
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
   }, [startInterval]);
 
   const handleTab = (i: number) => {
     if (i === active) return;
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    setVisible(false);
-    timeoutRef.current = setTimeout(() => {
-      setActive(i);
-      setVisible(true);
-    }, 150);
+    setActive(i);
     startInterval();
   };
 
@@ -173,10 +159,7 @@ export function TelegramFeature() {
           </div>
         </ScrollReveal>
 
-        <div
-          className="transition-opacity duration-150"
-          style={{ opacity: visible ? 1 : 0 }}
-        >
+        <div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             {/* Left: description */}
             <div>
