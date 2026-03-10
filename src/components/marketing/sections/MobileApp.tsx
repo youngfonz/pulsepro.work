@@ -364,7 +364,7 @@ function PhoneMock() {
 
 export function MobileApp() {
   return (
-    <section id="mobile-app" className="py-20 md:py-28">
+    <section id="mobile-app" className="relative z-0 py-20 md:py-28">
       <div className="max-w-5xl mx-auto px-4 md:px-8">
         <div className="text-center">
           <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 mb-6">

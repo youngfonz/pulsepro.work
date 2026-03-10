@@ -3,7 +3,7 @@
 ## What Is This
 Pulse Pro is a SaaS project management app for freelancers and small agencies. Built with Next.js App Router, Prisma, Clerk auth, and Polar billing. Deployed on Vercel.
 
-**Live URL:** pulsepro.org
+**Live URL:** pulsepro.work
 **Owner:** Fonz (Fonz@PulsePro.org)
 
 ---

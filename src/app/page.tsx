@@ -26,7 +26,7 @@ export default async function MarketingPage() {
   return (
     <div className="min-h-screen bg-background">
       <MarketingNav />
-      <main id="main-content">
+      <main id="main-content" className="relative z-0">
         <Hero />
         <StatsImpact />
         <Features />
