@@ -108,7 +108,7 @@ export function TelegramFeature() {
     timeoutRef.current = setTimeout(() => {
       setActive((prev) => (prev + 1) % features.length);
       setVisible(true);
-    }, 350);
+    }, 150);
   }, []);
 
   const startInterval = useCallback(() => {
@@ -131,7 +131,7 @@ export function TelegramFeature() {
     timeoutRef.current = setTimeout(() => {
       setActive(i);
       setVisible(true);
-    }, 350);
+    }, 150);
     startInterval();
   };
 
@@ -174,7 +174,7 @@ export function TelegramFeature() {
         </ScrollReveal>
 
         <div
-          className="transition-opacity duration-300"
+          className="transition-opacity duration-150"
           style={{ opacity: visible ? 1 : 0 }}
         >
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
