@@ -35,7 +35,7 @@ export function MarketingNav() {
       className={cn(
         'fixed top-0 w-full z-50 h-14 transition-all duration-200',
         isScrolled
-          ? 'bg-background/95 backdrop-blur-md border-b border-border'
+          ? 'bg-background border-b border-border'
           : 'bg-transparent'
       )}
     >
