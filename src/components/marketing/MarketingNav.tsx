@@ -33,10 +33,8 @@ export function MarketingNav() {
     </a>
     <header
       className={cn(
-        'fixed top-0 w-full z-50 h-14 transition-all duration-200',
-        isScrolled
-          ? 'bg-background border-b border-border'
-          : 'bg-transparent'
+        'fixed top-0 w-full z-50 h-14 transition-all duration-200 bg-background',
+        isScrolled && 'border-b border-border'
       )}
     >
       <div className="max-w-6xl mx-auto px-4 md:px-8 h-full">
