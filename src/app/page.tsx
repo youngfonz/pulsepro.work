@@ -13,6 +13,8 @@ import { WhySwitch } from '@/components/marketing/sections/WhySwitch'
 import { StatsImpact } from '@/components/marketing/sections/StatsImpact'
 import { FinalCTA } from '@/components/marketing/sections/FinalCTA'
 
+export const dynamic = 'force-dynamic'
+
 export default async function MarketingPage() {
   const clerkEnabled = !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
   if (clerkEnabled) {
