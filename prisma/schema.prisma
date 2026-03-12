@@ -235,6 +235,31 @@ model SystemConfig {
   updatedAt DateTime @updatedAt
 }
 
+model PromoCode {
+  id          String    @id @default(cuid())
+  code        String    @unique
+  plan        String    // "pro" or "team"
+  maxUses     Int       @default(1)
+  usedCount   Int       @default(0)
+  expiresAt   DateTime?
+  active      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  redemptions PromoRedemption[]
+
+  @@index([code])
+}
+
+model PromoRedemption {
+  id          String    @id @default(cuid())
+  promoCodeId String
+  promoCode   PromoCode @relation(fields: [promoCodeId], references: [id], onDelete: Cascade)
+  userId      String
+  redeemedAt  DateTime  @default(now())
+
+  @@unique([promoCodeId, userId])
+  @@index([userId])
+}
+
 model InvoiceItem {
   id          String  @id @default(cuid())
   invoiceId   String

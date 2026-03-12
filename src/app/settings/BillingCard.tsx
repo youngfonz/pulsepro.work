@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { getSubscriptionStatus, getUsageLimits } from '@/actions/subscription'
+import { redeemPromoCode } from '@/actions/promo'
 
 type SubscriptionData = Awaited<ReturnType<typeof getSubscriptionStatus>>
 type UsageData = Awaited<ReturnType<typeof getUsageLimits>>
@@ -119,8 +120,82 @@ export function BillingCard() {
             </p>
           )}
         </div>
+        {/* Promo Code */}
+        <PromoCodeInput onRedeemed={() => {
+          Promise.all([getSubscriptionStatus(), getUsageLimits()])
+            .then(([sub, usg]) => { setSubscription(sub); setUsage(usg) })
+        }} />
       </CardContent>
     </Card>
+  )
+}
+
+function PromoCodeInput({ onRedeemed }: { onRedeemed: () => void }) {
+  const [open, setOpen] = useState(false)
+  const [code, setCode] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+
+  async function handleRedeem() {
+    if (!code.trim()) return
+    setLoading(true)
+    setMessage(null)
+    try {
+      const result = await redeemPromoCode(code)
+      if (result.success) {
+        setMessage({ type: 'success', text: `Upgraded to ${result.plan?.toUpperCase()}! Refreshing...` })
+        setCode('')
+        setTimeout(onRedeemed, 1000)
+      } else {
+        setMessage({ type: 'error', text: result.error || 'Failed to redeem code.' })
+      }
+    } catch {
+      setMessage({ type: 'error', text: 'Something went wrong. Try again.' })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (!open) {
+    return (
+      <div className="pt-2 border-t border-border">
+        <button
+          onClick={() => setOpen(true)}
+          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          Have a promo code?
+        </button>
+      </div>
+    )
+  }
+
+  return (
+    <div className="pt-2 border-t border-border space-y-2">
+      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Promo Code</p>
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={code}
+          onChange={e => setCode(e.target.value.toUpperCase())}
+          placeholder="PP-XXXX-XXXX"
+          className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm font-mono placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+          onKeyDown={e => e.key === 'Enter' && handleRedeem()}
+          disabled={loading}
+        />
+        <button
+          onClick={handleRedeem}
+          disabled={loading || !code.trim()}
+          className="rounded-lg bg-primary text-primary-foreground px-4 py-2 text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
+        >
+          {loading ? 'Redeeming...' : 'Redeem'}
+        </button>
+      </div>
+      {message && (
+        <p className={`text-xs ${message.type === 'success' ? 'text-emerald-500' : 'text-destructive'}`}>
+          {message.text}
+        </p>
+      )}
+    </div>
   )
 }
 
