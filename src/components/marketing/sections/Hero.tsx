@@ -88,14 +88,20 @@ export function Hero() {
 
           <ScrollReveal delay={300}>
             <div className="mt-10 flex gap-4 flex-wrap justify-center">
-              <Link
-                href="/sign-up"
+              <a
+                href="#pricing"
                 className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-all duration-200 hover:shadow-lg hover:shadow-primary/25"
               >
-                Get started — it&apos;s free
+                Get Started
                 <svg className="ml-2 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
+              </a>
+              <Link
+                href="/sign-up"
+                className="inline-flex items-center justify-center px-6 py-3 rounded-full border border-border text-foreground font-medium hover:bg-muted transition-colors"
+              >
+                Get started — it&apos;s free
               </Link>
               <a
                 href="#features"
