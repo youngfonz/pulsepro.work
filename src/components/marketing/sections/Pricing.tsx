@@ -34,7 +34,7 @@ const plans = [
     ],
     highlighted: true,
     cta: 'Get Started',
-    href: '/sign-up',
+    href: '/sign-up?plan=pro',
   },
   {
     name: 'Team',
@@ -50,7 +50,7 @@ const plans = [
     ],
     highlighted: false,
     cta: 'Get Started',
-    href: '/sign-up',
+    href: '/sign-up?plan=team',
   },
 ]
 
