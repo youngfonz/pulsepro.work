@@ -652,6 +652,48 @@
   </div>
 </div>
 
+<!-- 14. Marketing Landing Page -->
+<div class="section">
+  <div class="section-header" onclick="this.parentElement.classList.toggle('open')">
+    <div class="section-title"><span class="icon">14</span> Marketing Landing Page</div>
+    <div class="section-progress">
+      <span class="section-count"></span>
+      <svg class="section-chevron" viewBox="0 0 16 16" fill="currentColor"><path d="M6 4l4 4-4 4"/></svg>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="subsection">Sections</div>
+    <div class="feature"><span class="dot"></span><span class="text">Hero section with headline, subheadline, and CTA buttons</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">StatsImpact section with animated metrics</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Features section: desktop dashboard mock + static iPhone mock side by side</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Features section: 6 feature cards in responsive grid (1/2/3 columns)</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Mobile App section: rotating phone mock (Dashboard, Tasks, Invoice, Project screens)</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Mobile App section: clickable dot indicators + bottom nav highlights active screen</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Mobile App section: 6 mobile feature items with icons</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">"Work smarter from anywhere" section: 5 auto-cycling tabs (AI Insights, Email to Task, Siri & Voice, Keyboard, Telegram)</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Testimonials section</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Why Switch section: competitor comparison cards (Asana, Monday, Trello, ClickUp, Apple Notes)</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Pricing section: Free vs Pro comparison with correct limits</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">FAQ section with expand/collapse</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Final CTA section</span></div>
+
+    <div class="subsection">Navigation & Footer</div>
+    <div class="feature"><span class="dot"></span><span class="text">Fixed nav bar with solid background (no transparency) — always readable</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Nav stacking context isolation (z-50 nav stays above all section content)</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Nav links: Features, Pricing, FAQ anchor scrolling</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Footer with dynamic copyright year</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Footer links to About, Privacy, Terms, Contact</span></div>
+
+    <div class="subsection">Animations & Dark Mode</div>
+    <div class="feature"><span class="dot"></span><span class="text">ScrollReveal fade-in animations on all sections (up, left, right directions)</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Phone mock screens swap instantly (no opacity fade — prevents dark flash)</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Work Smarter tabs swap instantly (no opacity fade — prevents dark flash)</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Dark mode: all sections render correctly, nav text readable</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Light mode: all sections render correctly</span></div>
+    <div class="feature"><span class="dot"></span><span class="text">Mobile responsive: all sections stack, nav collapses, tab bar wraps</span></div>
+  </div>
+</div>
+
 </div>
 
 <script>
@@ -667,7 +709,7 @@
 
   // Total feature count
   const total = document.querySelectorAll('.feature').length;
-  document.querySelector('.header-stat .stat-value').textContent = '13';
+  document.querySelector('.header-stat .stat-value').textContent = '14';
   document.querySelectorAll('.header-stat')[1].querySelector('.stat-value').textContent = total;
 </script>
 

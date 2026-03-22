@@ -24,15 +24,23 @@ Mark each item: PASS / FAIL / SKIP (with reason)
 - [ ] Visit pulsepro.work — marketing page loads, no errors
 - [ ] Hero section: headline, subheadline, CTA buttons render correctly
 - [ ] StatsImpact section: numbers/metrics display
-- [ ] Features section: dashboard mock + 4 feature cards render
-- [ ] "Capture tasks from anywhere" section: all 5 tabs work
+- [ ] Features section: dashboard mock + static iPhone mock render side by side (desktop)
+- [ ] Features section: static phone mock hidden on mobile viewport
+- [ ] Features section: 6 feature cards render below mocks
+- [ ] Mobile App section: "Your projects, wherever you are" heading renders
+  - [ ] Rotating phone mock displays 4 screens (Dashboard, Tasks, Invoice, Project)
+  - [ ] Screens rotate every 4 seconds (instant swap, no dark flash)
+  - [ ] Dot indicators below phone mock are clickable
+  - [ ] Bottom nav highlights active screen
+  - [ ] 6 mobile feature items render to the right (desktop) or below (mobile)
+- [ ] "Work smarter from anywhere" section: all 5 tabs work
   - [ ] AI Insights tab — mock displays correctly
   - [ ] Email to Task tab — email mock displays
   - [ ] Siri & Voice tab — Siri orb + shortcuts card displays
   - [ ] Keyboard tab — N key + Cmd+K mocks display
   - [ ] Telegram tab — bot conversation mock displays
-  - [ ] Auto-cycling works (tabs rotate automatically)
-  - [ ] Manual tab switching works
+  - [ ] Auto-cycling works (tabs rotate every 6 seconds, instant swap)
+  - [ ] Manual tab switching works (no dark flash during transitions)
 - [ ] Testimonials section renders
 - [ ] Why Switch section: all competitor cards (Asana, Monday, Trello, ClickUp, Apple Notes)
 - [ ] Pricing section: Free vs Pro comparison table
@@ -44,7 +52,10 @@ Mark each item: PASS / FAIL / SKIP (with reason)
   - [ ] "Who is Pulse Pro for?" includes personal/solo use
 - [ ] Final CTA section renders with button
 - [ ] Navigation: all nav links work (Features, Pricing, FAQ anchors)
+- [ ] Navigation: nav bar has solid background (no transparency), text always readable
+- [ ] Navigation: nav bar stays above all section content when scrolling (z-index)
 - [ ] Footer: all footer links work
+- [ ] Footer: copyright year is dynamic (current year, not hardcoded)
 - [ ] Mobile responsive: test on phone-sized viewport
   - [ ] Nav collapses properly
   - [ ] All sections stack correctly
@@ -232,7 +243,9 @@ Mark each item: PASS / FAIL / SKIP (with reason)
 - [ ] Dashboard renders correctly in dark mode
 - [ ] Tasks page renders correctly
 - [ ] Project detail renders correctly
-- [ ] Marketing page respects dark mode (if applicable)
+- [ ] Marketing page respects dark mode
+- [ ] Marketing page: nav bar text readable in dark mode over all sections
+- [ ] Marketing page: no dark flash during phone mock rotation or tab switching
 - [ ] All text is readable, no contrast issues
 - [ ] Toggle back to light mode — works
 
