@@ -82,32 +82,42 @@ export async function redeemPromoCode(code: string) {
     return { success: false, error: 'This promo code has reached its usage limit.' }
   }
 
-  // Check if user already redeemed this code
-  const existing = await prisma.promoRedemption.findUnique({
-    where: { promoCodeId_userId: { promoCodeId: promo.id, userId } },
-  })
+  // All checks + writes in an interactive transaction to prevent TOCTOU races
+  const result = await prisma.$transaction(async (tx) => {
+    // Re-check inside transaction for atomicity
+    const existing = await tx.promoRedemption.findUnique({
+      where: { promoCodeId_userId: { promoCodeId: promo.id, userId } },
+    })
+    if (existing) {
+      return { success: false as const, error: 'You have already redeemed this code.' }
+    }
 
-  if (existing) {
-    return { success: false, error: 'You have already redeemed this code.' }
-  }
+    // Conditional update: only increment if usedCount is still under maxUses
+    const updated = await tx.promoCode.updateMany({
+      where: { id: promo.id, usedCount: { lt: promo.maxUses }, active: true },
+      data: { usedCount: { increment: 1 } },
+    })
+    if (updated.count === 0) {
+      return { success: false as const, error: 'This promo code has reached its usage limit.' }
+    }
 
-  // Upgrade subscription + record redemption in a transaction
-  await prisma.$transaction([
-    prisma.subscription.upsert({
+    await tx.subscription.upsert({
       where: { userId },
       create: { userId, plan: promo.plan, status: 'active' },
       update: { plan: promo.plan, status: 'active' },
-    }),
-    prisma.promoRedemption.create({
+    })
+    await tx.promoRedemption.create({
       data: { promoCodeId: promo.id, userId },
-    }),
-    prisma.promoCode.update({
-      where: { id: promo.id },
-      data: { usedCount: { increment: 1 } },
-    }),
-  ])
+    })
+
+    return { success: true as const, plan: promo.plan }
+  })
+
+  if (!result.success) {
+    return result
+  }
 
   revalidatePath('/settings')
   revalidatePath('/dashboard')
-  return { success: true, plan: promo.plan }
+  return { success: true, plan: result.plan }
 }
