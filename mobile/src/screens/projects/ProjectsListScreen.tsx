@@ -18,7 +18,7 @@ export function ProjectsListScreen({ navigation }: Props) {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity onPress={() => navigation.navigate('CreateProject')} hitSlop={8}>
+        <TouchableOpacity onPress={() => navigation.navigate('CreateProject')} hitSlop={8} activeOpacity={0.7}>
           <Plus size={24} color={colors.primary} />
         </TouchableOpacity>
       ),
@@ -29,6 +29,7 @@ export function ProjectsListScreen({ navigation }: Props) {
     <TouchableOpacity
       style={styles.card}
       onPress={() => navigation.navigate('ProjectDetail', { id: item.id })}
+      activeOpacity={0.7}
     >
       <View style={styles.cardHeader}>
         <Text style={styles.cardTitle} numberOfLines={1}>{item.name}</Text>

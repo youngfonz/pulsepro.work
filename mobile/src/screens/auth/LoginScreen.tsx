@@ -71,7 +71,7 @@ export function LoginScreen({ navigation }: Props) {
       if (!message.includes('cancel')) {
         setError(message)
       }
-      console.error('Google sign in error:', JSON.stringify(err, null, 2))
+      if (__DEV__) console.error('Google sign in error:', JSON.stringify(err, null, 2))
     } finally {
       setGoogleLoading(false)
     }
@@ -89,7 +89,7 @@ export function LoginScreen({ navigation }: Props) {
     } catch (err: any) {
       const message = err?.errors?.[0]?.longMessage || err?.errors?.[0]?.message || err?.message || 'Sign in failed'
       setError(message)
-      console.error('Sign in error:', JSON.stringify(err, null, 2))
+      if (__DEV__) console.error('Sign in error:', JSON.stringify(err, null, 2))
     } finally {
       setLoading(false)
     }
@@ -145,16 +145,16 @@ export function LoginScreen({ navigation }: Props) {
                   onChangeText={setPassword}
                   secureTextEntry
                 />
-                <TouchableOpacity style={styles.primaryBtn} onPress={handleSignIn} disabled={loading}>
+                <TouchableOpacity style={styles.primaryBtn} onPress={handleSignIn} disabled={loading} activeOpacity={0.7}>
                   <Text style={styles.primaryBtnText}>{loading ? 'Signing in...' : 'Sign In'}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => setShowEmailForm(false)} style={styles.backBtn}>
+                <TouchableOpacity onPress={() => setShowEmailForm(false)} style={styles.backBtn} activeOpacity={0.7}>
                   <Text style={styles.backBtnText}>Back</Text>
                 </TouchableOpacity>
               </View>
             ) : (
               <>
-                <TouchableOpacity style={styles.googleBtn} onPress={handleGoogleSignIn} disabled={googleLoading}>
+                <TouchableOpacity style={styles.googleBtn} onPress={handleGoogleSignIn} disabled={googleLoading} activeOpacity={0.7}>
                   {googleLoading ? (
                     <ActivityIndicator size="small" color="#1c1c1e" />
                   ) : (
@@ -165,11 +165,11 @@ export function LoginScreen({ navigation }: Props) {
                   )}
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.emailBtn} onPress={() => setShowEmailForm(true)}>
+                <TouchableOpacity style={styles.emailBtn} onPress={() => setShowEmailForm(true)} activeOpacity={0.7}>
                   <Text style={styles.emailBtnText}>Sign in with email</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={() => navigation.navigate('SignUp')} style={styles.signUpRow}>
+                <TouchableOpacity onPress={() => navigation.navigate('SignUp')} style={styles.signUpRow} activeOpacity={0.7}>
                   <Text style={styles.signUpText}>
                     Don&apos;t have an account? <Text style={styles.signUpLink}>Sign Up</Text>
                   </Text>

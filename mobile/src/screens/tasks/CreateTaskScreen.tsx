@@ -184,7 +184,7 @@ export function CreateTaskScreen() {
                 </Text>
               </View>
               {dueDate ? (
-                <TouchableOpacity onPress={handleClearDate} hitSlop={8}>
+                <TouchableOpacity onPress={handleClearDate} hitSlop={8} activeOpacity={0.7}>
                   <X size={16} color={colors.textSecondary} />
                 </TouchableOpacity>
               ) : (
@@ -236,7 +236,7 @@ export function CreateTaskScreen() {
             style={[styles.createButton, !canSubmit && styles.createButtonDisabled]}
             onPress={handleCreate}
             disabled={!canSubmit}
-            activeOpacity={0.8}
+            activeOpacity={0.7}
           >
             {createTask.isPending ? (
               <ActivityIndicator color={colors.surface} size="small" />
@@ -260,6 +260,7 @@ export function CreateTaskScreen() {
             <TouchableOpacity
               onPress={() => setProjectModalVisible(false)}
               hitSlop={8}
+              activeOpacity={0.7}
             >
               <X size={22} color={colors.textPrimary} />
             </TouchableOpacity>

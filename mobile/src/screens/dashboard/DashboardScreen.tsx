@@ -169,7 +169,7 @@ export function DashboardScreen() {
             <Text style={styles.errorMessage}>{error.message}</Text>
             <Text style={styles.errorHint}>Pull down to retry</Text>
             {error.message === 'Not authenticated' && (
-              <TouchableOpacity style={styles.signOutBtn} onPress={() => signOut()}>
+              <TouchableOpacity style={styles.signOutBtn} onPress={() => signOut()} activeOpacity={0.7}>
                 <Text style={styles.signOutText}>Sign Out & Re-Login</Text>
               </TouchableOpacity>
             )}

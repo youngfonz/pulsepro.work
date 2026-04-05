@@ -18,7 +18,7 @@ type Tab = 'overview' | 'tasks' | 'time' | 'budget'
 export function ProjectDetailScreen({ route }: Props) {
   const { id } = route.params
   const navigation = useNavigation()
-  const { data: project, isLoading, refetch } = useProjectDetail(id)
+  const { data: project, isLoading, isRefetching, refetch } = useProjectDetail(id)
   const { addItem } = useRecentlyViewed()
   const [activeTab, setActiveTab] = useState<Tab>('overview')
 
@@ -84,6 +84,7 @@ export function ProjectDetailScreen({ route }: Props) {
                 key={tab.key}
                 style={[styles.tab, activeTab === tab.key && styles.tabActive]}
                 onPress={() => setActiveTab(tab.key)}
+                activeOpacity={0.7}
               >
                 <Text style={[styles.tabText, activeTab === tab.key && styles.tabTextActive]}>
                   {tab.label}
@@ -94,7 +95,7 @@ export function ProjectDetailScreen({ route }: Props) {
 
           <ScrollView
             contentContainerStyle={styles.content}
-            refreshControl={<RefreshControl refreshing={false} onRefresh={refetch} tintColor={colors.primary} />}
+            refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor={colors.primary} />}
           >
             {activeTab === 'overview' && (
               <>

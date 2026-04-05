@@ -17,7 +17,7 @@ export function ClientsListScreen({ navigation }: Props) {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity onPress={() => navigation.navigate('CreateClient')} hitSlop={8}>
+        <TouchableOpacity onPress={() => navigation.navigate('CreateClient')} hitSlop={8} activeOpacity={0.7}>
           <Plus size={24} color={colors.primary} />
         </TouchableOpacity>
       ),
@@ -28,6 +28,7 @@ export function ClientsListScreen({ navigation }: Props) {
     <TouchableOpacity
       style={styles.row}
       onPress={() => navigation.navigate('ClientDetail', { id: item.id })}
+      activeOpacity={0.7}
     >
       <Text style={styles.name} numberOfLines={1}>{item.name}</Text>
       <Text style={styles.company}>{item.company || 'No company'}</Text>

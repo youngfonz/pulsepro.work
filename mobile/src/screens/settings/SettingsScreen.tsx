@@ -75,7 +75,7 @@ export function SettingsScreen() {
         </View>
 
         {/* Sign Out */}
-        <TouchableOpacity style={styles.signOutButton} onPress={() => signOut()}>
+        <TouchableOpacity style={styles.signOutButton} onPress={() => signOut()} activeOpacity={0.7}>
           <Text style={styles.signOutText}>Sign Out</Text>
         </TouchableOpacity>
       </ScrollView>

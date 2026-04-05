@@ -137,7 +137,7 @@ export function CreateClientScreen() {
             style={[styles.createButton, !canSubmit && styles.createButtonDisabled]}
             onPress={handleCreate}
             disabled={!canSubmit}
-            activeOpacity={0.8}
+            activeOpacity={0.7}
           >
             {createClient.isPending ? (
               <ActivityIndicator color={colors.surface} size="small" />

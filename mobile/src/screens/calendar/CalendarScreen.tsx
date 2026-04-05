@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react'
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Dimensions } from 'react-native'
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Dimensions, ActivityIndicator } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useNavigation, CommonActions } from '@react-navigation/native'
 import { ChevronLeft, ChevronRight } from 'lucide-react-native'
@@ -25,7 +25,7 @@ export function CalendarScreen() {
   const [month, setMonth] = useState(today.getMonth())
   const [selectedDate, setSelectedDate] = useState(today)
 
-  const { data } = useCalendar(year, month)
+  const { data, error, refetch } = useCalendar(year, month)
   const tasks = data?.tasks ?? []
 
   const tasksByDate = useMemo(() => {
@@ -64,16 +64,29 @@ export function CalendarScreen() {
     else setMonth(m => m + 1)
   }
 
+  if (error) {
+    return (
+      <SafeAreaView style={styles.container} edges={['bottom']}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+          <Text style={{ fontSize: 16, color: colors.textSecondary, textAlign: 'center' }}>Something went wrong</Text>
+          <TouchableOpacity onPress={() => refetch()} style={{ marginTop: 12, paddingHorizontal: 20, paddingVertical: 10, backgroundColor: colors.primary, borderRadius: 8 }} activeOpacity={0.7}>
+            <Text style={{ color: '#fff', fontWeight: '600' }}>Retry</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    )
+  }
+
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <ScrollView>
         {/* Month navigation */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={goToPrev} hitSlop={12}>
+          <TouchableOpacity onPress={goToPrev} hitSlop={12} activeOpacity={0.7}>
             <ChevronLeft size={24} color={colors.textPrimary} />
           </TouchableOpacity>
           <Text style={styles.monthTitle}>{MONTHS[month]} {year}</Text>
-          <TouchableOpacity onPress={goToNext} hitSlop={12}>
+          <TouchableOpacity onPress={goToNext} hitSlop={12} activeOpacity={0.7}>
             <ChevronRight size={24} color={colors.textPrimary} />
           </TouchableOpacity>
         </View>
@@ -103,6 +116,7 @@ export function CalendarScreen() {
                 key={day}
                 style={[styles.cell, isSelected && styles.cellSelected]}
                 onPress={() => setSelectedDate(date)}
+                activeOpacity={0.7}
               >
                 <Text style={[
                   styles.dayText,

@@ -102,6 +102,7 @@ export function CreateInvoiceScreen({ navigation }: Props) {
                 key={c.id}
                 style={[styles.chip, clientId === c.id && styles.chipActive]}
                 onPress={() => { setClientId(c.id); setProjectId('') }}
+                activeOpacity={0.7}
               >
                 <Text style={[styles.chipText, clientId === c.id && styles.chipTextActive]} numberOfLines={1}>
                   {c.name}
@@ -117,6 +118,7 @@ export function CreateInvoiceScreen({ navigation }: Props) {
                 <TouchableOpacity
                   style={[styles.chip, !projectId && styles.chipActive]}
                   onPress={() => setProjectId('')}
+                  activeOpacity={0.7}
                 >
                   <Text style={[styles.chipText, !projectId && styles.chipTextActive]}>None</Text>
                 </TouchableOpacity>
@@ -125,6 +127,7 @@ export function CreateInvoiceScreen({ navigation }: Props) {
                     key={p.id}
                     style={[styles.chip, projectId === p.id && styles.chipActive]}
                     onPress={() => setProjectId(p.id)}
+                    activeOpacity={0.7}
                   >
                     <Text style={[styles.chipText, projectId === p.id && styles.chipTextActive]} numberOfLines={1}>
                       {p.name}
@@ -136,7 +139,7 @@ export function CreateInvoiceScreen({ navigation }: Props) {
           )}
 
           <Text style={styles.label}>Due Date</Text>
-          <TouchableOpacity style={styles.input} onPress={() => setShowDatePicker(true)}>
+          <TouchableOpacity style={styles.input} onPress={() => setShowDatePicker(true)} activeOpacity={0.7}>
             <Text style={styles.inputText}>{dueDate.toLocaleDateString()}</Text>
           </TouchableOpacity>
           {showDatePicker && (
@@ -160,7 +163,7 @@ export function CreateInvoiceScreen({ navigation }: Props) {
 
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Line Items</Text>
-            <TouchableOpacity onPress={addLineItem} hitSlop={8}>
+            <TouchableOpacity onPress={addLineItem} hitSlop={8} activeOpacity={0.7}>
               <Plus size={22} color={colors.primary} />
             </TouchableOpacity>
           </View>
@@ -170,7 +173,7 @@ export function CreateInvoiceScreen({ navigation }: Props) {
               <View style={styles.lineItemHeader}>
                 <Text style={styles.lineItemLabel}>Item {index + 1}</Text>
                 {items.length > 1 && (
-                  <TouchableOpacity onPress={() => removeLineItem(item.key)} hitSlop={8}>
+                  <TouchableOpacity onPress={() => removeLineItem(item.key)} hitSlop={8} activeOpacity={0.7}>
                     <Trash2 size={18} color={colors.destructive} />
                   </TouchableOpacity>
                 )}
@@ -249,6 +252,7 @@ export function CreateInvoiceScreen({ navigation }: Props) {
             style={[styles.createButton, createMutation.isPending && styles.buttonDisabled]}
             onPress={handleCreate}
             disabled={createMutation.isPending}
+            activeOpacity={0.7}
           >
             <Text style={styles.createButtonText}>
               {createMutation.isPending ? 'Creating...' : 'Create Invoice'}
