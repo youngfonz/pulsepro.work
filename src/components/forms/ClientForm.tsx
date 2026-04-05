@@ -75,12 +75,11 @@ export function ClientForm({ client, onSuccess }: ClientFormProps) {
     })
   }
 
-  if (limitMessage) {
-    return <UpgradePrompt message={limitMessage} onDismiss={() => setLimitMessage(null)} />
-  }
-
   return (
     <form action={handleSubmit} className="space-y-4">
+      {limitMessage && (
+        <UpgradePrompt message={limitMessage} onDismiss={() => setLimitMessage(null)} />
+      )}
       <ImageUpload
         value={logo}
         onChange={setLogo}

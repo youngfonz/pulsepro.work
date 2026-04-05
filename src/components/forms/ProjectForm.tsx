@@ -102,12 +102,11 @@ export function ProjectForm({ project, clients, defaultClientId, onSuccess }: Pr
     })
   }
 
-  if (limitMessage) {
-    return <UpgradePrompt message={limitMessage} onDismiss={() => setLimitMessage(null)} />
-  }
-
   return (
     <form action={handleSubmit} className="space-y-4">
+      {limitMessage && (
+        <UpgradePrompt message={limitMessage} onDismiss={() => setLimitMessage(null)} />
+      )}
       <div>
         <label htmlFor="name" className="block text-sm font-medium text-foreground mb-1">
           Project Name *

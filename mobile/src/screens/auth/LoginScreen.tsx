@@ -1,16 +1,33 @@
-import React, { useState, useCallback } from 'react'
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native'
+import React, { useState, useCallback, useEffect, useRef } from 'react'
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  ActivityIndicator,
+  Animated,
+  Easing,
+  Dimensions,
+  ImageBackground,
+  Image,
+} from 'react-native'
 import { useSignIn } from '@clerk/expo/legacy'
 import { useOAuth } from '@clerk/expo'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import Constants from 'expo-constants'
 import * as WebBrowser from 'expo-web-browser'
 import { makeRedirectUri } from 'expo-auth-session'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { colors } from '../../theme/colors'
-import { spacing } from '../../theme/spacing'
 import type { AuthStackParamList } from '../../types/navigation'
 
+const appIcon = require('../../../assets/icon.png')
+
 WebBrowser.maybeCompleteAuthSession()
+
+const { width, height } = Dimensions.get('window')
 
 type Props = {
   navigation: NativeStackNavigationProp<AuthStackParamList, 'Login'>
@@ -24,12 +41,27 @@ export function LoginScreen({ navigation }: Props) {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
+  const [showEmailForm, setShowEmailForm] = useState(false)
+
+  const fadeIn = useRef(new Animated.Value(0)).current
+  const slideUp = useRef(new Animated.Value(20)).current
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeIn, { toValue: 1, duration: 1000, delay: 200, useNativeDriver: true }),
+      Animated.timing(slideUp, { toValue: 0, duration: 1000, delay: 200, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+    ]).start()
+  }, [])
 
   const handleGoogleSignIn = useCallback(async () => {
     setError('')
     setGoogleLoading(true)
     try {
-      const redirectUrl = makeRedirectUri({ scheme: 'pulsepro', path: 'oauth-native-callback' })
+      const isExpoGo = Constants.appOwnership === 'expo'
+      const redirectUrl = makeRedirectUri({
+        ...(!isExpoGo && { scheme: 'pulsepro' }),
+        path: 'oauth-native-callback',
+      })
       const { createdSessionId, setActive: setActiveSession } = await startOAuthFlow({ redirectUrl })
       if (createdSessionId && setActiveSession) {
         await setActiveSession({ session: createdSessionId })
@@ -64,88 +96,239 @@ export function LoginScreen({ navigation }: Props) {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView style={styles.inner} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <Text style={styles.title}>Pulse Pro</Text>
-        <Text style={styles.subtitle}>Sign in to your account</Text>
+    <ImageBackground
+      source={{ uri: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80&fit=crop' }}
+      style={styles.container}
+      resizeMode="cover"
+    >
+      {/* Dark overlay gradient */}
+      <View style={styles.overlay} />
 
-        {error ? <Text style={styles.error}>{error}</Text> : null}
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <SafeAreaView style={styles.safeArea}>
+          {/* Top icon + name */}
+          <Animated.View style={[styles.topBar, { opacity: fadeIn }]}>
+            <Image source={appIcon} style={styles.appIcon} />
+            <Text style={styles.brand}>Pulse Pro</Text>
+          </Animated.View>
 
-        <TouchableOpacity style={styles.googleButton} onPress={handleGoogleSignIn} disabled={googleLoading}>
-          {googleLoading ? (
-            <ActivityIndicator size="small" color={colors.textPrimary} />
-          ) : (
-            <>
-              <Text style={styles.googleIcon}>G</Text>
-              <Text style={styles.googleText}>Continue with Google</Text>
-            </>
-          )}
-        </TouchableOpacity>
+          {/* Center headline */}
+          <Animated.View style={[styles.centerContent, { opacity: fadeIn, transform: [{ translateY: slideUp }] }]}>
+            <Text style={styles.headline}>
+              Your projects,{'\n'}under control.
+            </Text>
+            <Text style={styles.subheadline}>
+              Track tasks, manage clients, and send invoices — all from your pocket.
+            </Text>
+          </Animated.View>
 
-        <View style={styles.dividerRow}>
-          <View style={styles.dividerLine} />
-          <Text style={styles.dividerText}>or</Text>
-          <View style={styles.dividerLine} />
-        </View>
+          {/* Bottom actions */}
+          <Animated.View style={[styles.bottomSection, { opacity: fadeIn }]}>
+            {error ? <Text style={styles.error}>{error}</Text> : null}
 
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          placeholderTextColor={colors.textSecondary}
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          keyboardType="email-address"
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          placeholderTextColor={colors.textSecondary}
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
+            {showEmailForm ? (
+              <View style={styles.emailForm}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Email"
+                  placeholderTextColor="rgba(255,255,255,0.4)"
+                  value={email}
+                  onChangeText={setEmail}
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Password"
+                  placeholderTextColor="rgba(255,255,255,0.4)"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry
+                />
+                <TouchableOpacity style={styles.primaryBtn} onPress={handleSignIn} disabled={loading}>
+                  <Text style={styles.primaryBtnText}>{loading ? 'Signing in...' : 'Sign In'}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setShowEmailForm(false)} style={styles.backBtn}>
+                  <Text style={styles.backBtnText}>Back</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <>
+                <TouchableOpacity style={styles.googleBtn} onPress={handleGoogleSignIn} disabled={googleLoading}>
+                  {googleLoading ? (
+                    <ActivityIndicator size="small" color="#1c1c1e" />
+                  ) : (
+                    <>
+                      <Text style={styles.googleG}>G</Text>
+                      <Text style={styles.googleBtnText}>Continue with Google</Text>
+                    </>
+                  )}
+                </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button} onPress={handleSignIn} disabled={loading}>
-          <Text style={styles.buttonText}>{loading ? 'Signing in...' : 'Sign In'}</Text>
-        </TouchableOpacity>
+                <TouchableOpacity style={styles.emailBtn} onPress={() => setShowEmailForm(true)}>
+                  <Text style={styles.emailBtnText}>Sign in with email</Text>
+                </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
-          <Text style={styles.link}>Don&apos;t have an account? Sign Up</Text>
-        </TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate('SignUp')} style={styles.signUpRow}>
+                  <Text style={styles.signUpText}>
+                    Don&apos;t have an account? <Text style={styles.signUpLink}>Sign Up</Text>
+                  </Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </Animated.View>
+        </SafeAreaView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </ImageBackground>
   )
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  inner: { flex: 1, justifyContent: 'center', paddingHorizontal: spacing.xxl },
-  title: { fontSize: 32, fontWeight: '700', color: colors.textPrimary, textAlign: 'center', marginBottom: spacing.sm },
-  subtitle: { fontSize: 15, color: colors.textSecondary, textAlign: 'center', marginBottom: spacing.xxxl },
-  googleButton: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    backgroundColor: colors.surface, borderRadius: 10, padding: spacing.lg,
-    borderWidth: 1, borderColor: colors.border, marginBottom: spacing.lg,
-    minHeight: 52,
+  container: {
+    flex: 1,
+    backgroundColor: '#0a0e1a',
   },
-  googleIcon: {
-    fontSize: 20, fontWeight: '700', color: '#4285F4', marginRight: spacing.sm,
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.35)',
   },
-  googleText: { fontSize: 16, fontWeight: '600', color: colors.textPrimary },
-  dividerRow: { flexDirection: 'row', alignItems: 'center', marginBottom: spacing.lg },
-  dividerLine: { flex: 1, height: 1, backgroundColor: colors.border },
-  dividerText: { color: colors.textSecondary, fontSize: 13, paddingHorizontal: spacing.md },
+  safeArea: {
+    flex: 1,
+    justifyContent: 'space-between',
+  },
+
+  // Top
+  topBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingHorizontal: 28,
+    paddingTop: 12,
+  },
+  brand: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#fff',
+    letterSpacing: -0.3,
+  },
+  appIcon: {
+    width: 52,
+    height: 52,
+    borderRadius: 14,
+  },
+
+  // Center
+  centerContent: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    paddingHorizontal: 28,
+    paddingBottom: 40,
+  },
+  headline: {
+    fontSize: 44,
+    fontWeight: '800',
+    color: '#fff',
+    lineHeight: 52,
+    letterSpacing: -1,
+    marginBottom: 14,
+  },
+  subheadline: {
+    fontSize: 17,
+    color: 'rgba(255,255,255,0.7)',
+    lineHeight: 26,
+  },
+
+  // Bottom
+  bottomSection: {
+    paddingHorizontal: 24,
+    paddingBottom: Platform.OS === 'ios' ? 16 : 24,
+  },
+  googleBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 14,
+    paddingVertical: 16,
+    marginBottom: 10,
+  },
+  googleG: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#4285F4',
+    marginRight: 10,
+  },
+  googleBtnText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1c1c1e',
+  },
+  emailBtn: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 14,
+    paddingVertical: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+    marginBottom: 20,
+  },
+  emailBtnText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.8)',
+  },
+  signUpRow: {
+    alignItems: 'center',
+    paddingBottom: 8,
+  },
+  signUpText: {
+    fontSize: 15,
+    color: 'rgba(255,255,255,0.5)',
+  },
+  signUpLink: {
+    color: '#fff',
+    fontWeight: '700',
+  },
+
+  // Email form
+  emailForm: {
+    gap: 10,
+  },
   input: {
-    backgroundColor: colors.surfaceAlt, borderRadius: 10, padding: spacing.lg,
-    color: colors.textPrimary, fontSize: 15, marginBottom: spacing.md,
-    borderWidth: 1, borderColor: colors.border,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 14,
+    paddingHorizontal: 18,
+    paddingVertical: 16,
+    color: '#fff',
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
   },
-  button: {
-    backgroundColor: colors.primary, borderRadius: 10, padding: spacing.lg,
-    alignItems: 'center', marginTop: spacing.md, marginBottom: spacing.xl,
+  primaryBtn: {
+    backgroundColor: '#3b82f6',
+    borderRadius: 14,
+    paddingVertical: 16,
+    alignItems: 'center',
+    marginTop: 4,
   },
-  buttonText: { color: '#fff', fontSize: 17, fontWeight: '600' },
-  error: { color: colors.destructive, textAlign: 'center', marginBottom: spacing.lg, fontSize: 13 },
-  link: { color: colors.primary, textAlign: 'center', fontSize: 15 },
+  primaryBtnText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  backBtn: {
+    alignItems: 'center',
+    paddingVertical: 12,
+  },
+  backBtnText: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: 'rgba(255,255,255,0.5)',
+  },
+  error: {
+    color: '#f43f5e',
+    textAlign: 'center',
+    marginBottom: 12,
+    fontSize: 13,
+  },
 })

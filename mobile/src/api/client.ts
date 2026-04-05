@@ -1,4 +1,4 @@
-const API_BASE = 'https://www.pulsepro.work/api/v1'
+const API_BASE = process.env.EXPO_PUBLIC_API_URL || 'https://www.pulsepro.work/api/v1'
 
 export type GetToken = () => Promise<string | null>
 

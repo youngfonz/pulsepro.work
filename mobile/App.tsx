@@ -18,11 +18,11 @@ const queryClient = new QueryClient({
   },
 })
 
-// Hardcode production key — Expo loads parent .env.local which has dev keys
+// Use env key if available (supports both pk_live_ and pk_test_), fall back to production
 const PRODUCTION_CLERK_KEY = 'pk_live_Y2xlcmsucHVsc2Vwcm8ud29yayQ'
 const envKey = (process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY || Constants.expoConfig?.extra?.clerkPublishableKey) as string
-const publishableKey = envKey?.startsWith('pk_live_') ? envKey : PRODUCTION_CLERK_KEY
-console.log('[Auth] Clerk key prefix:', publishableKey?.substring(0, 10))
+const publishableKey = envKey?.startsWith('pk_') ? envKey : PRODUCTION_CLERK_KEY
+console.log('[Auth] Clerk key prefix:', publishableKey?.substring(0, 12))
 
 export default function App() {
   return (

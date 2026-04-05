@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingVi
 import { useSignUp } from '@clerk/expo/legacy'
 import { useOAuth } from '@clerk/expo'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import Constants from 'expo-constants'
 import * as WebBrowser from 'expo-web-browser'
 import { makeRedirectUri } from 'expo-auth-session'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -31,7 +32,11 @@ export function SignUpScreen({ navigation }: Props) {
     setError('')
     setGoogleLoading(true)
     try {
-      const redirectUrl = makeRedirectUri({ scheme: 'pulsepro', path: 'oauth-native-callback' })
+      const isExpoGo = Constants.appOwnership === 'expo'
+      const redirectUrl = makeRedirectUri({
+        ...(!isExpoGo && { scheme: 'pulsepro' }),
+        path: 'oauth-native-callback',
+      })
       const { createdSessionId, setActive: setActiveSession } = await startOAuthFlow({ redirectUrl })
       if (createdSessionId && setActiveSession) {
         await setActiveSession({ session: createdSessionId })
