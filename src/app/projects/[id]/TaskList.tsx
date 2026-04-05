@@ -31,6 +31,9 @@ interface TaskFile {
 interface TaskComment {
   id: string
   content: string
+  userId?: string | null
+  authorName?: string | null
+  isOwn?: boolean
   createdAt: Date
   updatedAt: Date
 }
@@ -572,7 +575,7 @@ function TaskComments({ taskId, canEdit = true }: { taskId: string; canEdit?: bo
     startTransition(async () => {
       await addTaskComment(taskId, newComment)
       setLocalComments([
-        { id: Date.now().toString(), content: newComment, createdAt: new Date(), updatedAt: new Date() },
+        { id: Date.now().toString(), content: newComment, authorName: 'You', isOwn: true, createdAt: new Date(), updatedAt: new Date() },
         ...localComments,
       ])
       setNewComment('')
@@ -648,10 +651,17 @@ function TaskComments({ taskId, canEdit = true }: { taskId: string; canEdit?: bo
               className="border border-border bg-muted/30 p-3 space-y-2"
             >
               <div className="flex items-start justify-between gap-2">
-                <p className="text-sm text-foreground whitespace-pre-wrap flex-1">
-                  {comment.content}
-                </p>
-                {canEdit && (
+                <div className="flex-1 min-w-0">
+                  {comment.authorName && (
+                    <p className="text-xs font-medium text-foreground mb-1">
+                      {comment.isOwn ? 'You' : comment.authorName}
+                    </p>
+                  )}
+                  <p className="text-sm text-foreground whitespace-pre-wrap">
+                    {comment.content}
+                  </p>
+                </div>
+                {canEdit && comment.isOwn !== false && (
                   <button
                     onClick={() => handleDeleteComment(comment.id)}
                     className="flex-shrink-0 p-1 text-muted-foreground hover:text-destructive transition-colors"

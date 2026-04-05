@@ -92,7 +92,7 @@ export async function POST(
     if (!task) return apiError('Task not found or insufficient permissions', 404)
 
     const comment = await prisma.taskComment.create({
-      data: { content, taskId },
+      data: { content, taskId, userId },
     })
 
     return NextResponse.json(comment, { status: 201 })
