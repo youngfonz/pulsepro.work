@@ -661,7 +661,7 @@ function TaskComments({ taskId, canEdit = true }: { taskId: string; canEdit?: bo
                     {comment.content}
                   </p>
                 </div>
-                {canEdit && comment.isOwn !== false && (
+                {canEdit && comment.isOwn === true && (
                   <button
                     onClick={() => handleDeleteComment(comment.id)}
                     className="flex-shrink-0 p-1 text-muted-foreground hover:text-destructive transition-colors"

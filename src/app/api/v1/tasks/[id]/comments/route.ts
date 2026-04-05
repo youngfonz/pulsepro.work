@@ -83,7 +83,7 @@ export async function POST(
           where: { projectId_userId: { projectId: taskRecord.projectId, userId } },
           select: { role: true },
         })
-        if (access && ['editor', 'manager'].includes(access.role)) {
+        if (access && ['editor', 'manager', 'owner'].includes(access.role)) {
           task = taskRecord
         }
       }
