@@ -671,10 +671,30 @@ export async function getTaskComments(taskId: string) {
     }
     if (!task) return []
 
-    return prisma.taskComment.findMany({
+    const comments = await prisma.taskComment.findMany({
       where: { taskId },
       orderBy: { createdAt: 'desc' },
     })
+
+    // Enrich with author names from Clerk
+    const authorIds = [...new Set(comments.map(c => c.userId).filter(Boolean))] as string[]
+    let authorMap: Record<string, string> = {}
+    if (authorIds.length > 0) {
+      try {
+        const { clerkClient } = await import('@clerk/nextjs/server')
+        const clerk = await clerkClient()
+        const users = await clerk.users.getUserList({ userId: authorIds, limit: authorIds.length })
+        for (const u of users.data) {
+          authorMap[u.id] = [u.firstName, u.lastName].filter(Boolean).join(' ') || u.emailAddresses[0]?.emailAddress || 'Unknown'
+        }
+      } catch { /* fall through — comments still work without names */ }
+    }
+
+    return comments.map(c => ({
+      ...c,
+      authorName: c.userId ? (authorMap[c.userId] || 'Unknown') : null,
+      isOwn: c.userId === userId,
+    }))
   } catch (error) {
     console.error('getTaskComments:', error)
     return []
@@ -706,6 +726,7 @@ export async function addTaskComment(taskId: string, content: string) {
       data: {
         content,
         taskId,
+        userId,
       },
     })
     if (task.projectId) revalidatePath(`/projects/${task.projectId}`)
@@ -728,9 +749,11 @@ export async function deleteTaskComment(commentId: string) {
     })
 
     if (!comment) return
-    if (comment.task.userId !== userId) {
+    const isCommentAuthor = comment.userId === userId
+    const isTaskOwner = comment.task.userId === userId
+    if (!isCommentAuthor && !isTaskOwner) {
       if (!comment.task.projectId) throw new Error('Not authorized')
-      await requireProjectAccess(comment.task.projectId, 'editor')
+      await requireProjectAccess(comment.task.projectId, 'manager')
     }
 
     await prisma.taskComment.delete({
@@ -768,6 +791,16 @@ export async function createBookmarkTask(
       const shared = await prisma.project.findUnique({ where: { id: projectId }, select: { userId: true } })
       if (!shared || !shared.userId) throw new Error('Project not found')
       taskUserId = shared.userId
+    }
+
+    // Validate URL protocol (prevent javascript: XSS)
+    try {
+      const parsed = new URL(data.url)
+      if (!['http:', 'https:'].includes(parsed.protocol)) {
+        throw new Error('Only http and https URLs are allowed')
+      }
+    } catch {
+      throw new Error('Invalid URL')
     }
 
     const limit = await checkLimit('tasks')

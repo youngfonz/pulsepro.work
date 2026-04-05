@@ -54,20 +54,24 @@ export function AddTaskForm({ projectId, onSuccess }: { projectId: string; onSuc
     })
   }
 
-  if (limitMessage) {
-    return <UpgradePrompt message={limitMessage} onDismiss={() => setLimitMessage(null)} />
-  }
-
   if (!isOpen) {
     return (
-      <Button onClick={() => setIsOpen(true)}>
-        + Add Task
-      </Button>
+      <>
+        {limitMessage && (
+          <UpgradePrompt message={limitMessage} onDismiss={() => setLimitMessage(null)} />
+        )}
+        <Button onClick={() => setIsOpen(true)}>
+          + Add Task
+        </Button>
+      </>
     )
   }
 
   return (
     <form action={handleSubmit} className="space-y-3  border border-border bg-muted/50 p-4">
+      {limitMessage && (
+        <UpgradePrompt message={limitMessage} onDismiss={() => setLimitMessage(null)} />
+      )}
       <div className="flex items-start gap-2">
         <Input
           id="title"

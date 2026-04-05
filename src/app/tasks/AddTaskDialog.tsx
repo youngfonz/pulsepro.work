@@ -8,6 +8,7 @@ import { Select } from '@/components/ui/Select'
 import { Textarea } from '@/components/ui/Textarea'
 import { VoiceInput } from '@/components/ui/VoiceInput'
 import { DatePicker } from '@/components/ui/DatePicker'
+import { UpgradePrompt, isLimitError } from '@/components/ui/UpgradePrompt'
 import { createTask } from '@/actions/tasks'
 import { parseTaskFromVoice } from '@/lib/voice'
 
@@ -51,6 +52,7 @@ export function AddTaskDialog({ projects, defaultOpen = false }: AddTaskDialogPr
   const [priority, setPriority] = useState('medium')
   const [dueDate, setDueDate] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [limitMessage, setLimitMessage] = useState<string | null>(null)
 
   const handleVoiceInput = (transcript: string) => {
     const parsed = parseTaskFromVoice(transcript)
@@ -84,7 +86,12 @@ export function AddTaskDialog({ projects, defaultOpen = false }: AddTaskDialogPr
         setDueDate('')
         router.refresh()
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to create task. Please try again.')
+        const msg = isLimitError(err)
+        if (msg) {
+          setLimitMessage(msg)
+        } else {
+          setError(err instanceof Error ? err.message : 'Failed to create task. Please try again.')
+        }
       }
     })
   }
@@ -189,14 +196,12 @@ export function AddTaskDialog({ projects, defaultOpen = false }: AddTaskDialogPr
                   onChange={setDueDate}
                 />
 
+                {limitMessage && (
+                  <UpgradePrompt message={limitMessage} onDismiss={() => setLimitMessage(null)} />
+                )}
                 {error && (
                   <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3">
                     <p className="text-sm text-destructive">{error}</p>
-                    {error.toLowerCase().includes('upgrade') && (
-                      <a href="/settings" className="text-sm font-medium text-primary hover:text-primary/80 mt-1 inline-block">
-                        Manage plan &rarr;
-                      </a>
-                    )}
                   </div>
                 )}
                 <div className="flex flex-col-reverse gap-3 pt-4 sm:flex-row">

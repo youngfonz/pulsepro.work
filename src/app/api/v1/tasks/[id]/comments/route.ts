@@ -83,7 +83,7 @@ export async function POST(
           where: { projectId_userId: { projectId: taskRecord.projectId, userId } },
           select: { role: true },
         })
-        if (access && ['editor', 'manager'].includes(access.role)) {
+        if (access && ['editor', 'manager', 'owner'].includes(access.role)) {
           task = taskRecord
         }
       }
@@ -92,7 +92,7 @@ export async function POST(
     if (!task) return apiError('Task not found or insufficient permissions', 404)
 
     const comment = await prisma.taskComment.create({
-      data: { content, taskId },
+      data: { content, taskId, userId },
     })
 
     return NextResponse.json(comment, { status: 201 })

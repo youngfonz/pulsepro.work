@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingVi
 import { useSignUp } from '@clerk/expo/legacy'
 import { useOAuth } from '@clerk/expo'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import Constants from 'expo-constants'
 import * as WebBrowser from 'expo-web-browser'
 import { makeRedirectUri } from 'expo-auth-session'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -31,7 +32,11 @@ export function SignUpScreen({ navigation }: Props) {
     setError('')
     setGoogleLoading(true)
     try {
-      const redirectUrl = makeRedirectUri({ scheme: 'pulsepro', path: 'oauth-native-callback' })
+      const isExpoGo = Constants.appOwnership === 'expo'
+      const redirectUrl = makeRedirectUri({
+        ...(!isExpoGo && { scheme: 'pulsepro' }),
+        path: 'oauth-native-callback',
+      })
       const { createdSessionId, setActive: setActiveSession } = await startOAuthFlow({ redirectUrl })
       if (createdSessionId && setActiveSession) {
         await setActiveSession({ session: createdSessionId })
@@ -41,7 +46,7 @@ export function SignUpScreen({ navigation }: Props) {
       if (!message.includes('cancel')) {
         setError(message)
       }
-      console.error('Google sign up error:', JSON.stringify(err, null, 2))
+      if (__DEV__) console.error('Google sign up error:', JSON.stringify(err, null, 2))
     } finally {
       setGoogleLoading(false)
     }
@@ -58,7 +63,7 @@ export function SignUpScreen({ navigation }: Props) {
     } catch (err: any) {
       const message = err?.errors?.[0]?.longMessage || err?.errors?.[0]?.message || err?.message || 'Sign up failed'
       setError(message)
-      console.error('Sign up error:', JSON.stringify(err, null, 2))
+      if (__DEV__) console.error('Sign up error:', JSON.stringify(err, null, 2))
     } finally {
       setLoading(false)
     }
@@ -76,7 +81,7 @@ export function SignUpScreen({ navigation }: Props) {
     } catch (err: any) {
       const message = err?.errors?.[0]?.longMessage || err?.errors?.[0]?.message || err?.message || 'Verification failed'
       setError(message)
-      console.error('Verify error:', JSON.stringify(err, null, 2))
+      if (__DEV__) console.error('Verify error:', JSON.stringify(err, null, 2))
     } finally {
       setLoading(false)
     }
@@ -102,13 +107,13 @@ export function SignUpScreen({ navigation }: Props) {
               onChangeText={setCode}
               keyboardType="number-pad"
             />
-            <TouchableOpacity style={styles.button} onPress={handleVerify} disabled={loading}>
+            <TouchableOpacity style={styles.button} onPress={handleVerify} disabled={loading} activeOpacity={0.7}>
               <Text style={styles.buttonText}>{loading ? 'Verifying...' : 'Verify Email'}</Text>
             </TouchableOpacity>
           </>
         ) : (
           <>
-            <TouchableOpacity style={styles.googleButton} onPress={handleGoogleSignUp} disabled={googleLoading}>
+            <TouchableOpacity style={styles.googleButton} onPress={handleGoogleSignUp} disabled={googleLoading} activeOpacity={0.7}>
               {googleLoading ? (
                 <ActivityIndicator size="small" color={colors.textPrimary} />
               ) : (
@@ -142,13 +147,13 @@ export function SignUpScreen({ navigation }: Props) {
               onChangeText={setPassword}
               secureTextEntry
             />
-            <TouchableOpacity style={styles.button} onPress={handleSignUp} disabled={loading}>
+            <TouchableOpacity style={styles.button} onPress={handleSignUp} disabled={loading} activeOpacity={0.7}>
               <Text style={styles.buttonText}>{loading ? 'Creating account...' : 'Sign Up'}</Text>
             </TouchableOpacity>
           </>
         )}
 
-        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+        <TouchableOpacity onPress={() => navigation.navigate('Login')} activeOpacity={0.7}>
           <Text style={styles.link}>Already have an account? Sign In</Text>
         </TouchableOpacity>
       </KeyboardAvoidingView>

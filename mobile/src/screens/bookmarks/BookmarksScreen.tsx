@@ -26,12 +26,13 @@ function getDomain(url: string): string {
 }
 
 export function BookmarksScreen() {
-  const { data, isLoading, isFetching, refetch } = useBookmarks()
+  const { data, isLoading, isFetching, error, refetch } = useBookmarks()
 
   const renderItem = ({ item }: { item: Task }) => (
     <TouchableOpacity
       style={styles.row}
       onPress={() => item.url && Linking.openURL(item.url)}
+      activeOpacity={0.7}
     >
       <View style={styles.iconWrap}>
         <Text style={styles.iconText}>{getBookmarkIcon(item.bookmarkType)}</Text>
@@ -44,6 +45,19 @@ export function BookmarksScreen() {
       <ExternalLink size={16} color={colors.textSecondary} />
     </TouchableOpacity>
   )
+
+  if (error) {
+    return (
+      <SafeAreaView style={styles.container} edges={['bottom']}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+          <Text style={{ fontSize: 16, color: colors.textSecondary, textAlign: 'center' }}>Something went wrong</Text>
+          <TouchableOpacity onPress={() => refetch()} style={{ marginTop: 12, paddingHorizontal: 20, paddingVertical: 10, backgroundColor: colors.primary, borderRadius: 8 }} activeOpacity={0.7}>
+            <Text style={{ color: '#fff', fontWeight: '600' }}>Retry</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    )
+  }
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>

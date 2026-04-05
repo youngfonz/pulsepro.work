@@ -172,7 +172,7 @@ export function CreateProjectScreen() {
             style={[styles.createButton, !canSubmit && styles.createButtonDisabled]}
             onPress={handleCreate}
             disabled={!canSubmit}
-            activeOpacity={0.8}
+            activeOpacity={0.7}
           >
             {createProject.isPending ? (
               <ActivityIndicator color={colors.surface} size="small" />
@@ -196,6 +196,7 @@ export function CreateProjectScreen() {
             <TouchableOpacity
               onPress={() => setClientModalVisible(false)}
               hitSlop={8}
+              activeOpacity={0.7}
             >
               <X size={22} color={colors.textPrimary} />
             </TouchableOpacity>

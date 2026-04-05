@@ -1,16 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { isAdminUser } from '@/lib/auth'
+import crypto from 'crypto'
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify webhook secret if configured
+    // Require and verify webhook secret (timing-safe)
     const webhookSecret = process.env.RESEND_WEBHOOK_SECRET
-    if (webhookSecret) {
-      const signature = request.headers.get('x-resend-signature') || request.headers.get('webhook-secret')
-      if (signature !== webhookSecret) {
-        return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
-      }
+    if (!webhookSecret) {
+      return NextResponse.json({ error: 'Webhook not configured' }, { status: 503 })
+    }
+    const signature = request.headers.get('x-resend-signature') || request.headers.get('webhook-secret')
+    if (!signature ||
+        signature.length !== webhookSecret.length ||
+        !crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(webhookSecret))) {
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
     }
 
     const body = await request.json()

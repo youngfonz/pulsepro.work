@@ -14,7 +14,8 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "org.pulsepro.app"
+      "bundleIdentifier": "org.pulsepro.app",
+      "buildNumber": "1"
     },
     "android": {
       "adaptiveIcon": {

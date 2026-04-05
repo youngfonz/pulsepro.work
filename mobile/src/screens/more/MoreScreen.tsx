@@ -25,6 +25,7 @@ export function MoreScreen({ navigation }: Props) {
             key={item.screen}
             style={styles.menuItem}
             onPress={() => navigation.navigate(item.screen)}
+            activeOpacity={0.7}
           >
             <item.icon size={22} color={colors.textPrimary} />
             <Text style={styles.menuLabel}>{item.label}</Text>

@@ -11,8 +11,11 @@ export async function GET(request: NextRequest) {
     const { userId } = auth
 
     const url = new URL(request.url)
-    const year = parseInt(url.searchParams.get('year') || new Date().getFullYear().toString())
-    const month = parseInt(url.searchParams.get('month') || new Date().getMonth().toString())
+    const now = new Date()
+    const rawYear = parseInt(url.searchParams.get('year') || '')
+    const rawMonth = parseInt(url.searchParams.get('month') || '')
+    const year = isNaN(rawYear) ? now.getFullYear() : Math.max(2020, Math.min(now.getFullYear() + 5, rawYear))
+    const month = isNaN(rawMonth) ? now.getMonth() : Math.max(0, Math.min(11, rawMonth))
 
     const startOfMonth = new Date(year, month, 1)
     const endOfMonth = new Date(year, month + 1, 0, 23, 59, 59)

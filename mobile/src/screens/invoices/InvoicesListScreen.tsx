@@ -1,5 +1,5 @@
 import React, { useLayoutEffect } from 'react'
-import { Text, FlatList, TouchableOpacity, RefreshControl, StyleSheet, View } from 'react-native'
+import { Text, FlatList, TouchableOpacity, RefreshControl, StyleSheet, View, ActivityIndicator } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Plus } from 'lucide-react-native'
@@ -19,7 +19,7 @@ export function InvoicesListScreen({ navigation }: Props) {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity onPress={() => navigation.navigate('CreateInvoice')} hitSlop={8}>
+        <TouchableOpacity onPress={() => navigation.navigate('CreateInvoice')} hitSlop={8} activeOpacity={0.7}>
           <Plus size={24} color={colors.primary} />
         </TouchableOpacity>
       ),
@@ -30,6 +30,7 @@ export function InvoicesListScreen({ navigation }: Props) {
     <TouchableOpacity
       style={styles.row}
       onPress={() => navigation.navigate('InvoiceDetail', { id: item.id })}
+      activeOpacity={0.7}
     >
       <View style={styles.rowHeader}>
         <Text style={styles.number}>{item.number}</Text>
@@ -55,7 +56,11 @@ export function InvoicesListScreen({ navigation }: Props) {
         renderItem={renderItem}
         contentContainerStyle={styles.list}
         refreshControl={<RefreshControl refreshing={isFetching && !!data} onRefresh={refetch} tintColor={colors.primary} />}
-        ListEmptyComponent={!isLoading ? <Text style={styles.empty}>No invoices yet. Tap + to create one.</Text> : null}
+        ListEmptyComponent={
+          isLoading
+            ? <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 60 }} />
+            : <Text style={styles.empty}>No invoices yet. Tap + to create one.</Text>
+        }
       />
     </SafeAreaView>
   )

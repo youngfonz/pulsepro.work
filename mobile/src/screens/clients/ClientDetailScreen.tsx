@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { Text, ScrollView, RefreshControl, StyleSheet, View, TouchableOpacity } from 'react-native'
+import { Text, ScrollView, RefreshControl, StyleSheet, View, TouchableOpacity, ActivityIndicator } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { useNavigation, CommonActions } from '@react-navigation/native'
@@ -14,20 +14,43 @@ type Props = NativeStackScreenProps<MoreStackParamList, 'ClientDetail'>
 export function ClientDetailScreen({ route }: Props) {
   const { id } = route.params
   const navigation = useNavigation()
-  const { data: client, isLoading, refetch } = useClientDetail(id)
+  const { data: client, isLoading, isRefetching, error, refetch } = useClientDetail(id)
   const { addItem } = useRecentlyViewed()
 
   useEffect(() => {
     if (client) {
-      addItem({ id: client.id, type: 'client', name: client.name, subtitle: client.company })
+      addItem({ id: client.id, type: 'client', name: client.name, subtitle: client.company ?? undefined })
     }
   }, [client?.id])
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.container} edges={['bottom']}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      </SafeAreaView>
+    )
+  }
+
+  if (error) {
+    return (
+      <SafeAreaView style={styles.container} edges={['bottom']}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+          <Text style={{ fontSize: 16, color: colors.textSecondary, textAlign: 'center' }}>Something went wrong</Text>
+          <TouchableOpacity onPress={() => refetch()} style={{ marginTop: 12, paddingHorizontal: 20, paddingVertical: 10, backgroundColor: colors.primary, borderRadius: 8 }} activeOpacity={0.7}>
+            <Text style={{ color: '#fff', fontWeight: '600' }}>Retry</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    )
+  }
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <ScrollView
         contentContainerStyle={styles.content}
-        refreshControl={<RefreshControl refreshing={false} onRefresh={refetch} tintColor={colors.primary} />}
+        refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor={colors.primary} />}
       >
         {client && (
           <>

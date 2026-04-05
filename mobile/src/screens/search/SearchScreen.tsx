@@ -49,7 +49,7 @@ function ResultRow({ item, onPress }: { item: SearchResult; onPress: () => void 
 
 export function SearchScreen() {
   const [query, setQuery] = useState('')
-  const { data, isLoading } = useSearch(query)
+  const { data, isLoading, error, refetch } = useSearch(query)
   const navigation = useNavigation()
 
   const navigateToResult = useCallback((item: SearchResult) => {
@@ -85,7 +85,14 @@ export function SearchScreen() {
         <ActivityIndicator style={styles.loader} color={colors.primary} />
       )}
 
-      {query.length < 2 ? (
+      {error && query.length >= 2 ? (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+          <Text style={{ fontSize: 16, color: colors.textSecondary, textAlign: 'center' }}>Something went wrong</Text>
+          <TouchableOpacity onPress={() => refetch()} style={{ marginTop: 12, paddingHorizontal: 20, paddingVertical: 10, backgroundColor: colors.primary, borderRadius: 8 }} activeOpacity={0.7}>
+            <Text style={{ color: '#fff', fontWeight: '600' }}>Retry</Text>
+          </TouchableOpacity>
+        </View>
+      ) : query.length < 2 ? (
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyTitle}>Search Pulse Pro</Text>
           <Text style={styles.emptyText}>Type at least 2 characters to search across projects, tasks, clients, and bookmarks.</Text>

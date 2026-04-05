@@ -84,7 +84,7 @@ function TaskRow({ item, onToggle, onPress }: { item: Task; onToggle: (id: strin
           onPress={() => onPress(item.id)}
           activeOpacity={0.7}
         >
-          <TouchableOpacity onPress={handleToggle} hitSlop={8}>
+          <TouchableOpacity onPress={handleToggle} hitSlop={8} activeOpacity={0.7}>
             {isDone
               ? <CheckSquare size={22} color={colors.success} />
               : <Square size={22} color={colors.textSecondary} />
@@ -118,7 +118,7 @@ export function TasksListScreen({ navigation }: Props) {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity onPress={() => navigation.navigate('CreateTask')} hitSlop={8}>
+        <TouchableOpacity onPress={() => navigation.navigate('CreateTask')} hitSlop={8} activeOpacity={0.7}>
           <Plus size={24} color={colors.primary} />
         </TouchableOpacity>
       ),
@@ -189,6 +189,7 @@ export function TasksListScreen({ navigation }: Props) {
               key={f.key}
               style={[styles.filterChip, statusFilter === f.key && styles.filterChipActive]}
               onPress={() => handleStatusFilter(f.key)}
+              activeOpacity={0.7}
             >
               <Text style={[styles.filterChipText, statusFilter === f.key && styles.filterChipTextActive]}>
                 {f.label}
@@ -201,6 +202,7 @@ export function TasksListScreen({ navigation }: Props) {
               key={f.key}
               style={[styles.filterChip, priorityFilter === f.key && styles.filterChipActive]}
               onPress={() => handlePriorityFilter(f.key)}
+              activeOpacity={0.7}
             >
               {f.key !== 'all' && <View style={[styles.filterDot, { backgroundColor: f.color }]} />}
               <Text style={[styles.filterChipText, priorityFilter === f.key && styles.filterChipTextActive]}>
@@ -214,6 +216,7 @@ export function TasksListScreen({ navigation }: Props) {
               key={s.key}
               style={[styles.filterChip, sortBy === s.key && styles.filterChipActive]}
               onPress={() => handleSort(s.key)}
+              activeOpacity={0.7}
             >
               <Text style={[styles.filterChipText, sortBy === s.key && styles.filterChipTextActive]}>
                 {s.label}

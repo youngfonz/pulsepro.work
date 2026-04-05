@@ -37,22 +37,9 @@ export async function authenticateRequest(request: NextRequest): Promise<AuthRes
 
   // Fall back to API token auth (Siri/Shortcuts)
   const tokenHash = crypto.createHash('sha256').update(token).digest('hex')
-  let subscription = await prisma.subscription.findFirst({
+  const subscription = await prisma.subscription.findFirst({
     where: { apiToken: tokenHash },
   })
-
-  // Legacy plain-text lookup with auto-migration
-  if (!subscription) {
-    subscription = await prisma.subscription.findFirst({
-      where: { apiToken: token },
-    })
-    if (subscription) {
-      await prisma.subscription.update({
-        where: { id: subscription.id },
-        data: { apiToken: tokenHash },
-      })
-    }
-  }
 
   if (!subscription) {
     return { error: 'Invalid token', status: 401 }
@@ -79,7 +66,7 @@ export function handleCors() {
   return new NextResponse(null, {
     status: 204,
     headers: {
-      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Origin': process.env.NEXT_PUBLIC_APP_URL || 'https://www.pulsepro.work',
       'Access-Control-Allow-Methods': 'GET,POST,PATCH,DELETE,OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     },

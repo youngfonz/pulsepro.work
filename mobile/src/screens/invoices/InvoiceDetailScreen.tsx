@@ -15,7 +15,7 @@ type Props = NativeStackScreenProps<MoreStackParamList, 'InvoiceDetail'>
 
 export function InvoiceDetailScreen({ route }: Props) {
   const { id } = route.params
-  const { data: invoice, isLoading, refetch } = useInvoiceDetail(id)
+  const { data: invoice, isLoading, isRefetching, error, refetch } = useInvoiceDetail(id)
   const sendMutation = useSendInvoice()
   const markPaidMutation = useMarkInvoicePaid()
 
@@ -54,11 +54,34 @@ export function InvoiceDetailScreen({ route }: Props) {
   const canSend = invoice && invoice.status === 'draft'
   const canMarkPaid = invoice && (invoice.status === 'sent' || invoice.status === 'overdue')
 
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.container} edges={['bottom']}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      </SafeAreaView>
+    )
+  }
+
+  if (error) {
+    return (
+      <SafeAreaView style={styles.container} edges={['bottom']}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+          <Text style={{ fontSize: 16, color: colors.textSecondary, textAlign: 'center' }}>Something went wrong</Text>
+          <TouchableOpacity onPress={() => refetch()} style={{ marginTop: 12, paddingHorizontal: 20, paddingVertical: 10, backgroundColor: colors.primary, borderRadius: 8 }} activeOpacity={0.7}>
+            <Text style={{ color: '#fff', fontWeight: '600' }}>Retry</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    )
+  }
+
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <ScrollView
         contentContainerStyle={styles.content}
-        refreshControl={<RefreshControl refreshing={false} onRefresh={refetch} tintColor={colors.primary} />}
+        refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor={colors.primary} />}
       >
         {invoice && (
           <>
@@ -135,7 +158,7 @@ export function InvoiceDetailScreen({ route }: Props) {
             {(canSend || canMarkPaid) && (
               <View style={styles.actions}>
                 {canSend && (
-                  <TouchableOpacity style={styles.sendButton} onPress={handleSend} disabled={sendMutation.isPending}>
+                  <TouchableOpacity style={styles.sendButton} onPress={handleSend} disabled={sendMutation.isPending} activeOpacity={0.7}>
                     {sendMutation.isPending ? (
                       <ActivityIndicator size="small" color="#fff" />
                     ) : (
@@ -147,7 +170,7 @@ export function InvoiceDetailScreen({ route }: Props) {
                   </TouchableOpacity>
                 )}
                 {canMarkPaid && (
-                  <TouchableOpacity style={styles.paidButton} onPress={handleMarkPaid} disabled={markPaidMutation.isPending}>
+                  <TouchableOpacity style={styles.paidButton} onPress={handleMarkPaid} disabled={markPaidMutation.isPending} activeOpacity={0.7}>
                     {markPaidMutation.isPending ? (
                       <ActivityIndicator size="small" color="#fff" />
                     ) : (

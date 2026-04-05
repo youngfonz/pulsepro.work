@@ -45,7 +45,7 @@ const PRIORITY_OPTIONS = [
 
 export function TaskDetailScreen({ route, navigation }: Props) {
   const { id } = route.params
-  const { data: task, isLoading, refetch } = useTaskDetail(id)
+  const { data: task, isLoading, isRefetching, refetch } = useTaskDetail(id)
   const { addItem } = useRecentlyViewed()
 
   useEffect(() => {
@@ -79,13 +79,14 @@ export function TaskDetailScreen({ route, navigation }: Props) {
       navigation.setOptions({
         headerRight: () => (
           <View style={styles.headerActions}>
-            <TouchableOpacity onPress={handleCancelEdit} style={styles.headerBtn}>
+            <TouchableOpacity onPress={handleCancelEdit} style={styles.headerBtn} activeOpacity={0.7}>
               <Text style={styles.headerBtnCancel}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={handleSaveEdit}
               style={styles.headerBtn}
               disabled={updateTask.isPending}
+              activeOpacity={0.7}
             >
               <Text style={styles.headerBtnSave}>
                 {updateTask.isPending ? 'Saving…' : 'Save'}
@@ -97,7 +98,7 @@ export function TaskDetailScreen({ route, navigation }: Props) {
     } else {
       navigation.setOptions({
         headerRight: () => (
-          <TouchableOpacity onPress={handleStartEdit} style={styles.headerBtn}>
+          <TouchableOpacity onPress={handleStartEdit} style={styles.headerBtn} activeOpacity={0.7}>
             <Text style={styles.headerBtnSave}>Edit</Text>
           </TouchableOpacity>
         ),
@@ -219,7 +220,7 @@ export function TaskDetailScreen({ route, navigation }: Props) {
           style={styles.flex}
           contentContainerStyle={styles.content}
           refreshControl={
-            <RefreshControl refreshing={false} onRefresh={refetch} tintColor={colors.primary} />
+            <RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor={colors.primary} />
           }
           keyboardShouldPersistTaps="handled"
         >
@@ -230,7 +231,7 @@ export function TaskDetailScreen({ route, navigation }: Props) {
                 style={[styles.toggleBtn, isCompleted ? styles.toggleBtnMuted : styles.toggleBtnGreen]}
                 onPress={handleToggle}
                 disabled={toggleTask.isPending}
-                activeOpacity={0.75}
+                activeOpacity={0.7}
               >
                 <Text style={[styles.toggleBtnText, isCompleted ? styles.toggleBtnTextMuted : styles.toggleBtnTextGreen]}>
                   {toggleTask.isPending
@@ -332,15 +333,15 @@ export function TaskDetailScreen({ route, navigation }: Props) {
                       returnKeyType="done"
                       onSubmitEditing={handleDueSave}
                     />
-                    <TouchableOpacity style={styles.dueDateSaveBtn} onPress={handleDueSave} disabled={updateTask.isPending}>
+                    <TouchableOpacity style={styles.dueDateSaveBtn} onPress={handleDueSave} disabled={updateTask.isPending} activeOpacity={0.7}>
                       <Text style={styles.dueDateSaveBtnText}>Set</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.dueDateClearBtn} onPress={handleDueClear} disabled={updateTask.isPending}>
+                    <TouchableOpacity style={styles.dueDateClearBtn} onPress={handleDueClear} disabled={updateTask.isPending} activeOpacity={0.7}>
                       <Text style={styles.dueDateClearBtnText}>Clear</Text>
                     </TouchableOpacity>
                   </View>
                 ) : (
-                  <TouchableOpacity onPress={handleDueTap} activeOpacity={0.65}>
+                  <TouchableOpacity onPress={handleDueTap} activeOpacity={0.7}>
                     <Text style={task.dueDate ? styles.dueDateText : styles.dueDateEmpty}>
                       {task.dueDate ? formatDate(task.dueDate) : 'Tap to set a due date'}
                     </Text>
@@ -426,7 +427,7 @@ export function TaskDetailScreen({ route, navigation }: Props) {
                 style={styles.deleteBtn}
                 onPress={handleDelete}
                 disabled={deleteTask.isPending}
-                activeOpacity={0.75}
+                activeOpacity={0.7}
               >
                 <Text style={styles.deleteBtnText}>
                   {deleteTask.isPending ? 'Deleting…' : 'Delete Task'}

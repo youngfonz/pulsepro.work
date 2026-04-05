@@ -4,11 +4,15 @@ import { isAdminUser } from '@/lib/auth'
 import { sendTelegramMessage } from '@/lib/telegram'
 import { parseCommand } from '@/lib/telegram-commands'
 import { executeCommand } from '@/lib/telegram-executor'
+import crypto from 'crypto'
 
 export async function POST(request: NextRequest) {
-  // Validate webhook secret
+  // Validate webhook secret (timing-safe)
   const secret = request.headers.get('x-telegram-bot-api-secret-token')
-  if (secret !== process.env.TELEGRAM_WEBHOOK_SECRET) {
+  const expected = process.env.TELEGRAM_WEBHOOK_SECRET
+  if (!secret || !expected ||
+      secret.length !== expected.length ||
+      !crypto.timingSafeEqual(Buffer.from(secret), Buffer.from(expected))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

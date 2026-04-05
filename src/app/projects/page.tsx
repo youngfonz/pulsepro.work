@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { getProjects, getClientsForSelect } from '@/actions/projects'
-import { getProjectHealth } from '@/actions/dashboard'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent } from '@/components/ui/Card'
 import { ProjectsFilter } from './ProjectsFilter'
@@ -8,21 +7,59 @@ import { ProjectsView } from './ProjectsView'
 
 export const dynamic = 'force-dynamic'
 
+function computeHealthLabel(project: {
+  status: string
+  dueDate: Date | null
+  updatedAt: Date
+  tasks: { status: string; url: string | null; dueDate: Date | null }[]
+}): 'healthy' | 'at_risk' | 'critical' | 'completed' {
+  const realTasks = project.tasks.filter(t => t.url === null)
+  const total = realTasks.length
+  const completed = realTasks.filter(t => t.status === 'done').length
+
+  if (project.status === 'completed' || (total > 0 && completed === total)) return 'completed'
+  if (total === 0) return 'healthy'
+
+  const now = new Date()
+  now.setHours(0, 0, 0, 0)
+  const overdue = realTasks.filter(t => t.status !== 'done' && t.dueDate && new Date(t.dueDate) < now).length
+
+  let score = 100
+  score -= Math.round((overdue / total) * 40)
+
+  const daysSinceUpdate = Math.floor((now.getTime() - new Date(project.updatedAt).getTime()) / 86400000)
+  if (daysSinceUpdate > 14) score -= 20
+  else if (daysSinceUpdate > 7) score -= 10
+  else if (daysSinceUpdate > 3) score -= 5
+
+  if (project.dueDate) {
+    const daysUntilDue = Math.floor((new Date(project.dueDate).getTime() - now.getTime()) / 86400000)
+    const ratio = completed / total
+    if (daysUntilDue < 0) score -= 20
+    else if (daysUntilDue <= 3 && ratio < 0.5) score -= 15
+    else if (daysUntilDue <= 7 && ratio < 0.3) score -= 10
+  }
+
+  score += Math.round((completed / total) * 10)
+  score = Math.max(0, Math.min(100, score))
+
+  return score >= 70 ? 'healthy' : score >= 40 ? 'at_risk' : 'critical'
+}
+
 interface Props {
   searchParams: Promise<{ search?: string; status?: string; priority?: string; clientId?: string; sort?: string }>
 }
 
 export default async function ProjectsPage({ searchParams }: Props) {
   const params = await searchParams
-  const [projects, clients, health] = await Promise.all([
+  const [projects, clients] = await Promise.all([
     getProjects(params),
     getClientsForSelect(),
-    getProjectHealth(),
   ])
 
   const healthMap: Record<string, 'healthy' | 'at_risk' | 'critical' | 'completed'> = {}
-  for (const h of health) {
-    healthMap[h.projectId] = h.label
+  for (const p of projects) {
+    healthMap[p.id] = computeHealthLabel(p)
   }
 
   return (

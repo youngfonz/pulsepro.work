@@ -140,10 +140,12 @@ model TaskComment {
   content   String
   taskId    String
   task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId    String?  // Clerk user ID of comment author (nullable for legacy comments)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([taskId])
+  @@index([userId])
 }
 
 model ProjectAccess {
