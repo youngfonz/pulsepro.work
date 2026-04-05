@@ -5,8 +5,11 @@ import { requireUserId } from '@/lib/auth'
 export async function GET(request: NextRequest) {
   const userId = await requireUserId()
   const searchParams = request.nextUrl.searchParams
-  const year = parseInt(searchParams.get('year') || new Date().getFullYear().toString())
-  const month = parseInt(searchParams.get('month') || new Date().getMonth().toString())
+  const now = new Date()
+  const rawYear = parseInt(searchParams.get('year') || '')
+  const rawMonth = parseInt(searchParams.get('month') || '')
+  const year = isNaN(rawYear) ? now.getFullYear() : Math.max(2020, Math.min(now.getFullYear() + 5, rawYear))
+  const month = isNaN(rawMonth) ? now.getMonth() : Math.max(0, Math.min(11, rawMonth))
 
   const startOfMonth = new Date(year, month, 1)
   const endOfMonth = new Date(year, month + 1, 0, 23, 59, 59)

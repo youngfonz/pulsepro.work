@@ -42,6 +42,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'File must be less than 10MB' }, { status: 400 })
     }
 
+    // Validate file content matches declared MIME type (magic byte check)
+    const buffer = Buffer.from(await file.arrayBuffer())
+    const hex = buffer.slice(0, 4).toString('hex')
+    const magicBytes: Record<string, string[]> = {
+      '89504e47': ['image/png'],
+      'ffd8ff':   ['image/jpeg', 'image/jpg'],
+      '47494638': ['image/gif'],
+      '52494646': ['image/webp'],
+      '25504446': ['application/pdf'],
+    }
+    // Markdown and text files skip magic byte check (no reliable signature)
+    if (!file.type.startsWith('text/')) {
+      const match = Object.entries(magicBytes).find(([sig]) => hex.startsWith(sig))
+      if (!match || !match[1].includes(file.type)) {
+        return NextResponse.json({ error: 'File content does not match declared type' }, { status: 400 })
+      }
+    }
+
     // Create unique filename
     const timestamp = Date.now()
     const ext = file.name.split('.').pop()

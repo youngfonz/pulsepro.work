@@ -2,12 +2,16 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { resend } from '@/lib/email'
 import { sendTelegramMessage } from '@/lib/telegram'
+import crypto from 'crypto'
 
 const OWNER_USER_ID = process.env.REMINDER_USER_ID
 
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('authorization')
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  const expected = `Bearer ${process.env.CRON_SECRET}`
+  if (!authHeader || !process.env.CRON_SECRET ||
+      authHeader.length !== expected.length ||
+      !crypto.timingSafeEqual(Buffer.from(authHeader), Buffer.from(expected))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

@@ -793,6 +793,16 @@ export async function createBookmarkTask(
       taskUserId = shared.userId
     }
 
+    // Validate URL protocol (prevent javascript: XSS)
+    try {
+      const parsed = new URL(data.url)
+      if (!['http:', 'https:'].includes(parsed.protocol)) {
+        throw new Error('Only http and https URLs are allowed')
+      }
+    } catch {
+      throw new Error('Invalid URL')
+    }
+
     const limit = await checkLimit('tasks')
     if (!limit.allowed) {
       throw new Error(`Free plan limit: ${limit.limit} tasks. Upgrade to Pro for unlimited tasks.`)
