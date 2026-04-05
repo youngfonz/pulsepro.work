@@ -33,7 +33,7 @@ export default function TermsPage() {
 
           <section className="space-y-3">
             <h2 className="text-xl font-semibold text-foreground">4. Payment Terms</h2>
-            <p>Pro subscriptions are billed monthly at $9/month. Payment is processed securely through our payment provider, Polar. You can cancel your subscription at any time — your Pro access will continue until the end of the current billing period. We do not offer prorated refunds for partial months, but refund requests are handled on a case-by-case basis. We reserve the right to change pricing with 30 days notice to existing subscribers.</p>
+            <p>Pro subscriptions are billed monthly at $12/month, and Team subscriptions at $29/month. Payment is processed securely through our payment provider, Polar. You can cancel your subscription at any time — your access will continue until the end of the current billing period. We do not offer prorated refunds for partial months, but refund requests are handled on a case-by-case basis. We reserve the right to change pricing with 30 days notice to existing subscribers.</p>
           </section>
 
           <section className="space-y-3">
