@@ -54,9 +54,9 @@ const plans = [
 
 export function Pricing() {
   return (
-    <section id="pricing" className="py-20 md:py-28 bg-muted/30">
+    <section id="pricing" className="py-20 md:py-28">
       <div className="max-w-4xl mx-auto px-4 md:px-8">
-        <h2 className="text-3xl font-semibold text-foreground text-center tracking-tight">
+        <h2 className="text-3xl font-semibold text-foreground text-center tracking-tight font-[family-name:var(--font-display)]">
           Simple pricing
         </h2>
         <p className="text-base text-muted-foreground mt-3 text-center">
@@ -67,15 +67,15 @@ export function Pricing() {
           {plans.map((plan, index) => (
             <div
               key={index}
-              className={`relative ${
+              className={`relative rounded-2xl p-8 bg-[#f5f5f7] dark:bg-[#1d1d1f] ${
                 plan.highlighted
-                  ? 'border-2 border-foreground shadow-lg'
-                  : 'border border-border'
-              } rounded-xl p-8`}
+                  ? 'ring-2 ring-primary'
+                  : ''
+              }`}
             >
               {'badge' in plan && plan.badge && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="inline-flex items-center rounded-full bg-foreground text-background px-3 py-0.5 text-xs font-medium">
+                  <span className="inline-flex items-center rounded-full bg-primary text-primary-foreground px-3 py-0.5 text-xs font-medium">
                     {plan.badge}
                   </span>
                 </div>
@@ -85,7 +85,7 @@ export function Pricing() {
               </div>
 
               <div className="mt-4 flex items-baseline gap-1">
-                <span className="text-4xl font-semibold text-foreground tracking-tight">{plan.price}</span>
+                <span className="text-4xl font-semibold text-foreground tracking-tight font-[family-name:var(--font-display)]">{plan.price}</span>
                 <span className="text-sm text-muted-foreground">/month</span>
               </div>
 
@@ -119,7 +119,7 @@ export function Pricing() {
                 className={`mt-6 block rounded-full px-5 py-2.5 w-full text-center text-sm font-medium transition-colors ${
                   plan.highlighted
                     ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                    : 'border border-border hover:bg-muted'
+                    : 'border border-border text-foreground hover:bg-muted'
                 }`}
               >
                 {plan.cta}
@@ -129,7 +129,7 @@ export function Pricing() {
         </div>
 
         {/* Cost comparison */}
-        <div className="mt-12 border border-border rounded-xl p-6 max-w-2xl mx-auto">
+        <div className="mt-12 rounded-2xl bg-[#f5f5f7] dark:bg-[#1d1d1f] p-6 max-w-2xl mx-auto">
           <p className="text-sm font-semibold text-foreground text-center">
             What 10 users actually costs per month
           </p>
@@ -139,7 +139,7 @@ export function Pricing() {
               { tool: 'Asana', cost: '$110' },
               { tool: 'ClickUp', cost: '$70' },
             ].map((item) => (
-              <div key={item.tool} className="text-center py-2 px-3 rounded-lg bg-muted/50">
+              <div key={item.tool} className="text-center py-2 px-3 rounded-lg bg-black/5 dark:bg-white/5">
                 <p className="text-xs text-muted-foreground">{item.tool}</p>
                 <p className="text-sm font-semibold text-muted-foreground line-through">{item.cost}/mo</p>
               </div>

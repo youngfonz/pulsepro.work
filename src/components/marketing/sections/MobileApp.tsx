@@ -122,12 +122,12 @@ function TasksScreen() {
     <>
       <div className="px-5 pt-2 pb-3 flex items-center justify-between">
         <p className="text-[13px] font-semibold text-gray-900">Tasks</p>
-        <div className="px-2 py-0.5 bg-blue-600 text-white rounded-md text-[9px] font-medium">+ New</div>
+        <div className="px-2 py-0.5 bg-[#E54D2E] text-white rounded-md text-[9px] font-medium">+ New</div>
       </div>
       <div className="px-5 pb-2">
         <div className="flex gap-1.5 mb-3">
           {['All', 'Today', 'Upcoming'].map((tab, i) => (
-            <div key={tab} className={`px-2.5 py-1 rounded-full text-[9px] font-medium ${i === 1 ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-500'}`}>{tab}</div>
+            <div key={tab} className={`px-2.5 py-1 rounded-full text-[9px] font-medium ${i === 1 ? 'bg-[#E54D2E] text-white' : 'bg-gray-100 text-gray-500'}`}>{tab}</div>
           ))}
         </div>
         <div className="space-y-2">
@@ -215,7 +215,7 @@ function InvoiceScreen() {
         </div>
         <div className="flex gap-2 mt-3">
           <div className="flex-1 text-center py-2 bg-white rounded-lg border border-gray-100 text-[9px] font-medium text-gray-600">Preview</div>
-          <div className="flex-1 text-center py-2 bg-blue-600 rounded-lg text-[9px] font-medium text-white">Email Client</div>
+          <div className="flex-1 text-center py-2 bg-[#E54D2E] rounded-lg text-[9px] font-medium text-white">Email Client</div>
         </div>
       </div>
     </>
@@ -240,7 +240,7 @@ function ProjectScreen() {
       <div className="px-5 pt-2 pb-1">
         <div className="flex gap-1">
           {['Overview', 'Tasks', 'Time', 'Budget'].map((tab, i) => (
-            <div key={tab} className={`px-2.5 py-1 rounded-full text-[9px] font-medium ${i === 0 ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-500'}`}>{tab}</div>
+            <div key={tab} className={`px-2.5 py-1 rounded-full text-[9px] font-medium ${i === 0 ? 'bg-[#E54D2E] text-white' : 'bg-gray-100 text-gray-500'}`}>{tab}</div>
           ))}
         </div>
       </div>
@@ -248,7 +248,7 @@ function ProjectScreen() {
         <div className="bg-gray-50 rounded-xl p-3">
           <p className="text-[10px] font-medium text-gray-500 mb-2">Progress</p>
           <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-            <div className="h-full bg-blue-600 rounded-full" style={{ width: '67%' }} />
+            <div className="h-full bg-[#E54D2E] rounded-full" style={{ width: '67%' }} />
           </div>
           <p className="text-[9px] text-gray-400 mt-1">67% complete</p>
         </div>
@@ -328,8 +328,8 @@ export function PhoneMock() {
             const isActive = item.screenIdx === activeScreen;
             return (
               <div key={item.label} className="flex flex-col items-center gap-0.5">
-                <svg className={`w-4 h-4 ${isActive ? 'text-blue-600' : 'text-gray-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d={item.icon} /></svg>
-                <span className={`text-[8px] ${isActive ? 'text-blue-600 font-medium' : 'text-gray-400'}`}>{item.label}</span>
+                <svg className={`w-4 h-4 ${isActive ? 'text-[#E54D2E]' : 'text-gray-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d={item.icon} /></svg>
+                <span className={`text-[8px] ${isActive ? 'text-[#E54D2E] font-medium' : 'text-gray-400'}`}>{item.label}</span>
               </div>
             );
           })}
@@ -357,7 +357,7 @@ export function PhoneMock() {
 
 export function MobileApp() {
   return (
-    <section id="mobile-app" className="relative z-0 py-20 md:py-28">
+    <section id="mobile-app" className="relative z-0 py-20 md:py-28 bg-[#f5f5f7] dark:bg-[#1d1d1f]">
       <div className="max-w-5xl mx-auto px-4 md:px-8">
         <div className="text-center">
           <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 mb-6">
@@ -366,7 +366,7 @@ export function MobileApp() {
             </svg>
             <span className="text-sm font-medium text-primary">Now on mobile</span>
           </div>
-          <h2 className="text-3xl font-semibold text-foreground tracking-tight">
+          <h2 className="text-3xl font-semibold text-foreground tracking-tight font-[family-name:var(--font-display)]">
             Your projects, wherever you are.
           </h2>
           <p className="text-base text-muted-foreground mt-3 max-w-xl mx-auto">

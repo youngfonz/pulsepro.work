@@ -34,7 +34,7 @@ export function WhySwitch() {
       <div className="max-w-6xl mx-auto px-4 md:px-8">
         <div className="text-center">
           <ScrollReveal>
-            <h2 className="text-3xl font-semibold text-foreground tracking-tight">
+            <h2 className="text-3xl font-semibold text-foreground tracking-tight font-[family-name:var(--font-display)]">
               Why freelancers switch to Pulse Pro.
             </h2>
             <p className="text-base text-muted-foreground mt-3 max-w-lg mx-auto">
@@ -48,7 +48,7 @@ export function WhySwitch() {
             {tools.map((tool) => (
               <div
                 key={tool.name}
-                className="border border-border rounded-xl p-6 hover:shadow-lg transition-all duration-200"
+                className="rounded-2xl p-6 bg-[#f5f5f7] dark:bg-[#1d1d1f] hover:shadow-lg transition-all duration-200"
               >
                 <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                   Switching from
