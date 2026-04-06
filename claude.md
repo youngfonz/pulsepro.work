@@ -133,27 +133,50 @@ Pulse Pro is a SaaS project management app for freelancers and small agencies. B
 
 ## Design Standards
 
+### Brand Identity
+- **Apple-inspired design philosophy** — cinematic dark/light alternation, single accent color, clean hierarchy
+- NOT a clone — Pulse Pro has its own identity built on these principles
+
 ### Typography
-- Primary font: Inter (fallback: -apple-system, system-ui)
-- NEVER use: Roboto, Open Sans, or generic Google Fonts defaults
-- Use semantic font scaling (not arbitrary pixel values)
+- **Display font:** Bricolage Grotesque (`--font-display` / `--font-bricolage`) — all headings, stat numbers, logo text
+- **Body font:** Plus Jakarta Sans (`--font-sans` / `--font-jakarta`) — body text, UI elements
+- **Mono font:** Geist Mono (`--font-mono` / `--font-geist-mono`)
+- Apply display font via: `font-[family-name:var(--font-display)]`
+- NEVER use: Inter, Roboto, Open Sans, or generic Google Fonts defaults
+
+### Color Palette
+- **Accent:** Warm vermillion coral — `#E54D2E` (light) / `#F0613E` (dark)
+- **Dark sections:** Matte charcoal `#1a1a1a` (NEVER pure black `#000`)
+- **Light sections:** `bg-[#f5f5f7] dark:bg-[#1d1d1f]`
+- **Cards on light bg:** `bg-white dark:bg-[#2d2d2f]` (borderless)
+- **Section rhythm:** Hero (gradient dark→light) and FinalCTA are dark; everything else alternates default bg and `#f5f5f7`
+- Logo background: `#171717`
 
 ### Visual Design - CRITICAL
 - NO AI gradient designs (rainbow fades, purple-blue-pink blends)
-- NO "vibe coded" aesthetics - nothing generic or amateur-looking
+- NO "vibe coded" aesthetics — nothing generic or amateur-looking
+- NO blue accent colors (too common in vibe-coded apps)
 - All design choices must be intentional and purposeful
 - Favor clean, professional layouts over trendy effects
+
+### Marketing Page Patterns
+- Nav: glass effect with `backdrop-blur-xl backdrop-saturate-[180%]`, 48px height
+- Nav text/logo switch dynamically: white over dark hero, `text-foreground` when scrolled
+- Hero: gradient `from-[#1a1a1a] via-[#1a1a1a] to-[#f5f5f7]` with product mock as centerpiece
+- CTAs: pill-shaped (`rounded-full`), primary uses `bg-[#E54D2E]`
+- Feature cards: dark inner cards (`bg-[#1a1a1a]`) inside light sections
 
 ### Anti-Patterns to Avoid
 - Generic hero sections with gradient backgrounds
 - Overused glassmorphism or blur effects
 - Random decorative elements without function
 - Cookie-cutter SaaS landing page aesthetics
+- Pure black backgrounds (use `#1a1a1a` matte charcoal)
+- Blue accents that look like every other SaaS app
 
 ### When Creating UI
-- Ask about brand colors/style before defaulting
 - Prioritize clarity, hierarchy, and whitespace
-- Use a defined, limited color palette
+- Use the defined color palette — do not introduce new accent colors
 - Every element should have a clear purpose
 
 ---

@@ -3,22 +3,22 @@ import { ScrollReveal } from '@/components/marketing/ScrollReveal'
 
 export function FinalCTA() {
   return (
-    <section className="py-20 md:py-28">
+    <section className="py-20 md:py-28 bg-[#1a1a1a]">
       <div className="max-w-4xl mx-auto px-4 md:px-8">
         <ScrollReveal>
-          <div className="rounded-2xl bg-primary px-8 py-16 md:py-20 text-center">
-            <h2 className="text-3xl md:text-4xl font-semibold text-primary-foreground tracking-tight">
+          <div className="text-center">
+            <h2 className="text-3xl md:text-4xl font-semibold text-white tracking-tight font-[family-name:var(--font-display)]">
               Stop losing work to tab overload.
             </h2>
 
-            <p className="text-base text-primary-foreground/80 mt-4 max-w-md mx-auto">
+            <p className="text-base text-white/60 mt-4 max-w-md mx-auto">
               Every client, project, and deadline in one place.
               Set up in 5 minutes. Free forever.
             </p>
 
             <Link
               href="/sign-up"
-              className="mt-8 inline-flex items-center justify-center px-6 py-3 rounded-full bg-primary-foreground text-primary text-sm font-semibold hover:bg-primary-foreground/90 transition-colors shadow-lg shadow-primary/20"
+              className="mt-8 inline-flex items-center justify-center px-8 py-3 rounded-full bg-[#E54D2E] text-white text-sm font-semibold hover:bg-[#D4431F] transition-colors"
             >
               Get started — it&apos;s free
               <svg className="ml-2 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -26,7 +26,7 @@ export function FinalCTA() {
               </svg>
             </Link>
 
-            <p className="mt-4 text-sm text-primary-foreground/60">
+            <p className="mt-4 text-sm text-white/30">
               Free forever. No credit card required.
             </p>
           </div>

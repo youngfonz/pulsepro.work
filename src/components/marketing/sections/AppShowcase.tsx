@@ -33,7 +33,7 @@ export function AppShowcase() {
     <section className="py-20 md:py-28" ref={ref}>
       <div className="max-w-5xl mx-auto px-4 md:px-8">
         <ScrollReveal delay={0}>
-          <h2 className="text-3xl font-semibold text-foreground tracking-tight text-center">
+          <h2 className="text-3xl font-semibold text-foreground tracking-tight text-center font-[family-name:var(--font-display)]">
             See it in action
           </h2>
           <p className="text-base text-muted-foreground mt-3 text-center max-w-xl mx-auto">

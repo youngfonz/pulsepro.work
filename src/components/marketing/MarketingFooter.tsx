@@ -28,7 +28,7 @@ export function MarketingFooter() {
   ]
 
   return (
-    <footer className="border-t border-border">
+    <footer className="bg-[#f5f5f7] dark:bg-[#1d1d1f]">
       <div className="max-w-6xl mx-auto px-4 md:px-8 py-12">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
@@ -54,13 +54,13 @@ export function MarketingFooter() {
         </div>
 
         {/* Separator */}
-        <div className="border-t border-border mb-8" />
+        <div className="border-t border-black/10 dark:border-white/10 mb-8" />
 
         {/* Bottom Row */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
             <PulseLogo size={28} />
-            <span className="text-lg font-bold text-foreground">Pulse Pro</span>
+            <span className="text-lg font-semibold text-foreground font-[family-name:var(--font-display)]">Pulse Pro</span>
           </Link>
           <p className="text-sm text-muted-foreground">
             © {new Date().getFullYear()} Pulse Pro. All rights reserved.

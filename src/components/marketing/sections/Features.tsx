@@ -130,8 +130,8 @@ function StaticPhoneMock() {
             { label: 'More', active: false },
           ].map((item) => (
             <div key={item.label} className="flex flex-col items-center gap-0.5">
-              <div className={`w-3 h-3 rounded-full ${item.active ? 'bg-blue-600' : 'bg-gray-200'}`} />
-              <span className={`text-[7px] ${item.active ? 'text-blue-600 font-medium' : 'text-gray-400'}`}>{item.label}</span>
+              <div className={`w-3 h-3 rounded-full ${item.active ? 'bg-[#E54D2E]' : 'bg-gray-200'}`} />
+              <span className={`text-[7px] ${item.active ? 'text-[#E54D2E] font-medium' : 'text-gray-400'}`}>{item.label}</span>
             </div>
           ))}
         </div>
@@ -151,7 +151,7 @@ function DashboardMock() {
       {/* Top bar */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100">
         <div className="flex items-center gap-3">
-          <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center">
+          <div className="w-7 h-7 rounded-lg bg-[#E54D2E] flex items-center justify-center">
             <svg viewBox="0 0 24 24" className="w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" strokeLinecap="round" strokeLinejoin="round" /></svg>
           </div>
           <span className="text-sm font-semibold text-gray-900">Pulse Pro</span>
@@ -162,14 +162,14 @@ function DashboardMock() {
             Search...
             <span className="ml-4 text-[10px] text-gray-300 border border-gray-200 rounded px-1">⌘K</span>
           </div>
-          <div className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-[10px] font-semibold text-blue-600">JD</div>
+          <div className="w-7 h-7 rounded-full bg-orange-100 flex items-center justify-center text-[10px] font-semibold text-[#E54D2E]">JD</div>
         </div>
       </div>
 
       <div className="flex">
         {/* Sidebar */}
         <div className="hidden md:flex flex-col w-44 border-r border-gray-100 py-3 px-3 gap-0.5 shrink-0">
-          <div className="flex items-center gap-2 px-2 py-1.5 bg-blue-50 rounded-md text-xs font-medium text-blue-700">
+          <div className="flex items-center gap-2 px-2 py-1.5 bg-orange-50 rounded-md text-xs font-medium text-[#E54D2E]">
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0h4" /></svg>
             Dashboard
           </div>
@@ -196,7 +196,7 @@ function DashboardMock() {
               <p className="text-[11px] text-gray-400 mt-0.5">You have 3 tasks due today</p>
             </div>
             <div className="flex gap-2">
-              <div className="px-2.5 py-1 bg-blue-600 text-white rounded-md text-[10px] font-medium">+ Add Task</div>
+              <div className="px-2.5 py-1 bg-[#E54D2E] text-white rounded-md text-[10px] font-medium">+ Add Task</div>
               <div className="hidden sm:block px-2.5 py-1 border border-gray-200 text-gray-600 rounded-md text-[10px] font-medium">+ Add Project</div>
             </div>
           </div>
@@ -284,10 +284,10 @@ function DashboardMock() {
 
 export function Features() {
   return (
-    <section id="features" className="py-20 md:py-28 bg-muted/30">
+    <section id="features" className="py-20 md:py-28">
       <div className="max-w-5xl mx-auto px-4 md:px-8">
         <div className="text-center">
-          <h2 className="text-3xl font-semibold text-foreground tracking-tight">
+          <h2 className="text-3xl font-semibold text-foreground tracking-tight font-[family-name:var(--font-display)]">
             Built for how you actually work.
           </h2>
           <p className="text-base text-muted-foreground mt-3 max-w-xl mx-auto">
@@ -311,7 +311,7 @@ export function Features() {
             {features.map((feature) => (
               <div
                 key={feature.title}
-                className="border border-border border-t-2 border-t-primary rounded-xl p-6 bg-card hover:shadow-lg transition-all duration-200"
+                className="rounded-2xl p-6 bg-white dark:bg-[#2d2d2f] hover:shadow-lg transition-all duration-200"
               >
                 <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
                   {feature.icon}

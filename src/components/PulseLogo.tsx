@@ -3,19 +3,21 @@ import { cn } from '@/lib/utils'
 interface PulseLogoProps {
   size?: number
   className?: string
+  variant?: 'dark' | 'light'
 }
 
-export function PulseLogo({ size = 28, className }: PulseLogoProps) {
+export function PulseLogo({ size = 28, className, variant = 'dark' }: PulseLogoProps) {
   return (
     <div
       className={cn(
-        'bg-[#171717] flex items-center justify-center rounded-lg',
+        'flex items-center justify-center rounded-lg',
+        variant === 'dark' ? 'bg-[#171717]' : 'bg-foreground/10',
         className
       )}
       style={{ width: size, height: size }}
     >
       <svg
-        className="text-white"
+        className={variant === 'dark' ? 'text-white' : 'text-foreground'}
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"

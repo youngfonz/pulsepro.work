@@ -11,6 +11,10 @@ export function MarketingNav() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const { theme, toggleTheme } = useTheme()
 
+  // Over the dark hero = white text; after scrolling = normal foreground
+  const textColor = isScrolled ? 'text-foreground' : 'text-white'
+  const hoverBg = isScrolled ? 'hover:bg-muted' : 'hover:bg-white/10'
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20)
@@ -33,16 +37,18 @@ export function MarketingNav() {
     </a>
     <header
       className={cn(
-        'fixed top-0 w-full z-50 h-14 transition-all duration-200 bg-background',
-        isScrolled && 'border-b border-border'
+        'fixed top-0 w-full z-50 h-12 transition-all duration-300',
+        isScrolled
+          ? 'bg-background backdrop-blur-xl backdrop-saturate-[180%] border-b border-border/50'
+          : 'bg-transparent'
       )}
     >
       <div className="max-w-6xl mx-auto px-4 md:px-8 h-full">
         <div className="relative flex items-center justify-between h-full">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
-            <PulseLogo size={32} />
-            <span className="text-xl font-bold text-foreground">Pulse Pro</span>
+            <PulseLogo size={32} variant={isScrolled ? 'light' : 'dark'} />
+            <span className={cn('text-lg font-semibold font-[family-name:var(--font-display)]', textColor)}>Pulse Pro</span>
           </Link>
 
           {/* Desktop Navigation — true center */}
@@ -51,7 +57,7 @@ export function MarketingNav() {
               <a
                 key={link.href}
                 href={link.href}
-                className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+                className={cn('text-sm font-medium transition-colors hover:opacity-70', textColor)}
               >
                 {link.label}
               </a>
@@ -62,7 +68,7 @@ export function MarketingNav() {
           <div className="hidden md:flex items-center gap-3">
             <button
               onClick={toggleTheme}
-              className="p-2 text-foreground hover:bg-muted rounded-md transition-colors"
+              className={cn('p-2 rounded-md transition-colors', textColor, hoverBg)}
               aria-label="Toggle theme"
             >
               {theme === 'dark' ? (
@@ -87,14 +93,14 @@ export function MarketingNav() {
             </button>
             <Link
               href="/sign-in"
-              className="px-4 py-2 text-sm font-medium text-foreground hover:bg-muted rounded-md transition-colors"
+              className={cn('px-4 py-2 text-sm font-medium rounded-md transition-colors', textColor, hoverBg)}
               aria-label="Sign in to your Pulse Pro account"
             >
               Sign In
             </Link>
             <Link
               href="/sign-up"
-              className="px-4 py-2 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 rounded-full transition-colors"
+              className="px-5 py-1.5 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 rounded-full transition-colors"
             >
               Get Started
             </Link>
@@ -103,7 +109,7 @@ export function MarketingNav() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 text-foreground hover:bg-muted rounded-md transition-colors"
+            className={cn('md:hidden p-2 rounded-md transition-colors', textColor, hoverBg)}
             aria-label="Toggle menu"
           >
             {isMobileMenuOpen ? (
@@ -130,7 +136,7 @@ export function MarketingNav() {
 
         {/* Mobile Menu Dropdown */}
         {isMobileMenuOpen && (
-          <div className="md:hidden absolute top-14 left-0 right-0 bg-background border-b border-border shadow-lg">
+          <div className="md:hidden absolute top-12 left-0 right-0 bg-background/95 backdrop-blur-xl border-b border-border/50 shadow-lg">
             <nav className="flex flex-col px-4 py-4 space-y-3">
               {navLinks.map((link) => (
                 <a

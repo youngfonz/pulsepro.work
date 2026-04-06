@@ -129,7 +129,7 @@ export function TelegramFeature() {
         {/* Section heading */}
         <ScrollReveal delay={0}>
           <div className="text-center mb-14">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight font-[family-name:var(--font-display)]">
               Work smarter from anywhere
             </h2>
             <p className="text-base md:text-lg text-muted-foreground mt-4 max-w-2xl mx-auto">
@@ -190,7 +190,7 @@ export function TelegramFeature() {
                 {feature.badge}
               </div>
 
-              <h3 className="text-3xl font-semibold text-foreground tracking-tight">
+              <h3 className="text-3xl font-semibold text-foreground tracking-tight font-[family-name:var(--font-display)]">
                 {feature.title}
               </h3>
               <p className="text-base text-muted-foreground mt-3 max-w-lg">
@@ -471,7 +471,7 @@ function InsightsMock() {
         {[
           { dot: 'bg-rose-500', text: 'Acme Rebrand has 3 overdue tasks \u2014 prioritize before Friday' },
           { dot: 'bg-amber-500', text: "Morris Design Co hasn\u2019t been updated in 12 days" },
-          { dot: 'bg-blue-500', text: '2 high-priority tasks due tomorrow \u2014 start with wireframes' },
+          { dot: 'bg-[#E54D2E]', text: '2 high-priority tasks due tomorrow \u2014 start with wireframes' },
         ].map((insight) => (
           <div
             key={insight.text}
