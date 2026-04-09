@@ -1,6 +1,7 @@
 import React from 'react'
-import { Text, ScrollView, StyleSheet, View, TouchableOpacity } from 'react-native'
+import { Text, ScrollView, StyleSheet, View, TouchableOpacity, Linking } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { ChevronRight } from 'lucide-react-native'
 import { useAuth, useUser } from '@clerk/expo'
 import { useSubscription } from '../../hooks/useSubscription'
 import { colors } from '../../theme/colors'
@@ -42,14 +43,28 @@ export function SettingsScreen() {
           <View style={styles.infoCard}>
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Current plan</Text>
-              <View style={[styles.planBadge, plan === 'pro' && styles.planPro]}>
-                <Text style={[styles.planText, plan === 'pro' && styles.planProText]}>{planLabel}</Text>
+              <View style={[styles.planBadge, plan !== 'free' && styles.planPro]}>
+                <Text style={[styles.planText, plan !== 'free' && styles.planProText]}>{planLabel}</Text>
               </View>
             </View>
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Status</Text>
               <Text style={styles.infoValue}>{status === 'active' ? 'Active' : status}</Text>
             </View>
+            {/* Upgrade row — inline within the plan card */}
+            {plan === 'free' && (
+              <TouchableOpacity
+                style={styles.upgradeRow}
+                onPress={() => Linking.openURL('https://pulsepro.work/settings?upgrade=true')}
+                activeOpacity={0.7}
+              >
+                <View style={styles.upgradeInfo}>
+                  <Text style={styles.upgradeLabel}>Upgrade to Pro</Text>
+                  <Text style={styles.upgradeHint}>Unlimited projects, tasks & integrations</Text>
+                </View>
+                <ChevronRight size={18} color={colors.primary} />
+              </TouchableOpacity>
+            )}
           </View>
         </View>
 
@@ -74,7 +89,7 @@ export function SettingsScreen() {
           </View>
         </View>
 
-        {/* Sign Out */}
+        {/* Sign Out — understated, text-only */}
         <TouchableOpacity style={styles.signOutButton} onPress={() => signOut()} activeOpacity={0.7}>
           <Text style={styles.signOutText}>Sign Out</Text>
         </TouchableOpacity>
@@ -131,9 +146,15 @@ const styles = StyleSheet.create({
   planPro: { backgroundColor: colors.primary + '20' },
   planText: { fontSize: 13, fontWeight: '600', color: colors.textSecondary },
   planProText: { color: colors.primary },
-  signOutButton: {
-    backgroundColor: colors.destructive, borderRadius: 10, padding: spacing.lg,
-    alignItems: 'center', marginTop: spacing.md,
+  upgradeRow: {
+    flexDirection: 'row', alignItems: 'center', padding: spacing.lg,
+    backgroundColor: colors.primary + '08',
   },
-  signOutText: { color: '#fff', fontSize: 17, fontWeight: '600' },
+  upgradeInfo: { flex: 1 },
+  upgradeLabel: { fontSize: 15, fontWeight: '600', color: colors.primary },
+  upgradeHint: { fontSize: 12, color: colors.textSecondary, marginTop: 2 },
+  signOutButton: {
+    alignItems: 'center', paddingVertical: spacing.lg, marginTop: spacing.md,
+  },
+  signOutText: { color: colors.destructive, fontSize: 15, fontWeight: '500' },
 })

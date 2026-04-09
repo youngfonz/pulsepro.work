@@ -70,7 +70,11 @@ export function BookmarksScreen() {
         ListEmptyComponent={
           isLoading
             ? <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 60 }} />
-            : <Text style={styles.empty}>No bookmarks yet</Text>
+            : <View style={styles.emptyContainer}>
+                <Text style={styles.emptyEmoji}>🔖</Text>
+                <Text style={styles.emptyTitle}>No bookmarks yet</Text>
+                <Text style={styles.empty}>Save links from your projects to find them fast.</Text>
+              </View>
         }
       />
     </SafeAreaView>
@@ -94,5 +98,8 @@ const styles = StyleSheet.create({
   title: { fontSize: 15, color: colors.textPrimary },
   domain: { fontSize: 12, color: colors.textSecondary, marginTop: 2 },
   project: { fontSize: 12, color: colors.textSecondary, marginTop: 2 },
-  empty: { color: colors.textSecondary, textAlign: 'center', marginTop: 60, fontSize: 15 },
+  emptyContainer: { alignItems: 'center', marginTop: 80 },
+  emptyEmoji: { fontSize: 48, marginBottom: spacing.md },
+  emptyTitle: { fontSize: 20, fontWeight: '700', color: colors.textPrimary, marginBottom: spacing.xs },
+  empty: { color: colors.textSecondary, textAlign: 'center', fontSize: 15 },
 })

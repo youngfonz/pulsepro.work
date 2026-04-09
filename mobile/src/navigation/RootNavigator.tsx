@@ -1,11 +1,14 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useCallback } from 'react'
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import { useAuth } from '@clerk/expo'
+import { useAuth, useUser } from '@clerk/expo'
+import { useQueryClient } from '@tanstack/react-query'
 import { View, Text, StyleSheet, Animated, Easing, Dimensions } from 'react-native'
 import { TabNavigator } from './TabNavigator'
 import { LoginScreen } from '../screens/auth/LoginScreen'
 import { SignUpScreen } from '../screens/auth/SignUpScreen'
+import { OnboardingScreen } from '../screens/onboarding/OnboardingScreen'
+import { useOnboardingStatus } from '../hooks/useOnboardingStatus'
 import { colors } from '../theme/colors'
 import type { RootStackParamList, AuthStackParamList } from '../types/navigation'
 
@@ -102,18 +105,38 @@ function SplashScreen() {
 
 export function RootNavigator() {
   const { isSignedIn, isLoaded } = useAuth()
+  const { user } = useUser()
+  const queryClient = useQueryClient()
+  const { isComplete, markComplete } = useOnboardingStatus(user?.id)
+  const prevUserId = useRef<string | undefined>(undefined)
 
-  if (!isLoaded) {
+  // Clear React Query cache when user changes (sign out → sign in as different user)
+  useEffect(() => {
+    if (prevUserId.current && prevUserId.current !== user?.id) {
+      queryClient.clear()
+    }
+    prevUserId.current = user?.id
+  }, [user?.id, queryClient])
+
+  const handleOnboardingComplete = useCallback(() => {
+    markComplete()
+  }, [markComplete])
+
+  if (!isLoaded || (isSignedIn && isComplete === null)) {
     return <SplashScreen />
   }
 
   return (
     <NavigationContainer theme={appTheme}>
       <RootStack.Navigator screenOptions={{ headerShown: false }}>
-        {isSignedIn ? (
-          <RootStack.Screen name="Main" component={TabNavigator} />
-        ) : (
+        {!isSignedIn ? (
           <RootStack.Screen name="Auth" component={AuthNavigator} />
+        ) : !isComplete ? (
+          <RootStack.Screen name="Onboarding">
+            {() => <OnboardingScreen onComplete={handleOnboardingComplete} />}
+          </RootStack.Screen>
+        ) : (
+          <RootStack.Screen name="Main" component={TabNavigator} />
         )}
       </RootStack.Navigator>
     </NavigationContainer>
@@ -123,7 +146,7 @@ export function RootNavigator() {
 const splash = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0e1a',
+    backgroundColor: '#1a1a1a',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -134,7 +157,7 @@ const splash = StyleSheet.create({
     width: 200,
     height: 200,
     borderRadius: 100,
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#E54D2E',
     opacity: 0.06,
   },
   bgDot2: {
@@ -144,7 +167,7 @@ const splash = StyleSheet.create({
     width: 260,
     height: 260,
     borderRadius: 130,
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#E54D2E',
     opacity: 0.04,
   },
   logoArea: {
@@ -158,17 +181,17 @@ const splash = StyleSheet.create({
     height: 100,
     borderRadius: 50,
     borderWidth: 2,
-    borderColor: '#3b82f6',
+    borderColor: '#E54D2E',
   },
   logoBox: {
     width: 80,
     height: 80,
     borderRadius: 22,
-    backgroundColor: '#1e293b',
+    backgroundColor: '#252525',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#333',
   },
   logoLine: {
     fontSize: 28,
@@ -195,13 +218,13 @@ const splash = StyleSheet.create({
     width: 120,
     height: 3,
     borderRadius: 2,
-    backgroundColor: '#1e293b',
+    backgroundColor: '#333',
     overflow: 'hidden',
   },
   bottomBarFill: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#E54D2E',
     borderRadius: 2,
   },
 })

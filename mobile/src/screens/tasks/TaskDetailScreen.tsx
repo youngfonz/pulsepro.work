@@ -22,7 +22,9 @@ import {
   useToggleTask,
   useAddComment,
 } from '../../hooks/useTasks'
+import { useUser } from '@clerk/expo'
 import { useRecentlyViewed } from '../../hooks/useRecentlyViewed'
+import { VoiceMicButton } from '../../components/ui/VoiceMicButton'
 import { colors } from '../../theme/colors'
 import { spacing } from '../../theme/spacing'
 import { getStatusLabel, getStatusColor, getPriorityColor } from '../../utils/status'
@@ -46,7 +48,8 @@ const PRIORITY_OPTIONS = [
 export function TaskDetailScreen({ route, navigation }: Props) {
   const { id } = route.params
   const { data: task, isLoading, isRefetching, refetch } = useTaskDetail(id)
-  const { addItem } = useRecentlyViewed()
+  const { user } = useUser()
+  const { addItem } = useRecentlyViewed(user?.id)
 
   useEffect(() => {
     if (task) {
@@ -199,12 +202,14 @@ export function TaskDetailScreen({ route, navigation }: Props) {
     )
   }
 
+  useEffect(() => {
+    if (!task && !isLoading) {
+      navigation.goBack()
+    }
+  }, [task, isLoading, navigation])
+
   if (!task && !isLoading) {
-    return (
-      <SafeAreaView style={styles.container} edges={['bottom']}>
-        <Text style={styles.empty}>Task not found</Text>
-      </SafeAreaView>
-    )
+    return null
   }
 
   const isCompleted = task?.status === 'done' || task?.status === 'completed'
@@ -405,6 +410,10 @@ export function TaskDetailScreen({ route, navigation }: Props) {
                     returnKeyType="send"
                     blurOnSubmit
                     onSubmitEditing={handleAddComment}
+                  />
+                  <VoiceMicButton
+                    size={34}
+                    onTranscript={(text) => setCommentText((prev) => prev ? `${prev} ${text}` : text)}
                   />
                   <TouchableOpacity
                     style={[

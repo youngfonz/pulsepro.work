@@ -3,6 +3,7 @@ import { Text, ScrollView, RefreshControl, StyleSheet, View, TouchableOpacity, A
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { useNavigation, CommonActions } from '@react-navigation/native'
+import { useUser } from '@clerk/expo'
 import { useClientDetail } from '../../hooks/useClients'
 import { useRecentlyViewed } from '../../hooks/useRecentlyViewed'
 import { colors } from '../../theme/colors'
@@ -14,8 +15,9 @@ type Props = NativeStackScreenProps<MoreStackParamList, 'ClientDetail'>
 export function ClientDetailScreen({ route }: Props) {
   const { id } = route.params
   const navigation = useNavigation()
+  const { user } = useUser()
   const { data: client, isLoading, isRefetching, error, refetch } = useClientDetail(id)
-  const { addItem } = useRecentlyViewed()
+  const { addItem } = useRecentlyViewed(user?.id)
 
   useEffect(() => {
     if (client) {

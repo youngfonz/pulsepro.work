@@ -1,16 +1,20 @@
 import React from 'react'
-import { View, Text, ScrollView, RefreshControl, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, Text, ScrollView, RefreshControl, ActivityIndicator, StyleSheet, TouchableOpacity, Alert } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Svg, { Circle, Defs, LinearGradient, Stop } from 'react-native-svg'
 import { useNavigation, CommonActions } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { FolderKanban, CheckSquare, Users, Search, ChevronRight, AlertTriangle, Plus, CircleCheckBig } from 'lucide-react-native'
 import { SpeedDialFAB } from '../../components/SpeedDialFAB'
+import { useCreateTask } from '../../hooks/useTasks'
+import { parseTaskFromVoice } from '../../lib/voice'
 import { AnimatedEntry } from '../../components/AnimatedEntry'
 import { useAuth, useUser } from '@clerk/expo'
 import { useDashboard } from '../../hooks/useDashboard'
 import { useInsights } from '../../hooks/useInsights'
 import { useRecentlyViewed, RecentItem } from '../../hooks/useRecentlyViewed'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { ONBOARDING_KEY_PREFIX } from '../../hooks/useOnboardingStatus'
 import type { Insight } from '../../api/insights'
 import { colors } from '../../theme/colors'
 import { spacing } from '../../theme/spacing'
@@ -70,8 +74,22 @@ export function DashboardScreen() {
   const { user } = useUser()
   const { data, isLoading, isFetching, error, refetch } = useDashboard()
   const { data: insightsData } = useInsights()
-  const { items: recentItems } = useRecentlyViewed()
+  const { items: recentItems } = useRecentlyViewed(user?.id)
   const { greeting, dateStr } = useGreeting()
+  const createTask = useCreateTask()
+
+  const handleVoiceCreate = (transcript: string) => {
+    const parsed = parseTaskFromVoice(transcript)
+    if (parsed.title.length < 3) {
+      navigation.navigate('CreateTask')
+      return
+    }
+    const payload: Record<string, unknown> = { title: parsed.title }
+    if (parsed.description) payload.description = parsed.description
+    if (parsed.priority) payload.priority = parsed.priority
+    if (parsed.dueDate) payload.dueDate = parsed.dueDate
+    createTask.mutate(payload)
+  }
 
   const goToSettings = () => {
     navigation.dispatch(CommonActions.navigate({ name: 'MoreTab', params: { screen: 'Settings' } }))
@@ -142,7 +160,7 @@ export function DashboardScreen() {
               <Text style={styles.quickBtnText}>Add Task</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.quickBtn} onPress={() => navigation.navigate('CreateProject')} activeOpacity={0.7}>
-              <View style={[styles.quickBtnIcon, { backgroundColor: '#3b82f6' }]}>
+              <View style={[styles.quickBtnIcon, { backgroundColor: colors.primary }]}>
                 <Plus size={14} color="#fff" />
               </View>
               <Text style={styles.quickBtnText}>Add Project</Text>
@@ -358,6 +376,7 @@ export function DashboardScreen() {
                 })
               ) : (
                 <View style={styles.emptyState}>
+                  <Text style={{ fontSize: 32 }}>📁</Text>
                   <Text style={styles.emptyText}>No projects yet</Text>
                 </View>
               )}
@@ -394,11 +413,32 @@ export function DashboardScreen() {
                 })
               ) : (
                 <View style={styles.emptyState}>
-                  <Text style={styles.emptyText}>Start by viewing a project or task to see it here</Text>
+                  <Text style={{ fontSize: 32 }}>👀</Text>
+                  <Text style={styles.emptyText}>View a project or task to see it here</Text>
                 </View>
               )}
             </View>
           </AnimatedEntry>
+        )}
+
+        {/* DEV: Reset onboarding for testing */}
+        {__DEV__ && (
+          <TouchableOpacity
+            style={styles.devResetBtn}
+            onPress={async () => {
+              const key = `${ONBOARDING_KEY_PREFIX}-${user?.id}`
+              await AsyncStorage.removeItem(key)
+              // Also remove answers
+              await AsyncStorage.removeItem(`@pulsepro:onboarding-answers-${user?.id}`)
+              Alert.alert(
+                'Onboarding Reset',
+                'Reload the app (shake → Reload) to see onboarding again.',
+              )
+            }}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.devResetText}>Reset Onboarding (Dev)</Text>
+          </TouchableOpacity>
         )}
 
         <View style={{ height: 100 }} />
@@ -407,6 +447,7 @@ export function DashboardScreen() {
         onAddTask={() => navigation.navigate('CreateTask')}
         onAddProject={() => navigation.navigate('CreateProject')}
         onAddClient={() => navigation.navigate('CreateClient')}
+        onVoiceCreate={handleVoiceCreate}
       />
     </View>
   )
@@ -489,7 +530,7 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 6,
-    backgroundColor: '#3b82f615',
+    backgroundColor: 'rgba(229, 77, 46, 0.08)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -714,5 +755,21 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 15,
     fontWeight: '600',
+  },
+  devResetBtn: {
+    marginHorizontal: 16,
+    marginTop: 8,
+    padding: 12,
+    borderRadius: 10,
+    backgroundColor: colors.surfaceAlt,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderStyle: 'dashed',
+  },
+  devResetText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: colors.textSecondary,
   },
 })

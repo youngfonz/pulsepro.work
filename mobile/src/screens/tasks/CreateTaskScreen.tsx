@@ -19,6 +19,8 @@ import * as Haptics from 'expo-haptics'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import { useCreateTask } from '../../hooks/useTasks'
 import { useProjects } from '../../hooks/useProjects'
+import { VoiceMicButton } from '../../components/ui/VoiceMicButton'
+import { parseTaskFromVoice } from '../../lib/voice'
 import { colors } from '../../theme/colors'
 import { spacing } from '../../theme/spacing'
 import type { Project } from '../../types/api'
@@ -76,6 +78,18 @@ export function CreateTaskScreen() {
     setProjectModalVisible(false)
   }, [])
 
+  const handleVoiceTranscript = useCallback((transcript: string) => {
+    const parsed = parseTaskFromVoice(transcript)
+    setTitle(parsed.title)
+    if (parsed.description) setDescription(parsed.description)
+    if (parsed.priority && ['low', 'medium', 'high'].includes(parsed.priority)) {
+      setPriority(parsed.priority as Priority)
+    }
+    if (parsed.dueDate) {
+      setDueDate(new Date(parsed.dueDate + 'T00:00:00'))
+    }
+  }, [])
+
   const canSubmit = title.trim().length > 0 && !createTask.isPending
 
   const handleCreate = async () => {
@@ -112,16 +126,19 @@ export function CreateTaskScreen() {
           {/* Title */}
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>Title <Text style={styles.required}>*</Text></Text>
-            <TextInput
-              style={styles.input}
-              placeholder="What needs to be done?"
-              placeholderTextColor={colors.textSecondary}
-              value={title}
-              onChangeText={setTitle}
-              autoFocus
-              returnKeyType="next"
-              maxLength={200}
-            />
+            <View style={styles.inputRow}>
+              <TextInput
+                style={[styles.input, styles.inputFlex]}
+                placeholder="What needs to be done?"
+                placeholderTextColor={colors.textSecondary}
+                value={title}
+                onChangeText={setTitle}
+                autoFocus
+                returnKeyType="next"
+                maxLength={200}
+              />
+              <VoiceMicButton onTranscript={handleVoiceTranscript} />
+            </View>
           </View>
 
           {/* Description */}
@@ -319,6 +336,12 @@ const styles = StyleSheet.create({
   required: { color: colors.destructive },
 
   // Inputs
+  inputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  inputFlex: { flex: 1 },
   input: {
     backgroundColor: colors.surface,
     borderWidth: 1,

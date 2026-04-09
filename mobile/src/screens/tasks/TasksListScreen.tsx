@@ -241,6 +241,7 @@ export function TasksListScreen({ navigation }: Props) {
               </>
             ) : (
               <>
+                <Text style={styles.emptyEmoji}>✅</Text>
                 <Text style={styles.emptyTitle}>All clear</Text>
                 <Text style={styles.empty}>No tasks yet. Tap + to create one.</Text>
               </>
@@ -288,6 +289,7 @@ const styles = StyleSheet.create({
   swipeDelete: { backgroundColor: colors.destructive },
   swipeActionText: { color: '#fff', fontWeight: '600', fontSize: 14 },
   emptyContainer: { alignItems: 'center', marginTop: 80 },
+  emptyEmoji: { fontSize: 48, marginBottom: spacing.md },
   emptyTitle: { fontSize: 20, fontWeight: '700', color: colors.textPrimary, marginBottom: spacing.xs },
   empty: { color: colors.textSecondary, textAlign: 'center', fontSize: 15 },
 })

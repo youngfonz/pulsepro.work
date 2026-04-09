@@ -11,9 +11,9 @@ import {
   Animated,
   Easing,
   Dimensions,
-  ImageBackground,
   Image,
 } from 'react-native'
+import { Video, ResizeMode } from 'expo-av'
 import { useSignIn } from '@clerk/expo/legacy'
 import { useOAuth } from '@clerk/expo'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -24,6 +24,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import type { AuthStackParamList } from '../../types/navigation'
 
 const appIcon = require('../../../assets/icon.png')
+const loginVideo = require('../../../assets/login-bg.mp4')
 
 WebBrowser.maybeCompleteAuthSession()
 
@@ -96,14 +97,16 @@ export function LoginScreen({ navigation }: Props) {
   }
 
   return (
-    <ImageBackground
-      source={{ uri: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80&fit=crop' }}
-      style={styles.container}
-      resizeMode="cover"
-    >
-      {/* Dark overlay gradient */}
+    <View style={styles.container}>
+      <Video
+        source={loginVideo}
+        style={StyleSheet.absoluteFill}
+        resizeMode={ResizeMode.COVER}
+        shouldPlay
+        isLooping
+        isMuted
+      />
       <View style={styles.overlay} />
-
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <SafeAreaView style={styles.safeArea}>
           {/* Top icon + name */}
@@ -112,13 +115,14 @@ export function LoginScreen({ navigation }: Props) {
             <Text style={styles.brand}>Pulse Pro</Text>
           </Animated.View>
 
-          {/* Center headline */}
+          {/* Center headline — matches web hero copy */}
           <Animated.View style={[styles.centerContent, { opacity: fadeIn, transform: [{ translateY: slideUp }] }]}>
             <Text style={styles.headline}>
-              Your projects,{'\n'}under control.
+              Think less.{'\n'}
+              <Text style={styles.headlineAccent}>Run smoother</Text>.
             </Text>
             <Text style={styles.subheadline}>
-              Track tasks, manage clients, and send invoices — all from your pocket.
+              Add your first task in 5 seconds. No setup, no project boards, no learning curve. Just your work, organized.
             </Text>
           </Animated.View>
 
@@ -179,18 +183,18 @@ export function LoginScreen({ navigation }: Props) {
           </Animated.View>
         </SafeAreaView>
       </KeyboardAvoidingView>
-    </ImageBackground>
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0e1a',
+    backgroundColor: '#1a1a1a',
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.35)',
+    backgroundColor: 'rgba(26, 26, 26, 0.55)',
   },
   safeArea: {
     flex: 1,
@@ -232,9 +236,12 @@ const styles = StyleSheet.create({
     letterSpacing: -1,
     marginBottom: 14,
   },
+  headlineAccent: {
+    color: '#E54D2E',
+  },
   subheadline: {
     fontSize: 17,
-    color: 'rgba(255,255,255,0.7)',
+    color: 'rgba(255,255,255,0.6)',
     lineHeight: 26,
   },
 
@@ -269,13 +276,13 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     paddingVertical: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)',
+    borderColor: 'rgba(255,255,255,0.15)',
     marginBottom: 20,
   },
   emailBtnText: {
     fontSize: 16,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.8)',
+    color: 'rgba(255,255,255,0.7)',
   },
   signUpRow: {
     alignItems: 'center',
@@ -286,7 +293,7 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.5)',
   },
   signUpLink: {
-    color: '#fff',
+    color: '#E54D2E',
     fontWeight: '700',
   },
 
@@ -295,17 +302,17 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   input: {
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: 'rgba(255,255,255,0.08)',
     borderRadius: 14,
     paddingHorizontal: 18,
     paddingVertical: 16,
     color: '#fff',
     fontSize: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.15)',
+    borderColor: 'rgba(255,255,255,0.1)',
   },
   primaryBtn: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#E54D2E',
     borderRadius: 14,
     paddingVertical: 16,
     alignItems: 'center',

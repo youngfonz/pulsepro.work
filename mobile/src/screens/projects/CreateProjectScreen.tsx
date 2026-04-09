@@ -18,6 +18,8 @@ import { X, ChevronDown, Check } from 'lucide-react-native'
 import * as Haptics from 'expo-haptics'
 import { useCreateProject } from '../../hooks/useProjects'
 import { useClients } from '../../hooks/useClients'
+import { VoiceMicButton } from '../../components/ui/VoiceMicButton'
+import { parseProjectFromVoice } from '../../lib/voice'
 import { colors } from '../../theme/colors'
 import { spacing } from '../../theme/spacing'
 import type { Client } from '../../types/api'
@@ -87,16 +89,23 @@ export function CreateProjectScreen() {
           {/* Name */}
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>Name <Text style={styles.required}>*</Text></Text>
-            <TextInput
-              style={styles.input}
-              placeholder="What are you working on?"
-              placeholderTextColor={colors.textSecondary}
-              value={name}
-              onChangeText={setName}
-              autoFocus
-              returnKeyType="next"
-              maxLength={200}
-            />
+            <View style={styles.inputRow}>
+              <TextInput
+                style={[styles.input, styles.inputFlex]}
+                placeholder="What are you working on?"
+                placeholderTextColor={colors.textSecondary}
+                value={name}
+                onChangeText={setName}
+                autoFocus
+                returnKeyType="next"
+                maxLength={200}
+              />
+              <VoiceMicButton onTranscript={(text) => {
+                const parsed = parseProjectFromVoice(text)
+                setName(parsed.name)
+                if (parsed.description) setDescription(parsed.description)
+              }} />
+            </View>
           </View>
 
           {/* Description */}
@@ -259,6 +268,8 @@ const styles = StyleSheet.create({
   required: { color: colors.destructive },
 
   // Inputs
+  inputRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  inputFlex: { flex: 1 },
   input: {
     backgroundColor: colors.surface,
     borderWidth: 1,
