@@ -441,6 +441,7 @@ export function DashboardScreen() {
           </TouchableOpacity>
         )}
 
+
         <View style={{ height: 100 }} />
       </ScrollView>
       <SpeedDialFAB

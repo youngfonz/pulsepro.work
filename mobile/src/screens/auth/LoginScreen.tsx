@@ -173,6 +173,7 @@ export function LoginScreen({ navigation }: Props) {
                   <Text style={styles.emailBtnText}>Sign in with email</Text>
                 </TouchableOpacity>
 
+
                 <TouchableOpacity onPress={() => navigation.navigate('SignUp')} style={styles.signUpRow} activeOpacity={0.7}>
                   <Text style={styles.signUpText}>
                     Don&apos;t have an account? <Text style={styles.signUpLink}>Sign Up</Text>
