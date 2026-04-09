@@ -14,6 +14,8 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { useNavigation } from '@react-navigation/native'
 import * as Haptics from 'expo-haptics'
 import { useCreateClient } from '../../hooks/useClients'
+import { VoiceMicButton } from '../../components/ui/VoiceMicButton'
+import { parseClientFromVoice } from '../../lib/voice'
 import { colors } from '../../theme/colors'
 import { spacing } from '../../theme/spacing'
 
@@ -63,16 +65,25 @@ export function CreateClientScreen() {
             <Text style={styles.sectionLabel}>
               Name <Text style={styles.required}>*</Text>
             </Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Client name"
-              placeholderTextColor={colors.textSecondary}
-              value={name}
-              onChangeText={setName}
-              autoFocus
-              returnKeyType="next"
-              maxLength={200}
-            />
+            <View style={styles.inputRow}>
+              <TextInput
+                style={[styles.input, styles.inputFlex]}
+                placeholder="Client name"
+                placeholderTextColor={colors.textSecondary}
+                value={name}
+                onChangeText={setName}
+                autoFocus
+                returnKeyType="next"
+                maxLength={200}
+              />
+              <VoiceMicButton onTranscript={(text) => {
+                const parsed = parseClientFromVoice(text)
+                setName(parsed.name)
+                if (parsed.email) setEmail(parsed.email)
+                if (parsed.phone) setPhone(parsed.phone)
+                if (parsed.company) setCompany(parsed.company)
+              }} />
+            </View>
           </View>
 
           {/* Email */}
@@ -169,6 +180,8 @@ const styles = StyleSheet.create({
   required: { color: colors.destructive },
 
   // Inputs
+  inputRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  inputFlex: { flex: 1 },
   input: {
     backgroundColor: colors.surface,
     borderWidth: 1,

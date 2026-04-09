@@ -59,7 +59,11 @@ export function InvoicesListScreen({ navigation }: Props) {
         ListEmptyComponent={
           isLoading
             ? <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 60 }} />
-            : <Text style={styles.empty}>No invoices yet. Tap + to create one.</Text>
+            : <View style={styles.emptyContainer}>
+                <Text style={styles.emptyEmoji}>💸</Text>
+                <Text style={styles.emptyTitle}>No invoices yet</Text>
+                <Text style={styles.empty}>Tap + to create your first invoice.</Text>
+              </View>
         }
       />
     </SafeAreaView>
@@ -81,5 +85,8 @@ const styles = StyleSheet.create({
   total: { fontSize: 17, fontWeight: '600', color: colors.textPrimary, marginTop: spacing.sm },
   badge: { paddingHorizontal: spacing.sm, paddingVertical: 2, borderRadius: 6 },
   badgeText: { fontSize: 11, fontWeight: '600', textTransform: 'capitalize' },
-  empty: { color: colors.textSecondary, textAlign: 'center', marginTop: 60, fontSize: 15 },
+  emptyContainer: { alignItems: 'center', marginTop: 80 },
+  emptyEmoji: { fontSize: 48, marginBottom: spacing.md },
+  emptyTitle: { fontSize: 20, fontWeight: '700', color: colors.textPrimary, marginBottom: spacing.xs },
+  empty: { color: colors.textSecondary, textAlign: 'center', fontSize: 15 },
 })

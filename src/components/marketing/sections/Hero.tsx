@@ -180,7 +180,7 @@ export function Hero() {
   return (
     <section className="relative overflow-hidden">
       {/* Dark top with gradient fade to page background */}
-      <div className="bg-gradient-to-b from-[#1a1a1a] via-[#1a1a1a] to-[#f5f5f7] dark:to-background pt-28 pb-16">
+      <div className="bg-gradient-to-b from-[#1a1a1a] via-[#1a1a1a] via-[80%] to-[#f5f5f7] dark:to-background pt-28 pb-16">
         <div className="max-w-5xl mx-auto px-4 md:px-8 w-full">
           <div className="text-center max-w-3xl mx-auto">
             <ScrollReveal delay={0}>
@@ -202,38 +202,29 @@ export function Hero() {
 
             <ScrollReveal delay={300}>
               <div className="mt-10 flex gap-4 flex-wrap justify-center">
-                <a
-                  href="#pricing"
+                <Link
+                  href="/sign-up"
                   className="inline-flex items-center justify-center px-8 py-3 rounded-full bg-[#E54D2E] text-white font-medium hover:bg-[#D4431F] transition-all duration-200"
                 >
-                  Get Started
+                  Start for free
                   <svg className="ml-2 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                   </svg>
-                </a>
-                <Link
-                  href="/sign-up"
+                </Link>
+                <a
+                  href="#pricing"
                   className="inline-flex items-center justify-center px-8 py-3 rounded-full border border-white/20 text-white font-medium hover:border-white/40 transition-colors"
                 >
-                  Get started — it&apos;s free
-                </Link>
+                  See pricing
+                </a>
               </div>
             </ScrollReveal>
           </div>
 
           {/* Product showcase — the visual centerpiece */}
           <ScrollReveal delay={400}>
-            <div className="mt-16 relative">
-              {/* Glow behind the dashboard */}
-              <div
-                className="absolute -inset-4 md:-inset-8 pointer-events-none"
-                style={{
-                  background: 'radial-gradient(ellipse at center top, rgba(41, 151, 255, 0.15) 0%, transparent 60%)',
-                }}
-              />
-              <div className="relative">
-                <HeroDashboardMock />
-              </div>
+            <div className="mt-16">
+              <HeroDashboardMock />
             </div>
           </ScrollReveal>
         </div>

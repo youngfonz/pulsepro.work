@@ -3,6 +3,7 @@ import { View, Text, ScrollView, RefreshControl, ActivityIndicator, StyleSheet, 
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { useNavigation, CommonActions } from '@react-navigation/native'
+import { useUser } from '@clerk/expo'
 import { DollarSign, Clock } from 'lucide-react-native'
 import { useProjectDetail } from '../../hooks/useProjects'
 import { useRecentlyViewed } from '../../hooks/useRecentlyViewed'
@@ -18,8 +19,9 @@ type Tab = 'overview' | 'tasks' | 'time' | 'budget'
 export function ProjectDetailScreen({ route }: Props) {
   const { id } = route.params
   const navigation = useNavigation()
+  const { user } = useUser()
   const { data: project, isLoading, isRefetching, refetch } = useProjectDetail(id)
-  const { addItem } = useRecentlyViewed()
+  const { addItem } = useRecentlyViewed(user?.id)
   const [activeTab, setActiveTab] = useState<Tab>('overview')
 
   useEffect(() => {
@@ -38,12 +40,14 @@ export function ProjectDetailScreen({ route }: Props) {
     )
   }
 
+  useEffect(() => {
+    if (!project && !isLoading) {
+      navigation.goBack()
+    }
+  }, [project, isLoading, navigation])
+
   if (!project && !isLoading) {
-    return (
-      <SafeAreaView style={styles.container} edges={['bottom']}>
-        <Text style={styles.empty}>Project not found</Text>
-      </SafeAreaView>
-    )
+    return null
   }
 
   const totalTasks = project?.tasks?.length ?? 0

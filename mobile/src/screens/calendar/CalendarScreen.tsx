@@ -143,7 +143,11 @@ export function CalendarScreen() {
             {isSameDay(selectedDate, today) ? 'Today' : selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
           </Text>
           {selectedTasks.length === 0 ? (
-            <Text style={styles.noTasks}>Nothing scheduled. Enjoy the free time.</Text>
+            <View style={styles.emptyDay}>
+              <Text style={styles.emptyEmoji}>📅</Text>
+              <Text style={styles.emptyTitle}>Nothing scheduled</Text>
+              <Text style={styles.noTasks}>Add a task with a due date to see it here.</Text>
+            </View>
           ) : (
             selectedTasks.map(task => (
               <TouchableOpacity
@@ -192,6 +196,9 @@ const styles = StyleSheet.create({
   dot: { width: 4, height: 4, borderRadius: 2 },
   taskSection: { paddingVertical: spacing.lg, paddingHorizontal: spacing.xl, marginTop: spacing.sm },
   taskSectionTitle: { fontSize: 17, fontWeight: '600', color: colors.textPrimary, marginBottom: spacing.md },
+  emptyDay: { alignItems: 'center', paddingVertical: spacing.xl },
+  emptyEmoji: { fontSize: 48, marginBottom: spacing.md },
+  emptyTitle: { fontSize: 20, fontWeight: '700', color: colors.textPrimary, marginBottom: spacing.xs },
   noTasks: { fontSize: 15, color: colors.textSecondary },
   taskRow: {
     flexDirection: 'row', alignItems: 'center', backgroundColor: colors.surface,

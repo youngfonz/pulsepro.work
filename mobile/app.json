@@ -10,12 +10,16 @@
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#3b82f6"
+      "backgroundColor": "#1a1a1a"
     },
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "org.pulsepro.app",
-      "buildNumber": "1"
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "Pulse Pro uses the microphone for voice input to create tasks, projects, and comments hands-free.",
+        "NSSpeechRecognitionUsageDescription": "Pulse Pro uses speech recognition to convert your voice into text for faster task creation."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -28,7 +32,8 @@
       "@clerk/expo",
       "@react-native-community/datetimepicker",
       "expo-secure-store",
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-speech-recognition"
     ],
     "extra": {
       "clerkPublishableKey": "pk_live_Y2xlcmsucHVsc2Vwcm8ud29yayQ"

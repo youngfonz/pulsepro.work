@@ -23,6 +23,23 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
+    {
+      name: 'chrome',
+      use: { ...devices['Desktop Chrome'], channel: 'chrome' },
+    },
+    {
+      name: 'chrome-profile',
+      use: {
+        ...devices['Desktop Chrome'],
+        channel: 'chrome',
+        launchOptions: {
+          args: [
+            '--user-data-dir=/Users/fonz.morris/Library/Application Support/Google/Chrome',
+            '--profile-directory=Default',
+          ],
+        },
+      },
+    },
     // Run mobile tests explicitly: npx playwright test --project=mobile-chrome
     {
       name: 'mobile-chrome',

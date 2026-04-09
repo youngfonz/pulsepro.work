@@ -1,7 +1,8 @@
 import React, { useState, useRef } from 'react'
 import { View, TouchableOpacity, Text, StyleSheet, Animated, Pressable } from 'react-native'
-import { Plus, CheckSquare, FolderKanban, Users } from 'lucide-react-native'
+import { Plus, CheckSquare, FolderKanban, Users, Mic } from 'lucide-react-native'
 import * as Haptics from 'expo-haptics'
+import { VoiceInputOverlay } from './VoiceInputOverlay'
 import { colors } from '../theme/colors'
 import { spacing } from '../theme/spacing'
 
@@ -15,10 +16,12 @@ interface SpeedDialFABProps {
   onAddTask: () => void
   onAddProject: () => void
   onAddClient: () => void
+  onVoiceCreate?: (transcript: string) => void
 }
 
-export function SpeedDialFAB({ onAddTask, onAddProject, onAddClient }: SpeedDialFABProps) {
+export function SpeedDialFAB({ onAddTask, onAddProject, onAddClient, onVoiceCreate }: SpeedDialFABProps) {
   const [open, setOpen] = useState(false)
+  const [voiceVisible, setVoiceVisible] = useState(false)
   const anim = useRef(new Animated.Value(0)).current
 
   const toggle = async () => {
@@ -97,12 +100,31 @@ export function SpeedDialFAB({ onAddTask, onAddProject, onAddClient }: SpeedDial
             </Animated.View>
           )
         })}
-        <TouchableOpacity style={styles.fab} onPress={toggle} activeOpacity={0.85}>
+        <Pressable
+          style={styles.fab}
+          onPress={toggle}
+          onLongPress={async () => {
+            await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)
+            setVoiceVisible(true)
+          }}
+          delayLongPress={500}
+        >
           <Animated.View style={{ transform: [{ rotate: rotation }] }}>
             <Plus size={26} color="#fff" />
           </Animated.View>
-        </TouchableOpacity>
+        </Pressable>
       </View>
+
+      <VoiceInputOverlay
+        visible={voiceVisible}
+        onClose={() => setVoiceVisible(false)}
+        onResult={(transcript) => {
+          if (onVoiceCreate) {
+            onVoiceCreate(transcript)
+          }
+        }}
+        entityType="task"
+      />
     </>
   )
 }
