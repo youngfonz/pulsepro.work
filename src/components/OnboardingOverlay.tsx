@@ -103,20 +103,20 @@ export function OnboardingOverlay({ userId }: { userId: string }) {
         </div>
 
         {/* Footer: dots + navigation */}
-        <div className="px-6 pt-4 pb-5 flex items-center justify-between">
-          {/* Back button or spacer */}
+        <div className="px-6 pt-4 pb-5 relative flex items-center justify-center">
+          {/* Back button — absolute left */}
           {isFirstStep ? (
-            <div className="w-16" />
+            <div className="absolute left-6 w-16" />
           ) : (
             <button
               onClick={handleBack}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium"
+              className="absolute left-6 text-sm text-muted-foreground hover:text-foreground transition-colors font-medium"
             >
               Back
             </button>
           )}
 
-          {/* Step indicator */}
+          {/* Step indicator — truly centered */}
           <div className="flex flex-col items-center gap-1.5">
             <div className="flex items-center gap-2">
               {steps.map((_, i) => (
@@ -133,10 +133,10 @@ export function OnboardingOverlay({ userId }: { userId: string }) {
             <span className="text-[10px] text-muted-foreground">{currentStep + 1} of {steps.length}</span>
           </div>
 
-          {/* Continue/Done button */}
+          {/* Continue/Done button — absolute right */}
           <button
             onClick={handleNext}
-            className="inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground px-5 py-2 text-sm font-medium hover:bg-primary/90 transition-colors"
+            className="absolute right-6 inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground px-5 py-2 text-sm font-medium hover:bg-primary/90 transition-colors"
           >
             {isLastStep ? 'Get started' : 'Continue'}
           </button>
