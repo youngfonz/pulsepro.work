@@ -93,25 +93,29 @@ export function BillingCard() {
             </a>
           ) : (
             <div className="flex flex-col sm:flex-row gap-2">
-              <a
-                href={`/api/checkout?products=${process.env.NEXT_PUBLIC_POLAR_PRO_PRODUCT_ID || ''}`}
-                className="inline-flex items-center justify-center rounded-lg bg-primary text-primary-foreground px-4 py-2 text-sm font-medium hover:bg-primary/90 transition-colors"
-              >
-                Upgrade to Pro — $12/mo
-              </a>
-              <a
-                href={`/api/checkout?products=${process.env.NEXT_PUBLIC_POLAR_TEAM_PRODUCT_ID || ''}`}
-                className="inline-flex items-center justify-center rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-muted transition-colors"
-              >
-                Upgrade to Team — $29/mo
-              </a>
+              {process.env.NEXT_PUBLIC_POLAR_PRO_PRODUCT_ID && (
+                <a
+                  href={`/api/checkout?products=${process.env.NEXT_PUBLIC_POLAR_PRO_PRODUCT_ID}`}
+                  className="inline-flex items-center justify-center rounded-lg bg-primary text-primary-foreground px-4 py-2 text-sm font-medium hover:bg-primary/90 transition-colors"
+                >
+                  Upgrade to Pro — $12/mo
+                </a>
+              )}
+              {process.env.NEXT_PUBLIC_POLAR_TEAM_PRODUCT_ID && (
+                <a
+                  href={`/api/checkout?products=${process.env.NEXT_PUBLIC_POLAR_TEAM_PRODUCT_ID}`}
+                  className="inline-flex items-center justify-center rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-muted transition-colors"
+                >
+                  Upgrade to Team — $29/mo
+                </a>
+              )}
             </div>
           )}
-          {plan === 'pro' && (
+          {plan === 'pro' && process.env.NEXT_PUBLIC_POLAR_TEAM_PRODUCT_ID && (
             <p className="text-xs text-muted-foreground">
               Need more team members?{' '}
               <a
-                href={`/api/checkout?products=${process.env.NEXT_PUBLIC_POLAR_TEAM_PRODUCT_ID || ''}`}
+                href={`/api/checkout?products=${process.env.NEXT_PUBLIC_POLAR_TEAM_PRODUCT_ID}`}
                 className="text-primary hover:underline"
               >
                 Upgrade to Team ($29/mo)

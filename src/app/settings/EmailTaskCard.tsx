@@ -47,23 +47,18 @@ export function EmailTaskCard() {
 
   if (plan !== 'pro' && plan !== 'team') {
     return (
-      <Card>
+      <Card className="opacity-60">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <EmailIcon />
             Email to Task
+            <span className="ml-auto text-[10px] font-medium uppercase tracking-wider text-muted-foreground border border-border rounded px-1.5 py-0.5">Pro</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground mb-3">
+          <p className="text-sm text-muted-foreground">
             Forward emails to your personal Pulse Pro address and they become tasks automatically.
           </p>
-          <a
-            href={`/api/checkout?products=${process.env.NEXT_PUBLIC_POLAR_PRO_PRODUCT_ID || ''}`}
-            className="inline-flex items-center justify-center rounded-lg bg-primary text-primary-foreground px-4 py-2 text-sm font-medium hover:bg-primary/90 transition-colors"
-          >
-            Upgrade to Pro
-          </a>
         </CardContent>
       </Card>
     )
