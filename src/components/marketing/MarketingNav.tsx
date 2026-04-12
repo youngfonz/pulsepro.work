@@ -17,10 +17,11 @@ export function MarketingNav() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20)
+      setIsScrolled(window.scrollY > 10)
     }
 
-    window.addEventListener('scroll', handleScroll)
+    handleScroll() // Check initial position (e.g. page refreshed mid-scroll)
+    window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
