@@ -229,10 +229,12 @@ Mark each item: PASS / FAIL / SKIP (with reason)
 ### 1.14 Settings (Free Plan)
 
 - [ ] /settings — page loads
-- [ ] Billing card: shows "Free" plan
-- [ ] Telegram card: shows "Upgrade to Pro" button
-- [ ] Email to Task card: shows "Upgrade to Pro" button
-- [ ] Siri & Shortcuts card: shows "Upgrade to Pro" button
+- [ ] Billing card: shows "Free" plan with usage bars
+- [ ] Billing card: "Upgrade to Pro" and "Upgrade to Team" buttons visible (when product IDs configured)
+- [ ] Telegram card: dimmed at 60% opacity with "Pro" badge (no upgrade button)
+- [ ] Email to Task card: dimmed at 60% opacity with "Pro" badge (no upgrade button)
+- [ ] Siri & Shortcuts card: dimmed at 60% opacity with "Pro" badge (no upgrade button)
+- [ ] "Have a promo code?" input visible below upgrade buttons
 - [ ] Appearance: dark mode toggle works
 - [ ] Appearance: light mode toggle works
 - [ ] About: version and tech stack display
@@ -424,6 +426,31 @@ Mark each item: PASS / FAIL / SKIP (with reason)
 - [ ] HTML in task description — sanitized, no XSS
 - [ ] Empty search query — shows quick actions, no error
 - [ ] Search with special characters — no crash
+
+---
+
+## PERSONA 2.5: TEAM PLAN USER
+
+### 2T.1 Upgrade to Team
+
+- [ ] Admin upgrades user to Team plan (or via Polar checkout)
+- [ ] Settings > Billing: shows "Team" plan
+- [ ] All Pro features still work on Team plan
+
+### 2T.2 Team Collaboration Limits
+
+- [ ] Open a project — Team tab visible
+- [ ] Add collaborators up to 10 on a single project — all succeed
+- [ ] Adding 11th collaborator — shows limit message
+- [ ] All role types work (Viewer, Editor, Manager) at Team tier
+- [ ] Revoking access works — removed collaborator loses access
+
+### 2T.3 Team vs Pro Comparison
+
+- [ ] Team plan shows correct limits in Settings (unlimited projects/tasks/clients)
+- [ ] Collaboration limit is 10 (not 3 like Pro)
+- [ ] All Pro integrations (Telegram, Email-to-Task, Siri, AI Insights) available on Team
+- [ ] Invoicing available on Team
 
 ---
 
