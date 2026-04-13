@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import { PulseLogo } from '@/components/PulseLogo'
 import { useTheme } from '@/components/ThemeProvider'
@@ -10,13 +10,31 @@ export function MarketingNav() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const { theme, toggleTheme } = useTheme()
   const isDark = theme === 'dark'
+  const headerRef = useRef<HTMLElement>(null)
+
+  const updateNavColors = useCallback((scrolled: boolean) => {
+    const dark = document.documentElement.classList.contains('dark')
+    const color = scrolled ? (dark ? '#fafafa' : '#0a0a0a') : '#ffffff'
+    headerRef.current?.querySelectorAll('[data-nt]').forEach(el => {
+      ;(el as HTMLElement).style.setProperty('color', color, 'important')
+    })
+  }, [])
 
   useEffect(() => {
-    const onScroll = () => setIsScrolled(window.scrollY > 10)
+    const onScroll = () => {
+      const scrolled = window.scrollY > 10
+      setIsScrolled(scrolled)
+      updateNavColors(scrolled)
+    }
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+  }, [updateNavColors])
+
+  // Update colors when theme toggles
+  useEffect(() => {
+    updateNavColors(isScrolled)
+  }, [isDark, isScrolled, updateNavColors])
 
   const navLinks = [
     { label: 'Features', href: '#features' },
@@ -37,13 +55,13 @@ export function MarketingNav() {
     <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-[60] focus:p-4 focus:bg-background focus:text-foreground focus:border focus:border-border focus:rounded-md focus:top-2 focus:left-2">
       Skip to main content
     </a>
-    <header className={`fixed top-0 w-full z-50 h-12 ${headerBg}`}>
+    <header ref={headerRef} className={`fixed top-0 w-full z-50 h-12 ${headerBg}`}>
       <div className="max-w-6xl mx-auto px-4 md:px-8 h-full">
         <div className="relative flex items-center justify-between h-full">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
             <PulseLogo size={32} variant={isScrolled ? 'light' : 'dark'} />
-            <span className={`text-lg font-semibold font-[family-name:var(--font-display)] ${tc}`}>Pulse Pro</span>
+            <span data-nt className={`text-lg font-semibold font-[family-name:var(--font-display)] ${tc}`}>Pulse Pro</span>
           </Link>
 
           {/* Desktop Navigation — true center */}
@@ -52,6 +70,7 @@ export function MarketingNav() {
               <a
                 key={link.href}
                 href={link.href}
+                data-nt
                 className={`text-sm font-medium hover:opacity-70 ${tc}`}
               >
                 {link.label}
@@ -63,6 +82,7 @@ export function MarketingNav() {
           <div className="hidden md:flex items-center gap-3">
             <button
               onClick={toggleTheme}
+              data-nt
               className={`p-2 rounded-md ${tc} ${isScrolled ? 'hover:bg-muted' : 'hover:bg-white/10'}`}
               aria-label="Toggle theme"
             >
@@ -78,6 +98,7 @@ export function MarketingNav() {
             </button>
             <Link
               href="/sign-in"
+              data-nt
               className={`px-4 py-2 text-sm font-medium rounded-md ${tc} ${isScrolled ? 'hover:bg-muted' : 'hover:bg-white/10'}`}
               aria-label="Sign in to your Pulse Pro account"
             >
@@ -94,6 +115,7 @@ export function MarketingNav() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            data-nt
             className={`md:hidden p-2 rounded-md ${tc} ${isScrolled ? 'hover:bg-muted' : 'hover:bg-white/10'}`}
             aria-label="Toggle menu"
           >
