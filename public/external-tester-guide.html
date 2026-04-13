@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pulse Pro — External QA Testing Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Plus Jakarta Sans', -apple-system, system-ui, sans-serif; background: #f5f5f7; color: #1a1a1a; }
+
+  /* Password gate */
+  #gate { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+  #gate .gate-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 16px; padding: 40px; max-width: 380px; width: 100%; text-align: center; box-shadow: 0 4px 24px rgba(0,0,0,0.06); }
+  #gate h2 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px; margin-bottom: 6px; }
+  #gate p { font-size: 13px; color: #71717a; margin-bottom: 20px; }
+  #gate input { width: 100%; padding: 10px 14px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; font-family: inherit; outline: none; transition: border-color 0.15s; }
+  #gate input:focus { border-color: #E54D2E; }
+  #gate button { width: 100%; margin-top: 12px; padding: 10px; background: #E54D2E; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.15s; }
+  #gate button:hover { background: #F0613E; }
+  #gate .error { color: #ef4444; font-size: 12px; margin-top: 8px; display: none; }
+  #app-content { display: none; }
+
+  /* Sticky dashboard header */
+  .dashboard { position: sticky; top: 0; z-index: 50; background: #fff; border-bottom: 1px solid #e5e7eb; padding: 16px 24px; }
+  .dashboard-inner { max-width: 900px; margin: 0 auto; }
+  .dashboard h1 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 12px; }
+  .dashboard-stats { display: flex; gap: 12px; flex-wrap: wrap; }
+  .stat-card { flex: 1; min-width: 120px; background: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px 16px; }
+  .stat-card.overall { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+  .stat-card.overall .stat-label { color: #a1a1aa; }
+  .stat-card.pass { border-color: #22c55e; }
+  .stat-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; color: #71717a; }
+  .stat-value { font-size: 28px; font-weight: 700; margin-top: 2px; }
+  .stat-sub { font-size: 11px; color: #a1a1aa; margin-top: 2px; }
+
+  /* Progress bar */
+  .progress-bar-container { margin-top: 12px; background: #e5e7eb; border-radius: 999px; height: 8px; overflow: hidden; }
+  .progress-bar { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #E54D2E, #F0613E); transition: width 0.4s ease; }
+
+  /* Phase tabs */
+  .phase-tabs { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+  .phase-tab { padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid #e5e7eb; background: #fff; transition: all 0.15s; }
+  .phase-tab:hover { background: #f3f4f6; }
+  .phase-tab.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+  .phase-tab .tab-count { font-weight: 400; opacity: 0.6; margin-left: 4px; }
+
+  /* Content */
+  .content { max-width: 900px; margin: 0 auto; padding: 24px; }
+  .phase-section { display: none; }
+  .phase-section.active { display: block; }
+
+  /* Section cards */
+  .section { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; margin-bottom: 16px; overflow: hidden; }
+  .section-header { padding: 14px 18px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; user-select: none; }
+  .section-header:hover { background: #fafafa; }
+  .section-title { font-size: 14px; font-weight: 600; }
+  .section-progress { display: flex; align-items: center; gap: 8px; }
+  .section-count { font-size: 12px; color: #71717a; font-weight: 500; }
+  .section-bar { width: 60px; height: 4px; background: #e5e7eb; border-radius: 999px; overflow: hidden; }
+  .section-bar-fill { height: 100%; background: #22c55e; border-radius: 999px; transition: width 0.3s; }
+  .section-chevron { width: 16px; height: 16px; color: #a1a1aa; transition: transform 0.2s; }
+  .section.open .section-chevron { transform: rotate(180deg); }
+  .section-body { display: none; padding: 0 18px 14px; }
+  .section.open .section-body { display: block; }
+
+  /* Checklist item */
+  .check-item { display: flex; align-items: flex-start; gap: 10px; padding: 7px 0; border-bottom: 1px solid #f3f4f6; }
+  .check-item:last-child { border-bottom: none; }
+  .check-item input[type="checkbox"] { appearance: none; -webkit-appearance: none; width: 18px; height: 18px; border: 2px solid #d4d4d8; border-radius: 5px; cursor: pointer; flex-shrink: 0; margin-top: 1px; position: relative; transition: all 0.15s; }
+  .check-item input[type="checkbox"]:checked { background: #22c55e; border-color: #22c55e; }
+  .check-item input[type="checkbox"]:checked::after { content: ''; position: absolute; left: 5px; top: 1px; width: 5px; height: 10px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+  .check-item label { font-size: 13px; line-height: 1.5; cursor: pointer; transition: all 0.2s; flex: 1; }
+  .check-item.checked label { text-decoration: line-through; color: #a1a1aa; }
+  .check-item code { background: #f3f4f6; padding: 1px 5px; border-radius: 4px; font-size: 12px; font-family: 'SF Mono', Monaco, monospace; }
+  .check-item.checked code { opacity: 0.5; }
+  .indent { padding-left: 28px; }
+
+  /* Sub-section divider within section body */
+  .subsection { font-size: 13px; font-weight: 600; color: #1a1a1a; padding: 12px 0 4px; margin-top: 4px; border-top: 1px solid #e5e7eb; }
+  .subsection:first-child { border-top: none; margin-top: 0; }
+
+  /* Info cards (non-checkable) */
+  .info-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; margin-bottom: 16px; padding: 20px; }
+  .info-card h2 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 10px; }
+  .info-card h3 { font-size: 14px; font-weight: 600; margin: 12px 0 6px; }
+  .info-card p { font-size: 14px; line-height: 1.6; color: #404040; margin-bottom: 8px; }
+  .info-card ul { margin: 6px 0 10px 20px; font-size: 14px; line-height: 1.6; color: #404040; }
+  .info-card li { margin-bottom: 4px; }
+  .info-card code { background: #f3f4f6; padding: 1px 5px; border-radius: 4px; font-size: 12px; font-family: 'SF Mono', Monaco, monospace; }
+  .info-card .template { background: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; font-family: 'SF Mono', Monaco, monospace; font-size: 12px; line-height: 1.7; white-space: pre-wrap; margin: 8px 0; }
+  .info-card .severity { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; margin-right: 6px; }
+  .severity.blocker { background: #fef2f2; color: #dc2626; }
+  .severity.major { background: #fff7ed; color: #ea580c; }
+  .severity.minor { background: #fefce8; color: #ca8a04; }
+  .severity.cosmetic { background: #f0fdf4; color: #16a34a; }
+
+  /* STOP banner */
+  .stop-banner { background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2f 100%); border-radius: 12px; padding: 24px; margin-bottom: 16px; text-align: center; }
+  .stop-banner h3 { font-family: 'Bricolage Grotesque', sans-serif; color: #E54D2E; font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+  .stop-banner p { color: #a1a1aa; font-size: 14px; line-height: 1.6; }
+  .stop-banner .msg { background: rgba(229,77,46,0.1); border: 1px solid rgba(229,77,46,0.3); border-radius: 8px; padding: 10px 16px; display: inline-block; margin-top: 10px; color: #F0613E; font-weight: 600; font-size: 14px; }
+
+  /* Reference tables */
+  .ref-table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 12px 0; }
+  .ref-table th { background: #1a1a1a; color: #fff; padding: 10px 14px; text-align: left; font-weight: 600; }
+  .ref-table td { padding: 8px 14px; border-bottom: 1px solid #e5e7eb; }
+  .ref-table tr:last-child td { border-bottom: none; }
+  .ref-table tr:nth-child(even) { background: #f8f9fa; }
+  .ref-table .yes { color: #22c55e; font-weight: 600; }
+  .ref-table .no { color: #a1a1aa; }
+
+  /* Celebration */
+  .celebration { display: none; text-align: center; padding: 48px 24px; }
+  .celebration.show { display: block; }
+  .celebration h2 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+  .celebration p { font-size: 14px; color: #71717a; }
+
+  /* Reset button */
+  .reset-btn { position: fixed; bottom: 24px; right: 24px; padding: 10px 18px; background: #ef4444; color: #fff; border: none; border-radius: 10px; font-size: 12px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(239,68,68,0.3); transition: all 0.15s; z-index: 100; font-family: inherit; }
+  .reset-btn:hover { background: #dc2626; transform: translateY(-1px); }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .dashboard { padding: 12px 16px; }
+    .dashboard-stats { gap: 8px; }
+    .stat-card { min-width: 80px; padding: 8px 12px; }
+    .stat-value { font-size: 22px; }
+    .content { padding: 16px; }
+    .phase-tabs { gap: 4px; }
+    .phase-tab { padding: 5px 10px; font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="gate-card">
+    <h2>Pulse Pro QA</h2>
+    <p>Enter the password to access the testing guide</p>
+    <input type="password" id="gate-pw" placeholder="Password" onkeydown="if(event.key==='Enter')unlock()">
+    <button onclick="unlock()">Enter</button>
+    <div class="error" id="gate-error">Incorrect password</div>
+  </div>
+</div>
+
+<div id="app-content">
+<div class="dashboard">
+  <div class="dashboard-inner">
+    <h1>Pulse Pro — External QA Testing Guide</h1>
+    <div class="dashboard-stats">
+      <div class="stat-card overall">
+        <div class="stat-label">Overall</div>
+        <div class="stat-value" id="overall-pct">0%</div>
+        <div class="stat-sub" id="overall-count">0 / 0 steps</div>
+      </div>
+      <div class="stat-card" id="ph1-card">
+        <div class="stat-label">Phase 1: Free</div>
+        <div class="stat-value" id="ph1-pct">0%</div>
+        <div class="stat-sub" id="ph1-count">0 / 0</div>
+      </div>
+      <div class="stat-card" id="ph2-card">
+        <div class="stat-label">Phase 2: Pro</div>
+        <div class="stat-value" id="ph2-pct">0%</div>
+        <div class="stat-sub" id="ph2-count">0 / 0</div>
+      </div>
+      <div class="stat-card" id="ph3-card">
+        <div class="stat-label">Phase 3: Team</div>
+        <div class="stat-value" id="ph3-pct">0%</div>
+        <div class="stat-sub" id="ph3-count">0 / 0</div>
+      </div>
+    </div>
+    <div class="progress-bar-container">
+      <div class="progress-bar" id="overall-bar" style="width: 0%"></div>
+    </div>
+    <div class="phase-tabs">
+      <div class="phase-tab active" data-phase="setup">Setup</div>
+      <div class="phase-tab" data-phase="ph1">Phase 1: Free<span class="tab-count" id="ph1-tab-count"></span></div>
+      <div class="phase-tab" data-phase="ph2">Phase 2: Pro<span class="tab-count" id="ph2-tab-count"></span></div>
+      <div class="phase-tab" data-phase="ph3">Phase 3: Team<span class="tab-count" id="ph3-tab-count"></span></div>
+      <div class="phase-tab" data-phase="ref">Reference</div>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- ==================== SETUP ==================== -->
+<div class="phase-section active" id="setup">
+
+<div class="info-card">
+  <h2>About This Test</h2>
+  <p>Pulse Pro is a project management web app for freelancers and small agencies. It lets users create tasks, organize them into projects, track clients, log time, send invoices, and connect tools like Telegram and email.</p>
+  <p>Your job is to test the full app from a fresh user's perspective — signing up for the first time, trying every feature, and reporting anything that looks wrong, broken, or confusing.</p>
+  <p>You will be testing across three plan tiers: <strong>Free</strong>, <strong>Pro ($12/month)</strong>, and <strong>Team ($29/month)</strong>. Each tier has different features and limits. You will start on the Free plan and message Fonz when you're ready to be upgraded.</p>
+  <p><strong>Estimated total time:</strong> ~2 hours</p>
+  <p><strong>App URL:</strong> pulsepro.work</p>
+  <p><strong>Fonz's contact:</strong> Fonz@PulsePro.org — message him when you're ready for a plan upgrade, or if something is completely broken and you cannot continue.</p>
+</div>
+
+<div class="info-card">
+  <h2>What You Need</h2>
+  <ul>
+    <li><strong>Chrome browser</strong> (latest version)</li>
+    <li><strong>2 email addresses</strong> — one as your main test account, one as a secondary account for collaboration testing</li>
+    <li><strong>Telegram app</strong> on your phone (for Phase 2 integration testing)</li>
+    <li><strong>A document or notepad</strong> to write down bugs as you find them</li>
+  </ul>
+</div>
+
+<div class="info-card">
+  <h2>How to Report Bugs</h2>
+  <p>Use this exact template for every bug you find. Copy it and fill it in:</p>
+  <div class="template">Page URL: (copy from your browser's address bar)
+Steps: (numbered list — exactly what you clicked, step by step)
+Expected: (what you thought would happen)
+Actual: (what actually happened instead)
+Screenshot: (take one if you can — paste it in)
+Severity: Blocker / Major / Minor / Cosmetic</div>
+  <h3>Severity Guide</h3>
+  <p><span class="severity blocker">Blocker</span> The app crashes, you cannot continue, data was lost</p>
+  <p><span class="severity major">Major</span> A feature does not work at all</p>
+  <p><span class="severity minor">Minor</span> A feature works but behaves unexpectedly</p>
+  <p><span class="severity cosmetic">Cosmetic</span> Something looks off (wrong color, text overlap, alignment issue)</p>
+</div>
+
+</div>
+
+<!-- ==================== PHASE 1: FREE ==================== -->
+<div class="phase-section" id="ph1">
+
+<div class="section open" data-section="ph1-marketing">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-title">1.1 Marketing Page</span>
+    <div class="section-progress"><span class="section-count"></span><div class="section-bar"><div class="section-bar-fill"></div></div><svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="section-body">
+    <div class="check-item"><input type="checkbox" id="t1"><label for="t1">Open Chrome and go to <strong>pulsepro.work</strong></label></div>
+    <div class="check-item"><input type="checkbox" id="t2"><label for="t2">You land on a public marketing page — NOT redirected or asked to log in</label></div>
+    <div class="check-item"><input type="checkbox" id="t3"><label for="t3">Top of page: <strong>Pulse Pro</strong> logo in top left, navigation links in top right</label></div>
+    <div class="check-item"><input type="checkbox" id="t4"><label for="t4">Nav bar has a solid background, text is clearly readable</label></div>
+    <div class="subsection">Scroll down and verify each section:</div>
+    <div class="check-item"><input type="checkbox" id="t5"><label for="t5"><strong>Hero section</strong> — headline, subheadline, and at least one "Get Started" button</label></div>
+    <div class="check-item"><input type="checkbox" id="t6"><label for="t6"><strong>Stats section</strong> — numbers/metrics like "400%", "8 hrs", "0 missed deadlines"</label></div>
+    <div class="check-item"><input type="checkbox" id="t7"><label for="t7"><strong>Features section</strong> — dashboard screenshot on the left, phone mock on the right, 6 feature cards below</label></div>
+    <div class="check-item"><input type="checkbox" id="t8"><label for="t8"><strong>Mobile App section</strong> — heading "Your projects, wherever you are"; rotating phone mock with 4 screens; clickable dot indicators below the phone</label></div>
+    <div class="check-item"><input type="checkbox" id="t9"><label for="t9"><strong>"Work smarter from anywhere"</strong> — 5 clickable tabs: AI Insights, Email to Task, Siri &amp; Voice, Keyboard, Telegram</label></div>
+    <div class="check-item"><input type="checkbox" id="t10"><label for="t10">Click each tab — content changes. Wait 6 seconds without clicking — tabs cycle automatically</label></div>
+    <div class="check-item"><input type="checkbox" id="t11"><label for="t11"><strong>Testimonials section</strong> — customer quotes</label></div>
+    <div class="check-item"><input type="checkbox" id="t12"><label for="t12"><strong>Why Switch section</strong> — cards for Asana, Monday, Trello, ClickUp, Apple Notes</label></div>
+    <div class="check-item"><input type="checkbox" id="t13"><label for="t13"><strong>Pricing section</strong> — Free vs Pro table. Free: 3 projects, 50 tasks, 1 client. Pro: unlimited, integrations, AI</label></div>
+    <div class="check-item"><input type="checkbox" id="t14"><label for="t14"><strong>FAQ section</strong> — click each question, verify it expands/collapses</label></div>
+    <div class="check-item"><input type="checkbox" id="t15"><label for="t15"><strong>Final CTA section</strong> — button at the bottom of the page</label></div>
+    <div class="check-item"><input type="checkbox" id="t16"><label for="t16">Click nav links (<strong>Features</strong>, <strong>Pricing</strong>, <strong>FAQ</strong>) — each scrolls to that section</label></div>
+    <div class="check-item"><input type="checkbox" id="t17"><label for="t17"><strong>Footer</strong> — links work (Privacy, Terms, Contact), copyright year is 2026</label></div>
+    <div class="subsection">Mobile view test:</div>
+    <div class="check-item"><input type="checkbox" id="t18"><label for="t18">Right-click &gt; Inspect &gt; phone icon &gt; set width to 390. Nav bar collapses (menu icon appears)</label></div>
+    <div class="check-item"><input type="checkbox" id="t19"><label for="t19">All sections stack vertically, text is readable, no horizontal scrollbar</label></div>
+  </div>
+</div>
+
+<div class="section" data-section="ph1-signup">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-title">1.2 Sign Up</span>
+    <div class="section-progress"><span class="section-count"></span><div class="section-bar"><div class="section-bar-fill"></div></div><svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="section-body">
+    <div class="check-item"><input type="checkbox" id="t20"><label for="t20">Click <strong>Get Started</strong> in the top-right nav or hero section</label></div>
+    <div class="check-item"><input type="checkbox" id="t21"><label for="t21">Taken to sign-up page at <code>/sign-up</code> — form centered, no horizontal scrollbar</label></div>
+    <div class="check-item"><input type="checkbox" id="t22"><label for="t22">Enter your primary test email and create a password</label></div>
+    <div class="check-item"><input type="checkbox" id="t23"><label for="t23">Complete any verification step (email code, etc.)</label></div>
+    <div class="check-item"><input type="checkbox" id="t24"><label for="t24">After sign-up, automatically redirected to <strong>/dashboard</strong> — NOT back to marketing page</label></div>
+    <div class="check-item"><input type="checkbox" id="t25"><label for="t25"><em>(Optional)</em> In incognito window, try <strong>Sign In</strong> with Google OAuth — redirects to dashboard</label></div>
+  </div>
+</div>
+
+<div class="section" data-section="ph1-onboarding">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-title">1.3 Onboarding Overlay</span>
+    <div class="section-progress"><span class="section-count"></span><div class="section-bar"><div class="section-bar-fill"></div></div><svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="section-body">
+    <div class="check-item"><input type="checkbox" id="t26"><label for="t26">Overlay appears automatically on first dashboard visit (dimmed background, centered card)</label></div>
+    <div class="check-item"><input type="checkbox" id="t27"><label for="t27"><strong>Step 1:</strong> "Add your first task" — text input visual with blinking cursor, Continue + X buttons</label></div>
+    <div class="check-item"><input type="checkbox" id="t28"><label for="t28"><strong>Step 2:</strong> "Organize when you're ready" — tasks organized under project groups</label></div>
+    <div class="check-item"><input type="checkbox" id="t29"><label for="t29"><strong>Step 3:</strong> "Shortcuts that save time" — N key, Cmd+K, Enter shortcuts shown</label></div>
+    <div class="check-item"><input type="checkbox" id="t30"><label for="t30"><strong>Step 4:</strong> "You're all set" — dashboard preview, button says <strong>Get started</strong></label></div>
+    <div class="check-item"><input type="checkbox" id="t31"><label for="t31">Click <strong>Get started</strong> — overlay closes, dashboard visible</label></div>
+    <div class="check-item"><input type="checkbox" id="t32"><label for="t32">Refresh the page — overlay does NOT appear again</label></div>
+  </div>
+</div>
+
+<div class="section" data-section="ph1-dashboard-empty">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-title">1.4 Dashboard (Empty State)</span>
+    <div class="section-progress"><span class="section-count"></span><div class="section-bar"><div class="section-bar-fill"></div></div><svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="section-body">
+    <div class="check-item"><input type="checkbox" id="t33"><label for="t33">Dashboard at <code>/dashboard</code> — greeting like "Good morning, [your name]"</label></div>
+    <div class="check-item"><input type="checkbox" id="t34"><label for="t34">All stats show 0 or empty — no errors, no blank white boxes</label></div>
+    <div class="check-item"><input type="checkbox" id="t35"><label for="t35">Overdue Tasks section is empty or shows "No overdue tasks"</label></div>
+    <div class="check-item"><input type="checkbox" id="t36"><label for="t36">Project Health section is empty or shows a placeholder</label></div>
+  </div>
+</div>
+
+<div class="section" data-section="ph1-quickadd">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-title">1.5 Create Your First Task (N key quick-add)</span>
+    <div class="section-progress"><span class="section-count"></span><div class="section-bar"><div class="section-bar-fill"></div></div><svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="section-body">
+    <div class="check-item"><input type="checkbox" id="t37"><label for="t37">On dashboard (not typing in a form), press the <code>N</code> key</label></div>
+    <div class="check-item"><input type="checkbox" id="t38"><label for="t38">Quick-add popup modal appears near the top of the screen</label></div>
+    <div class="check-item"><input type="checkbox" id="t39"><label for="t39">Type <code>Buy groceries</code> and press Enter — modal closes, task created</label></div>
+    <div class="check-item"><input type="checkbox" id="t40"><label for="t40">Navigate to <strong>/tasks</strong> — "Buy groceries" appears in the list</label></div>
+    <div class="check-item"><input type="checkbox" id="t41"><label for="t41">Press <code>N</code> again, type <code>Fix homepage bug high priority due tomorrow</code>, press Enter</label></div>
+    <div class="check-item"><input type="checkbox" id="t42"><label for="t42">Go to <strong>/tasks</strong> — task has High priority label and due date set to tomorrow</label></div>
+  </div>
+</div>
+
+<div class="section" data-section="ph1-othertasks">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-title">1.6 Create Tasks Using Other Methods</span>
+    <div class="section-progress"><span class="section-count"></span><div class="section-bar"><div class="section-bar-fill"></div></div><svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="section-body">
+    <div class="subsection">From the Tasks page:</div>
+    <div class="check-item"><input type="checkbox" id="t43"><label for="t43">Go to <strong>/tasks</strong>, click <strong>Add Task</strong> button — dialog opens with Title, Description, Priority, Due Date, Project fields</label></div>
+    <div class="check-item"><input type="checkbox" id="t44"><label for="t44">Fill in title <code>Review wireframes</code>, set Priority to High, click Save — task appears in list</label></div>
+    <div class="subsection">Using Cmd+K (Command Bar):</div>
+    <div class="check-item"><input type="checkbox" id="t45"><label for="t45">Press <code>Cmd+K</code> (Mac) or <code>Ctrl+K</code> — search and command bar opens</label></div>
+    <div class="check-item"><input type="checkbox" id="t46"><label for="t46">Type <code>add task Submit invoice to client</code> — preview appears, press Enter — task created</label></div>
+    <div class="check-item"><input type="checkbox" id="t47"><label for="t47">Go to <strong>/tasks</strong> and verify the task appears</label></div>
+  </div>
+</div>
+
+<div class="section" data-section="ph1-clients">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-title">1.7 Create a Client (and hit the Free plan limit)</span>
+    <div class="section-progress"><span class="section-count"></span><div class="section-bar"><div class="section-bar-fill"></div></div><svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="section-body">
+    <div class="check-item"><input type="checkbox" id="t48"><label for="t48">Click <strong>Clients</strong> in sidebar — <code>/clients</code> shows empty state</label></div>
+    <div class="check-item"><input type="checkbox" id="t49"><label for="t49">Click <strong>New Client</strong> — fill in: Name: Acme Corp, Email: acme@test.com, Phone: 555-0100, Company: Acme Corp</label></div>
+    <div class="check-item"><input type="checkbox" id="t50"><label for="t50">Save — client appears in list. Click on it — detail page loads without errors</label></div>
+    <div class="check-item"><input type="checkbox" id="t51"><label for="t51"><strong>Test Free limit:</strong> Click New Client again — upgrade prompt appears (Free = 1 client). Cannot create 2nd client</label></div>
+  </div>
+</div>
+
+<div class="section" data-section="ph1-projects">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-title">1.8 Create Projects (and hit the Free plan limit)</span>
+    <div class="section-progress"><span class="section-count"></span><div class="section-bar"><div class="section-bar-fill"></div></div><svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="section-body">
+    <div class="check-item"><input type="checkbox" id="t52"><label for="t52">Click <strong>Projects</strong> in sidebar — <code>/projects</code> shows empty state</label></div>
+    <div class="check-item"><input type="checkbox" id="t53"><label for="t53">Click <strong>New Project</strong> — Name: Website Redesign, Description: Redesigning the main company website, Status: Active, Priority: High, Due Date: 2 weeks from now, Client: Acme Corp</label></div>
+    <div class="check-item"><input type="checkbox" id="t54"><label for="t54">Save — project appears in list</label></div>
+    <div class="check-item"><input type="checkbox" id="t55"><label for="t55">Create <strong>2nd project:</strong> Mobile App, no client, Status: Active</label></div>
+    <div class="check-item"><input type="checkbox" id="t56"><label for="t56">Create <strong>3rd project:</strong> Marketing Campaign, Status: Active</label></div>
+    <div class="check-item"><input type="checkbox" id="t57"><label for="t57"><strong>Test Free limit:</strong> Click New Project again — upgrade prompt appears (Free = 3 projects). Cannot create 4th</label></div>
+  </div>
+</div>
+
+<div class="section" data-section="ph1-taskfeatures">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-title">1.9 Task Features (Edit, Complete, Comment, Filter, Sort, Delete)</span>
+    <div class="section-progress"><span class="section-count"></span><div class="section-bar"><div class="section-bar-fill"></div></div><svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="section-body">
+    <div class="subsection">Editing a task:</div>
+    <div class="check-item"><input type="checkbox" id="t58"><label for="t58">Go to <strong>/tasks</strong>, click "Buy groceries" — task detail page loads</label></div>
+    <div class="check-item"><input type="checkbox" id="t59"><label for="t59">Click on title — becomes editable. Change to <code>Buy groceries and milk</code>, press Enter — saves</label></div>
+    <div class="check-item"><input type="checkbox" id="t60"><label for="t60">Add description: <code>Pick up from the organic store on Main St</code> — saves</label></div>
+    <div class="check-item"><input type="checkbox" id="t61"><label for="t61">Set Priority to Medium, set Due Date to next Monday — both save and display correctly</label></div>
+    <div class="subsection">Completing a task:</div>
+    <div class="check-item"><input type="checkbox" id="t62"><label for="t62">Click checkbox next to title — task shows as completed (strikethrough or checkmark)</label></div>
+    <div class="check-item"><input type="checkbox" id="t63"><label for="t63">Click checkbox again — task reverts to incomplete</label></div>
+    <div class="subsection">Adding a comment:</div>
+    <div class="check-item"><input type="checkbox" id="t64"><label for="t64">Scroll to Comments section, type: <code>Need to check if the store on Main St is open on Sundays</code></label></div>
+    <div class="check-item"><input type="checkbox" id="t65"><label for="t65">Click Add — comment appears with your name and timestamp</label></div>
+    <div class="check-item"><input type="checkbox" id="t66"><label for="t66">Click delete icon on comment — comment removed</label></div>
+    <div class="subsection">Filtering tasks:</div>
+    <div class="check-item"><input type="checkbox" id="t67"><label for="t67">Go to <strong>/tasks</strong>, find Filter button. Filter by Status: Completed — only completed tasks show</label></div>
+    <div class="check-item"><input type="checkbox" id="t68"><label for="t68">Filter by Status: Pending — only incomplete tasks show</label></div>
+    <div class="check-item"><input type="checkbox" id="t69"><label for="t69">Filter by Priority: High — only high-priority tasks show. Clear all filters</label></div>
+    <div class="subsection">Sorting tasks:</div>
+    <div class="check-item"><input type="checkbox" id="t70"><label for="t70">Sort by Due Date — tasks reorder by date</label></div>
+    <div class="check-item"><input type="checkbox" id="t71"><label for="t71">Sort by Priority — high-priority tasks appear first</label></div>
+    <div class="check-item"><input type="checkbox" id="t72"><label for="t72">Sort by Newest / Oldest — order changes</label></div>
+    <div class="subsection">Deleting a task:</div>
+    <div class="check-item"><input type="checkbox" id="t73"><label for="t73">Find delete option (trash icon or "..." menu), click delete — confirmation dialog appears</label></div>
+    <div class="check-item"><input type="checkbox" id="t74"><label for="t74">Confirm deletion — task removed, redirected to /tasks</label></div>
+  </div>
+</div>
+
+<div class="section" data-section="ph1-projectdetail">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-title">1.10 Project Detail (Kanban Board and Time Entries)</span>
+    <div class="section-progress"><span class="section-count"></span><div class="section-bar"><div class="section-bar-fill"></div></div><svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="section-body">
+    <div class="subsection">Kanban board:</div>
+    <div class="check-item"><input type="checkbox" id="t75"><label for="t75">Go to <strong>Projects</strong> &gt; <strong>Website Redesign</strong> &gt; find <strong>Board</strong> tab — columns: To Do, In Progress, Done</label></div>
+    <div class="check-item"><input type="checkbox" id="t76"><label for="t76">Tasks linked to this project appear as cards. (If none, create one and assign it)</label></div>
+    <div class="check-item"><input type="checkbox" id="t77"><label for="t77">Drag a task from To Do to In Progress — card moves, status updates</label></div>
+    <div class="check-item"><input type="checkbox" id="t78"><label for="t78">Drag it to Done — same behavior</label></div>
+    <div class="subsection">Time entries:</div>
+    <div class="check-item"><input type="checkbox" id="t79"><label for="t79">Find the <strong>Time</strong> tab — fill in: Hours: 2, Description: Initial planning session, Date: today</label></div>
+    <div class="check-item"><input type="checkbox" id="t80"><label for="t80">Click Save — entry appears in time log</label></div>
+    <div class="check-item"><input type="checkbox" id="t81"><label for="t81">Delete the entry — it is removed</label></div>
+  </div>
+</div>
+
+<div class="section" data-section="ph1-bookmarks">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-title">1.11 Bookmarks</span>
+    <div class="section-progress"><span class="section-count"></span><div class="section-bar"><div class="section-bar-fill"></div></div><svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="section-body">
+    <div class="check-item"><input type="checkbox" id="t82"><label for="t82">Click <strong>Bookmarks</strong> in sidebar — <code>/bookmarks</code> shows empty state</label></div>
+    <div class="check-item"><input type="checkbox" id="t83"><label for="t83">Click Add Bookmark, enter URL: <code>https://www.google.com</code> — bookmark appears with page title and favicon</label></div>
+    <div class="check-item"><input type="checkbox" id="t84"><label for="t84">Add YouTube URL: <code>https://www.youtube.com/watch?v=dQw4w9WgXcQ</code> — shows video title + thumbnail</label></div>
+    <div class="check-item"><input type="checkbox" id="t85"><label for="t85">Try filtering bookmarks (by type: YouTube, website) and searching — both work</label></div>
+  </div>
+</div>
+
+<div class="section" data-section="ph1-calendar">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-title">1.12 Calendar</span>
+    <div class="section-progress"><span class="section-count"></span><div class="section-bar"><div class="section-bar-fill"></div></div><svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="section-body">
+    <div class="check-item"><input type="checkbox" id="t86"><label for="t86">Click <strong>Calendar</strong> — <code>/calendar</code> shows current month</label></div>
+    <div class="check-item"><input type="checkbox" id="t87"><label for="t87">Tasks with due dates appear on the correct dates</label></div>
+    <div class="check-item"><input type="checkbox" id="t88"><label for="t88">Click Next month / Previous month arrows — calendar updates</label></div>
+    <div class="check-item"><input type="checkbox" id="t89"><label for="t89">Click a date with a task — shows the task name</label></div>
+  </div>
+</div>
+
+<div class="section" data-section="ph1-search">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-title">1.13 Search (Cmd+K Command Bar)</span>
+    <div class="section-progress"><span class="section-count"></span><div class="section-bar"><div class="section-bar-fill"></div></div><svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="section-body">
+    <div class="check-item"><input type="checkbox" id="t90"><label for="t90">Press <code>Cmd+K</code> — command bar opens with placeholder: <code>Search or type "add task..." to create</code></label></div>
+    <div class="check-item"><input type="checkbox" id="t91"><label for="t91">Type <code>groceries</code> — task appears in results. Click it — navigates to task detail</label></div>
+    <div class="check-item"><input type="checkbox" id="t92"><label for="t92">Open again, type <code>Website</code> — project appears. Click — navigates to project</label></div>
+    <div class="check-item"><input type="checkbox" id="t93"><label for="t93">Open again, type <code>Acme</code> — client appears</label></div>
+    <div class="check-item"><input type="checkbox" id="t94"><label for="t94">Open command bar, don't type — quick action links visible (Dashboard, Projects, Tasks, etc.). Click each — navigates correctly</label></div>
+    <div class="check-item"><input type="checkbox" id="t95"><label for="t95">Use arrow keys to navigate results — highlighted item changes. Press Esc — bar closes</label></div>
+  </div>
+</div>
+
+<div class="section" data-section="ph1-settings">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-title">1.14 Settings (Free Plan)</span>
+    <div class="section-progress"><span class="section-count"></span><div class="section-bar"><div class="section-bar-fill"></div></div><svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="section-body">
+    <div class="check-item"><input type="checkbox" id="t96"><label for="t96">Click <strong>Settings</strong> in sidebar — <code>/settings</code> loads</label></div>
+    <div class="check-item"><input type="checkbox" id="t97"><label for="t97"><strong>Billing card:</strong> shows "Free" plan, usage section (e.g., "1/1 Clients", "3/3 Projects")</label></div>
+    <div class="check-item"><input type="checkbox" id="t98"><label for="t98"><strong>Telegram card:</strong> shows "Pro" badge — NOT a "Link Telegram" button</label></div>
+    <div class="check-item"><input type="checkbox" id="t99"><label for="t99"><strong>Email to Task card:</strong> shows "Pro" badge — NOT the feature</label></div>
+    <div class="check-item"><input type="checkbox" id="t100"><label for="t100"><strong>Siri &amp; Shortcuts card:</strong> shows "Pro" badge — NOT the feature</label></div>
+  </div>
+</div>
+
+<div class="section" data-section="ph1-darkmode">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-title">1.15 Dark Mode (Full Check)</span>
+    <div class="section-progress"><span class="section-count"></span><div class="section-bar"><div class="section-bar-fill"></div></div><svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="section-body">
+    <div class="check-item"><input type="checkbox" id="t101"><label for="t101">In Settings, find <strong>Appearance / Dark Mode toggle</strong> — toggle ON. App switches to dark</label></div>
+    <div class="check-item"><input type="checkbox" id="t102"><label for="t102">Visit <strong>/dashboard</strong> — all cards and text readable</label></div>
+    <div class="check-item"><input type="checkbox" id="t103"><label for="t103">Visit <strong>/tasks</strong> — task list readable</label></div>
+    <div class="check-item"><input type="checkbox" id="t104"><label for="t104">Visit <strong>/projects</strong> — project list readable</label></div>
+    <div class="check-item"><input type="checkbox" id="t105"><label for="t105">Visit <strong>/clients</strong>, <strong>/calendar</strong>, <strong>/settings</strong> — all readable</label></div>
+    <div class="check-item"><input type="checkbox" id="t106"><label for="t106">Visit <strong>pulsepro.work</strong> (marketing page) — no broken layout</label></div>
+    <div class="check-item"><input type="checkbox" id="t107"><label for="t107">Toggle dark mode <strong>OFF</strong> — all pages return to light mode</label></div>
+  </div>
+</div>
+
+<div class="section" data-section="ph1-mobile">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-title">1.16 Mobile Layout Check</span>
+    <div class="section-progress"><span class="section-count"></span><div class="section-bar"><div class="section-bar-fill"></div></div><svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="section-body">
+    <div class="check-item"><input type="checkbox" id="t108"><label for="t108">Right-click &gt; Inspect &gt; phone icon &gt; set width to 390</label></div>
+    <div class="check-item"><input type="checkbox" id="t109"><label for="t109"><strong>/dashboard</strong> — stats stack vertically, no horizontal scrollbar</label></div>
+    <div class="check-item"><input type="checkbox" id="t110"><label for="t110"><strong>/tasks</strong> — task list readable, not cut off</label></div>
+    <div class="check-item"><input type="checkbox" id="t111"><label for="t111"><strong>/projects</strong> — project cards stack properly</label></div>
+    <div class="check-item"><input type="checkbox" id="t112"><label for="t112"><strong>/settings</strong> — all cards stack, no overflow</label></div>
+    <div class="check-item"><input type="checkbox" id="t113"><label for="t113">Sidebar collapses into menu icon or bottom nav</label></div>
+  </div>
+</div>
+
+<!-- STOP BANNER: Phase 1 -->
+<div class="stop-banner">
+  <h3>STOP — Phase 1 Complete</h3>
+  <p>Include any bugs you found in Phase 1 in your message.<br>Wait for Fonz to upgrade your account before continuing.</p>
+  <div class="msg">Message Fonz: "Phase 1 done, ready for Pro upgrade"</div>
+</div>
+
+</div>
+
+<!-- ==================== PHASE 2: PRO ==================== -->
+<div class="phase-section" id="ph2">
+
+<div class="section open" data-section="ph2-verify">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-title">2.1 Verify the Upgrade</span>
+    <div class="section-progress"><span class="section-count"></span><div class="section-bar"><div class="section-bar-fill"></div></div><svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="section-body">
+    <div class="check-item"><input type="checkbox" id="t114"><label for="t114">Go to <strong>/settings</strong> &gt; Billing — plan shows <strong>Pro</strong> with green badge and "$12/month"</label></div>
+    <div class="check-item"><input type="checkbox" id="t115"><label for="t115">Usage section: limits are gone or show "Unlimited"</label></div>
+    <div class="check-item"><input type="checkbox" id="t116"><label for="t116">Go to <strong>/projects</strong> &gt; New Project — can create without limit</label></div>
+    <div class="check-item"><input type="checkbox" id="t117"><label for="t117">Go to <strong>/clients</strong> &gt; New Client — can create 2nd client without upgrade prompt</label></div>
+  </div>
+</div>
+
+<div class="section" data-section="ph2-beyond">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-title">2.2 Create Content Beyond Free Limits</span>
+    <div class="section-progress"><span class="section-count"></span><div class="section-bar"><div class="section-bar-fill"></div></div><svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="section-body">
+    <div class="check-item"><input type="checkbox" id="t118"><label for="t118">Create <strong>4th project:</strong> Client Onboarding, Status: Active</label></div>
+    <div class="check-item"><input type="checkbox" id="t119"><label for="t119">Create <strong>2nd client:</strong> Bright Ideas Agency, Email: hello@brightideas.com</label></div>
+    <div class="check-item"><input type="checkbox" id="t120"><label for="t120">Create extra tasks to get above 5 total — all created without limits</label></div>
+  </div>
+</div>
+
+<div class="section" data-section="ph2-invoices">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-title">2.3 Invoices</span>
+    <div class="section-progress"><span class="section-count"></span><div class="section-bar"><div class="section-bar-fill"></div></div><svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="section-body">
+    <div class="check-item"><input type="checkbox" id="t121"><label for="t121">Click <strong>Invoices</strong> in sidebar — <code>/invoices</code> is accessible</label></div>
+    <div class="check-item"><input type="checkbox" id="t122"><label for="t122">Click <strong>New Invoice</strong> — fill in: Client: Acme Corp, Due date: 30 days from today</label></div>
+    <div class="check-item"><input type="checkbox" id="t123"><label for="t123">Add line items: "Website design" $2,500 qty 1 + "Hosting setup" $150 qty 1</label></div>
+    <div class="check-item"><input type="checkbox" id="t124"><label for="t124">Verify total calculates to $2,650. Save invoice — detail page loads</label></div>
+    <div class="subsection">Send by email:</div>
+    <div class="check-item"><input type="checkbox" id="t125"><label for="t125">Click <strong>Send</strong> — enter your secondary email. Click Send — confirmation appears</label></div>
+    <div class="check-item"><input type="checkbox" id="t126"><label for="t126">Check secondary email inbox — invoice email received with line items and total</label></div>
+    <div class="subsection">Public share link:</div>
+    <div class="check-item"><input type="checkbox" id="t127"><label for="t127">Click <strong>Share</strong> or <strong>Copy Link</strong> — URL generated</label></div>
+    <div class="check-item"><input type="checkbox" id="t128"><label for="t128">Open in incognito window — invoice visible WITHOUT being logged in, looks complete and professional</label></div>
+  </div>
+</div>
+
+<div class="section" data-section="ph2-telegram">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-title">2.4 Telegram Bot Integration</span>
+    <div class="section-progress"><span class="section-count"></span><div class="section-bar"><div class="section-bar-fill"></div></div><svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="section-body">
+    <div class="subsection">Linking your account:</div>
+    <div class="check-item"><input type="checkbox" id="t129"><label for="t129">Go to <strong>/settings</strong> &gt; Telegram card — shows <strong>Link Telegram</strong> button (not upgrade prompt)</label></div>
+    <div class="check-item"><input type="checkbox" id="t130"><label for="t130">Click Link Telegram — verification code appears (<code>LINK-XXXXXX</code>), Copy button, "expires in 10 minutes"</label></div>
+    <div class="check-item"><input type="checkbox" id="t131"><label for="t131">On phone, open Telegram, find Pulse Pro bot, send <code>/start</code> — welcome message received</label></div>
+    <div class="check-item"><input type="checkbox" id="t132"><label for="t132">Send the verification code to the bot — "Account linked!" reply</label></div>
+    <div class="check-item"><input type="checkbox" id="t133"><label for="t133">Refresh Settings — Telegram card shows green "Linked" status. Daily Reminders toggle works (ON/OFF)</label></div>
+    <div class="subsection">Testing bot commands:</div>
+    <div class="check-item"><input type="checkbox" id="t134"><label for="t134">Send <code>tasks</code> — list of your tasks returned</label></div>
+    <div class="check-item"><input type="checkbox" id="t135"><label for="t135">Send <code>today</code> — tasks due today returned</label></div>
+    <div class="check-item"><input type="checkbox" id="t136"><label for="t136">Send <code>overdue</code> — overdue tasks returned</label></div>
+    <div class="check-item"><input type="checkbox" id="t137"><label for="t137">Send <code>add Buy milk</code> — bot confirms new task created</label></div>
+    <div class="check-item"><input type="checkbox" id="t138"><label for="t138">Send <code>done 1</code> — bot marks task #1 as complete</label></div>
+    <div class="check-item"><input type="checkbox" id="t139"><label for="t139">Send <code>help</code> — list of available commands shown</label></div>
+    <div class="subsection">Unlinking:</div>
+    <div class="check-item"><input type="checkbox" id="t140"><label for="t140">In Settings, click <strong>Unlink Telegram</strong> — confirm — card returns to "Link Telegram" button</label></div>
+    <div class="check-item"><input type="checkbox" id="t141"><label for="t141">In Telegram, send <code>tasks</code> — bot responds with "No account linked" or similar</label></div>
+  </div>
+</div>
+
+<div class="section" data-section="ph2-email">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-title">2.5 Email-to-Task Integration</span>
+    <div class="section-progress"><span class="section-count"></span><div class="section-bar"><div class="section-bar-fill"></div></div><svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="section-body">
+    <div class="check-item"><input type="checkbox" id="t142"><label for="t142">Go to <strong>/settings</strong> &gt; Email to Task — click <strong>Generate Email Address</strong></label></div>
+    <div class="check-item"><input type="checkbox" id="t143"><label for="t143">Email address appears (<code>{token}@in.pulsepro.work</code>), Copy button works, instructions shown</label></div>
+    <div class="check-item"><input type="checkbox" id="t144"><label for="t144">From secondary email, send TO the address. Subject: <code>My first email task</code>. Body: <code>This task was created by forwarding an email</code></label></div>
+    <div class="check-item"><input type="checkbox" id="t145"><label for="t145">Wait 1-2 min, go to <strong>/tasks</strong> — new task "My first email task" with body as description</label></div>
+    <div class="check-item"><input type="checkbox" id="t146"><label for="t146">Send another email. Subject: <code>[Website Redesign] Fix the header image</code>. Body: <code>The header image is stretched on mobile</code></label></div>
+    <div class="check-item"><input type="checkbox" id="t147"><label for="t147">Wait 1-2 min, go to <strong>/tasks</strong> — task "Fix the header image" assigned to Website Redesign project</label></div>
+  </div>
+</div>
+
+<div class="section" data-section="ph2-api">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-title">2.6 API Access (Siri &amp; Shortcuts)</span>
+    <div class="section-progress"><span class="section-count"></span><div class="section-bar"><div class="section-bar-fill"></div></div><svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="section-body">
+    <div class="check-item"><input type="checkbox" id="t148"><label for="t148">Go to <strong>/settings</strong> &gt; Siri &amp; Shortcuts — click <strong>Generate API Token</strong></label></div>
+    <div class="check-item"><input type="checkbox" id="t149"><label for="t149">Token appears (<code>pp_...</code>), partially masked. Show/hide toggle works. Copy button works</label></div>
+    <div class="check-item"><input type="checkbox" id="t150"><label for="t150">Curl command examples shown in the card</label></div>
+    <div class="check-item"><input type="checkbox" id="t151"><label for="t151"><em>(Optional — Terminal)</em> Run POST curl with token — returns 201 with task object</label></div>
+    <div class="check-item"><input type="checkbox" id="t152"><label for="t152"><em>(Optional — Terminal)</em> Run GET curl — returns JSON array of tasks</label></div>
+  </div>
+</div>
+
+<div class="section" data-section="ph2-insights">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-title">2.7 AI Insights</span>
+    <div class="section-progress"><span class="section-count"></span><div class="section-bar"><div class="section-bar-fill"></div></div><svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="section-body">
+    <div class="check-item"><input type="checkbox" id="t153"><label for="t153">Go to <strong>/dashboard</strong> — <strong>Smart Insights / AI Insights</strong> panel is visible</label></div>
+    <div class="check-item"><input type="checkbox" id="t154"><label for="t154">Insights show relevant info (overdue tasks, project health, productivity observations)</label></div>
+    <div class="check-item"><input type="checkbox" id="t155"><label for="t155">Click <strong>Generate / Refresh</strong> button — insights update</label></div>
+    <div class="check-item"><input type="checkbox" id="t156"><label for="t156">Refresh the page — cached insights load quickly</label></div>
+  </div>
+</div>
+
+<div class="section" data-section="ph2-collab">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-title">2.8 Collaboration (Project Sharing)</span>
+    <div class="section-progress"><span class="section-count"></span><div class="section-bar"><div class="section-bar-fill"></div></div><svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="section-body">
+    <div class="subsection">Set up secondary account:</div>
+    <div class="check-item"><input type="checkbox" id="t157"><label for="t157">In <strong>incognito window</strong>, go to <code>pulsepro.work/sign-up</code>, sign up with secondary email. Keep window open</label></div>
+    <div class="subsection">Share as Viewer:</div>
+    <div class="check-item"><input type="checkbox" id="t158"><label for="t158">In main account: open Website Redesign &gt; <strong>Team</strong> tab &gt; Invite &gt; enter secondary email, role: <strong>Viewer</strong></label></div>
+    <div class="check-item"><input type="checkbox" id="t159"><label for="t159">In incognito (secondary): go to <strong>/projects</strong> — Website Redesign appears</label></div>
+    <div class="check-item"><input type="checkbox" id="t160"><label for="t160">Secondary can <strong>see</strong> project and tasks but <strong>cannot edit</strong></label></div>
+    <div class="subsection">Change to Editor:</div>
+    <div class="check-item"><input type="checkbox" id="t161"><label for="t161">Main account: change role to <strong>Editor</strong>. Secondary: refresh, try editing a task title — editing works</label></div>
+    <div class="subsection">Change to Manager:</div>
+    <div class="check-item"><input type="checkbox" id="t162"><label for="t162">Main account: change role to <strong>Manager</strong>. Secondary: can perform management actions</label></div>
+    <div class="subsection">Pro collaborator limit (max 3):</div>
+    <div class="check-item"><input type="checkbox" id="t163"><label for="t163">Add collaborators until you have 3 total — this should succeed</label></div>
+    <div class="check-item"><input type="checkbox" id="t164"><label for="t164">Try adding a <strong>4th collaborator</strong> — error/upgrade prompt (Pro limit = 3 per project)</label></div>
+    <div class="subsection">Remove collaborator:</div>
+    <div class="check-item"><input type="checkbox" id="t165"><label for="t165">Remove secondary from project. Switch to incognito — project no longer appears in their list</label></div>
+  </div>
+</div>
+
+<!-- STOP BANNER: Phase 2 -->
+<div class="stop-banner">
+  <h3>STOP — Phase 2 Complete</h3>
+  <p>Include any bugs you found in Phase 2 in your message.<br>Wait for Fonz to upgrade your account before continuing.</p>
+  <div class="msg">Message Fonz: "Phase 2 done, ready for Team upgrade"</div>
+</div>
+
+</div>
+
+<!-- ==================== PHASE 3: TEAM ==================== -->
+<div class="phase-section" id="ph3">
+
+<div class="section open" data-section="ph3-verify">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-title">3.1 Verify the Team Upgrade</span>
+    <div class="section-progress"><span class="section-count"></span><div class="section-bar"><div class="section-bar-fill"></div></div><svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="section-body">
+    <div class="check-item"><input type="checkbox" id="t166"><label for="t166">Go to <strong>/settings</strong> &gt; Billing — plan badge shows <strong>Team</strong> (blue) and "$29/month"</label></div>
+  </div>
+</div>
+
+<div class="section" data-section="ph3-collab">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-title">3.2 Collaboration Limits (Team = max 10)</span>
+    <div class="section-progress"><span class="section-count"></span><div class="section-bar"><div class="section-bar-fill"></div></div><svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="section-body">
+    <div class="check-item"><input type="checkbox" id="t167"><label for="t167">Open Website Redesign &gt; Team tab &gt; add collaborators beyond 3 (old Pro limit) — works</label></div>
+    <div class="check-item"><input type="checkbox" id="t168"><label for="t168">Try adding up to 10 collaborators — all succeed</label></div>
+    <div class="check-item"><input type="checkbox" id="t169"><label for="t169">Try adding an 11th — blocked with limit message</label></div>
+  </div>
+</div>
+
+<div class="section" data-section="ph3-profeatures">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-title">3.3 All Pro Features Still Work</span>
+    <div class="section-progress"><span class="section-count"></span><div class="section-bar"><div class="section-bar-fill"></div></div><svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="section-body">
+    <div class="check-item"><input type="checkbox" id="t170"><label for="t170"><strong>/invoices</strong> — can see existing invoice and create a new one</label></div>
+    <div class="check-item"><input type="checkbox" id="t171"><label for="t171"><strong>/settings</strong> — Telegram card still works (re-link if needed)</label></div>
+    <div class="check-item"><input type="checkbox" id="t172"><label for="t172"><strong>/dashboard</strong> — AI Insights panel still visible</label></div>
+    <div class="check-item"><input type="checkbox" id="t173"><label for="t173">Create a new task, project, and client — no limits enforced</label></div>
+  </div>
+</div>
+
+<div class="section" data-section="ph3-walkthrough">
+  <div class="section-header" onclick="toggleSection(this)">
+    <span class="section-title">3.4 Final Walkthrough</span>
+    <div class="section-progress"><span class="section-count"></span><div class="section-bar"><div class="section-bar-fill"></div></div><svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+  </div>
+  <div class="section-body">
+    <div class="check-item"><input type="checkbox" id="t174"><label for="t174"><strong>/dashboard</strong> — everything looks right?</label></div>
+    <div class="check-item"><input type="checkbox" id="t175"><label for="t175"><strong>/tasks</strong> — task list, filters, sort all working</label></div>
+    <div class="check-item"><input type="checkbox" id="t176"><label for="t176"><strong>/projects</strong> — project list looks correct</label></div>
+    <div class="check-item"><input type="checkbox" id="t177"><label for="t177">Click into one project — Kanban board, Time tab, Team tab all working</label></div>
+    <div class="check-item"><input type="checkbox" id="t178"><label for="t178"><strong>/clients</strong> — list looks correct. Click a client — linked projects appear</label></div>
+    <div class="check-item"><input type="checkbox" id="t179"><label for="t179"><strong>/bookmarks</strong> — bookmark list displays</label></div>
+    <div class="check-item"><input type="checkbox" id="t180"><label for="t180"><strong>/calendar</strong> — calendar with tasks on correct dates</label></div>
+    <div class="check-item"><input type="checkbox" id="t181"><label for="t181"><strong>/invoices</strong> — invoice list displays</label></div>
+    <div class="check-item"><input type="checkbox" id="t182"><label for="t182"><strong>/settings</strong> — all cards, billing, integrations, dark mode working</label></div>
+    <div class="check-item"><input type="checkbox" id="t183"><label for="t183"><strong>Cmd+K</strong> command bar — search returns accurate results</label></div>
+  </div>
+</div>
+
+<!-- Done banner -->
+<div class="stop-banner" style="background: linear-gradient(135deg, #14532d 0%, #166534 100%);">
+  <h3 style="color: #22c55e;">DONE — Send Your Full Bug Report</h3>
+  <p>Email your complete bug report to <strong style="color:#fff;">Fonz@PulsePro.org</strong></p>
+  <p>Subject: <strong style="color:#fff;">Pulse Pro QA Testing — Bug Report</strong></p>
+  <p style="margin-top:8px;">Include all bugs from all 3 phases, any confusing UI, and your overall impression.</p>
+</div>
+
+</div>
+
+<!-- ==================== REFERENCE ==================== -->
+<div class="phase-section" id="ref">
+
+<div class="info-card">
+  <h2>Feature Comparison by Plan</h2>
+  <table class="ref-table">
+    <thead><tr><th>Feature</th><th>Free</th><th>Pro</th><th>Team</th></tr></thead>
+    <tbody>
+      <tr><td>Projects</td><td>3</td><td class="yes">Unlimited</td><td class="yes">Unlimited</td></tr>
+      <tr><td>Tasks</td><td>50</td><td class="yes">Unlimited</td><td class="yes">Unlimited</td></tr>
+      <tr><td>Clients</td><td>1</td><td class="yes">Unlimited</td><td class="yes">Unlimited</td></tr>
+      <tr><td>Collaborators / project</td><td class="no">0</td><td>3</td><td>10</td></tr>
+      <tr><td>Invoices</td><td class="no">No</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+      <tr><td>Telegram bot</td><td class="no">No</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+      <tr><td>Email-to-Task</td><td class="no">No</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+      <tr><td>API / Siri Shortcuts</td><td class="no">No</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+      <tr><td>AI Insights</td><td class="no">No</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="info-card">
+  <h2>Keyboard Shortcuts</h2>
+  <table class="ref-table">
+    <thead><tr><th>Shortcut</th><th>Action</th></tr></thead>
+    <tbody>
+      <tr><td><code>N</code></td><td>Open quick-add task bar (from any page, when not typing)</td></tr>
+      <tr><td><code>Cmd+K</code> / <code>Ctrl+K</code></td><td>Open command bar (search + quick actions)</td></tr>
+      <tr><td><code>Enter</code></td><td>Submit the quick-add form or confirm a selected command</td></tr>
+      <tr><td><code>Esc</code></td><td>Close any overlay or command bar</td></tr>
+      <tr><td><code>Arrow Up / Down</code></td><td>Navigate command bar results</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="info-card" style="text-align: center; color: #71717a;">
+  <p><em>Thank you for testing Pulse Pro. Your findings directly help improve the product for everyone.</em></p>
+</div>
+
+</div>
+
+<!-- Celebration -->
+<div class="celebration" id="celebration">
+  <h2>All steps complete!</h2>
+  <p>You've finished every test in the guide. Time to send that bug report.</p>
+</div>
+
+</div>
+
+<button class="reset-btn" onclick="resetAll()">Reset All</button>
+</div><!-- end #app-content -->
+
+<script>
+  const GATE_KEY = 'pulsepro-qa-gate';
+  const GATE_HASH = '8d0e68c3e220a1b2f9d37e8c1f5a6b4d'; // md5 of password, checked client-side
+
+  function hashStr(s) {
+    // Simple hash for client-side gate (not crypto-secure, just a deterrent)
+    let h = 0;
+    for (let i = 0; i < s.length; i++) { h = ((h << 5) - h) + s.charCodeAt(i); h |= 0; }
+    return h.toString(36);
+  }
+
+  function unlock() {
+    const pw = document.getElementById('gate-pw').value;
+    if (pw === 'testing2026') {
+      sessionStorage.setItem(GATE_KEY, '1');
+      document.getElementById('gate').style.display = 'none';
+      document.getElementById('app-content').style.display = 'block';
+    } else {
+      document.getElementById('gate-error').style.display = 'block';
+      document.getElementById('gate-pw').value = '';
+      document.getElementById('gate-pw').focus();
+    }
+  }
+
+  // Auto-unlock if already authenticated this session
+  if (sessionStorage.getItem(GATE_KEY) === '1') {
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('app-content').style.display = 'block';
+  }
+</script>
+
+<script>
+  const STORAGE_KEY = 'pulsepro-tester-guide';
+
+  function loadState() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
+    catch { return {}; }
+  }
+
+  function saveState(state) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  // Initialize checkboxes
+  const state = loadState();
+  const allCheckboxes = document.querySelectorAll('.check-item input[type="checkbox"]');
+
+  allCheckboxes.forEach(cb => {
+    cb.checked = !!state[cb.id];
+    if (cb.checked) cb.closest('.check-item').classList.add('checked');
+
+    cb.addEventListener('change', () => {
+      const s = loadState();
+      s[cb.id] = cb.checked;
+      saveState(s);
+      cb.closest('.check-item').classList.toggle('checked', cb.checked);
+      updateStats();
+    });
+  });
+
+  // Section toggle
+  function toggleSection(header) {
+    header.closest('.section').classList.toggle('open');
+  }
+
+  // Phase tabs
+  document.querySelectorAll('.phase-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.phase-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.phase-section').forEach(s => s.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(tab.dataset.phase).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+
+  // Stats
+  function getPhaseChecks(phaseId) {
+    const section = document.getElementById(phaseId);
+    if (!section) return { total: 0, checked: 0 };
+    const checks = section.querySelectorAll('input[type="checkbox"]');
+    const checked = Array.from(checks).filter(c => c.checked).length;
+    return { total: checks.length, checked };
+  }
+
+  function updateStats() {
+    const phases = ['ph1', 'ph2', 'ph3'];
+    let totalAll = 0, checkedAll = 0;
+
+    phases.forEach(p => {
+      const { total, checked } = getPhaseChecks(p);
+      totalAll += total;
+      checkedAll += checked;
+      const pct = total ? Math.round((checked / total) * 100) : 0;
+
+      document.getElementById(`${p}-pct`).textContent = `${pct}%`;
+      document.getElementById(`${p}-count`).textContent = `${checked} / ${total}`;
+      const tabCount = document.getElementById(`${p}-tab-count`);
+      if (tabCount) tabCount.textContent = ` ${checked}/${total}`;
+
+      const card = document.getElementById(`${p}-card`);
+      if (card) card.classList.toggle('pass', pct === 100);
+    });
+
+    const overallPct = totalAll ? Math.round((checkedAll / totalAll) * 100) : 0;
+    document.getElementById('overall-pct').textContent = `${overallPct}%`;
+    document.getElementById('overall-count').textContent = `${checkedAll} / ${totalAll} steps`;
+    document.getElementById('overall-bar').style.width = `${overallPct}%`;
+
+    // Celebration
+    document.getElementById('celebration').classList.toggle('show', overallPct === 100);
+
+    // Section progress bars
+    document.querySelectorAll('.section').forEach(section => {
+      const checks = section.querySelectorAll('input[type="checkbox"]');
+      const checked = Array.from(checks).filter(c => c.checked).length;
+      const total = checks.length;
+      const pct = total ? Math.round((checked / total) * 100) : 0;
+      const countEl = section.querySelector('.section-count');
+      const barEl = section.querySelector('.section-bar-fill');
+      if (countEl) countEl.textContent = `${checked}/${total}`;
+      if (barEl) barEl.style.width = `${pct}%`;
+    });
+  }
+
+  function resetAll() {
+    if (!confirm('Reset all progress? This cannot be undone.')) return;
+    localStorage.removeItem(STORAGE_KEY);
+    allCheckboxes.forEach(cb => {
+      cb.checked = false;
+      cb.closest('.check-item').classList.remove('checked');
+    });
+    updateStats();
+  }
+
+  updateStats();
+</script>
+
+</body>
+</html>

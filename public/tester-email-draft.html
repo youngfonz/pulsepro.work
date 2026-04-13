@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pulse Pro — Tester Email Draft</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Plus Jakarta Sans', -apple-system, system-ui, sans-serif; background: #f5f5f7; color: #1a1a1a; padding: 40px 20px; }
+
+  /* Password gate */
+  #gate { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 0; }
+  #gate .gate-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 16px; padding: 40px; max-width: 380px; width: 100%; text-align: center; box-shadow: 0 4px 24px rgba(0,0,0,0.06); }
+  #gate h2 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px; margin-bottom: 6px; }
+  #gate p { font-size: 13px; color: #71717a; margin-bottom: 20px; }
+  #gate input { width: 100%; padding: 10px 14px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; font-family: inherit; outline: none; transition: border-color 0.15s; }
+  #gate input:focus { border-color: #E54D2E; }
+  #gate button { width: 100%; margin-top: 12px; padding: 10px; background: #E54D2E; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.15s; }
+  #gate button:hover { background: #F0613E; }
+  #gate .error { color: #ef4444; font-size: 12px; margin-top: 8px; display: none; }
+  #app-content { display: none; }
+  .container { max-width: 640px; margin: 0 auto; }
+  .header { text-align: center; margin-bottom: 32px; }
+  .header h1 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .header p { font-size: 14px; color: #71717a; }
+
+  .card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; margin-bottom: 16px; }
+  .card-header { background: #1a1a1a; color: #fff; padding: 14px 20px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: space-between; }
+  .card-body { padding: 20px; }
+
+  .subject-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #f3f4f6; }
+  .subject-label { font-size: 12px; font-weight: 600; color: #71717a; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; }
+  .subject-text { font-size: 15px; font-weight: 600; flex: 1; }
+
+  .email-body { font-size: 14px; line-height: 1.7; color: #404040; }
+  .email-body p { margin-bottom: 14px; }
+  .email-body strong { color: #1a1a1a; }
+  .email-body ul { margin: 8px 0 14px 20px; }
+  .email-body li { margin-bottom: 6px; }
+
+  .copy-btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; background: #E54D2E; color: #fff; border: none; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+  .copy-btn:hover { background: #F0613E; transform: translateY(-1px); }
+  .copy-btn:active { transform: translateY(0); }
+  .copy-btn.small { background: transparent; color: #71717a; border: 1px solid #d4d4d8; padding: 6px 12px; font-size: 12px; }
+  .copy-btn.small:hover { background: #f5f5f7; color: #1a1a1a; }
+
+  .actions { display: flex; gap: 10px; justify-content: center; margin-top: 24px; flex-wrap: wrap; }
+
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: #1a1a1a; color: #fff; padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 500; opacity: 0; transition: all 0.3s ease; z-index: 100; pointer-events: none; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="gate-card">
+    <h2>Pulse Pro QA</h2>
+    <p>Enter the password to access this page</p>
+    <input type="password" id="gate-pw" placeholder="Password" onkeydown="if(event.key==='Enter')unlock()">
+    <button onclick="unlock()">Enter</button>
+    <div class="error" id="gate-error">Incorrect password</div>
+  </div>
+</div>
+
+<div id="app-content">
+<div class="container">
+  <div class="header">
+    <h1>Tester Email Draft</h1>
+    <p>Copy and send to your external QA tester</p>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span>Email</span>
+      <button class="copy-btn small" onclick="copySubject()">Copy Subject</button>
+    </div>
+    <div class="card-body">
+      <div class="subject-row">
+        <span class="subject-label">Subject:</span>
+        <span class="subject-text" id="subject-text">Pulse Pro QA Testing -- Would Love Your Help</span>
+      </div>
+      <div class="email-body" id="email-body">
+        <p>Hi!</p>
+        <p>Hope you're doing well. I'm reaching out because I'd love your help testing Pulse Pro, a project management web app I've been building. The site is live at <strong>pulsepro.work</strong> and I need a fresh pair of eyes to go through the full experience -- someone who's never used it before, which is exactly the perspective I need.</p>
+        <p><strong>What you'll be doing:</strong></p>
+        <p>You'll be testing the app across all 3 plan tiers (Free, Pro, and Team) to make sure everything works the way it should -- creating projects, tasks, clients, invoices, and testing integrations like Telegram. I've put together a detailed step-by-step testing guide that walks you through everything, so you won't need to guess what to do. I'll send that over separately.</p>
+        <p><strong>What you'll need before starting:</strong></p>
+        <ul>
+          <li><strong>2 email addresses</strong> -- one for your main test account, one for testing collaboration features (a Gmail or any email you can access works fine)</li>
+          <li><strong>Telegram</strong> installed on your phone -- you'll use it to test the Telegram bot integration</li>
+          <li><strong>A laptop or desktop browser</strong> -- Chrome is ideal, but any modern browser works</li>
+          <li>About <strong>2 hours</strong> of uninterrupted time</li>
+        </ul>
+        <p><strong>How it works:</strong></p>
+        <p>The testing is split into 3 phases -- one for each plan tier (Free, Pro, Team). After you finish each phase, just message me and I'll upgrade your account to the next tier so you can continue. This way you get to experience exactly what users on each plan see.</p>
+        <p><strong>For bug reports:</strong></p>
+        <p>If you find anything broken, confusing, or just "off," send the details to <strong>Fonz@PulsePro.org</strong>. Screenshots are always helpful. Even small things matter -- if a button looks weird or something doesn't make sense, I want to know.</p>
+        <p>Your feedback on this is genuinely valuable. You're testing the real experience that actual users will have, and catching issues now saves a lot of headaches later. I really appreciate you taking the time.</p>
+        <p>Let me know when you're ready to start and I'll send over the testing guide!</p>
+        <p>Thanks,<br>Fonz</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="copy-btn" onclick="copyBody()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+      Copy Email Body
+    </button>
+    <button class="copy-btn small" onclick="copyAll()">Copy Subject + Body</button>
+  </div>
+</div>
+
+<div class="toast" id="toast">Copied to clipboard!</div>
+</div><!-- end #app-content -->
+
+<script>
+  const GATE_KEY = 'pulsepro-qa-gate';
+
+  function unlock() {
+    const pw = document.getElementById('gate-pw').value;
+    if (pw === 'testing2026') {
+      sessionStorage.setItem(GATE_KEY, '1');
+      document.getElementById('gate').style.display = 'none';
+      document.getElementById('app-content').style.display = 'block';
+    } else {
+      document.getElementById('gate-error').style.display = 'block';
+      document.getElementById('gate-pw').value = '';
+      document.getElementById('gate-pw').focus();
+    }
+  }
+
+  if (sessionStorage.getItem(GATE_KEY) === '1') {
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('app-content').style.display = 'block';
+  }
+</script>
+
+<script>
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg || 'Copied to clipboard!';
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+  }
+
+  function copyToClipboard(text) {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(() => showToast());
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      showToast();
+    }
+  }
+
+  function copySubject() {
+    copyToClipboard(document.getElementById('subject-text').innerText);
+    showToast('Subject copied!');
+  }
+
+  function copyBody() {
+    copyToClipboard(document.getElementById('email-body').innerText);
+    showToast('Email body copied!');
+  }
+
+  function copyAll() {
+    const subject = 'Subject: ' + document.getElementById('subject-text').innerText;
+    const body = document.getElementById('email-body').innerText;
+    copyToClipboard(subject + '\n\n' + body);
+    showToast('Subject + body copied!');
+  }
+</script>
+
+</body>
+</html>
