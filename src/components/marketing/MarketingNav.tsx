@@ -35,17 +35,21 @@ export function MarketingNav() {
     <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-[60] focus:p-4 focus:bg-background focus:text-foreground focus:border focus:border-border focus:rounded-md focus:top-2 focus:left-2">
       Skip to main content
     </a>
-    <header
-      className={cn(
-        'fixed top-0 w-full z-50 h-12 transition-all duration-300',
-        isScrolled
-          ? (isDark
-              ? 'bg-[#09090b]/95 backdrop-blur-xl backdrop-saturate-[180%] border-b border-white/10 shadow-sm'
-              : 'bg-white/95 backdrop-blur-xl backdrop-saturate-[180%] border-b border-black/5 shadow-sm')
-          : 'bg-transparent'
-      )}
-    >
-      <div className="max-w-6xl mx-auto px-4 md:px-8 h-full">
+    <header className="fixed top-0 w-full z-50 h-12">
+      {/* Backdrop layer — isolated compositing context for blur effects */}
+      <div
+        className={cn(
+          'absolute inset-0',
+          isScrolled
+            ? (isDark
+                ? 'bg-[#09090b]/95 backdrop-blur-xl backdrop-saturate-[180%] border-b border-white/10 shadow-sm'
+                : 'bg-white/95 backdrop-blur-xl backdrop-saturate-[180%] border-b border-black/5 shadow-sm')
+            : 'bg-transparent'
+        )}
+        style={{ transition: 'background-color 300ms, border-color 300ms, box-shadow 300ms' }}
+      />
+      {/* Content layer — renders above backdrop in clean compositing context */}
+      <div className="relative z-[1] max-w-6xl mx-auto px-4 md:px-8 h-full">
         <div className="relative flex items-center justify-between h-full">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
@@ -59,7 +63,7 @@ export function MarketingNav() {
               <a
                 key={link.href}
                 href={link.href}
-                className="text-sm font-medium transition-colors hover:opacity-70"
+                className="text-sm font-medium hover:opacity-70"
                 style={textStyle}
               >
                 {link.label}
@@ -71,7 +75,7 @@ export function MarketingNav() {
           <div className="hidden md:flex items-center gap-3">
             <button
               onClick={toggleTheme}
-              className={cn('p-2 rounded-md transition-colors', isScrolled ? 'hover:bg-muted' : 'hover:bg-white/10')}
+              className={cn('p-2 rounded-md', isScrolled ? 'hover:bg-muted' : 'hover:bg-white/10')}
               style={textStyle}
               aria-label="Toggle theme"
             >
@@ -97,7 +101,7 @@ export function MarketingNav() {
             </button>
             <Link
               href="/sign-in"
-              className={cn('px-4 py-2 text-sm font-medium rounded-md transition-colors', isScrolled ? 'hover:bg-muted' : 'hover:bg-white/10')}
+              className={cn('px-4 py-2 text-sm font-medium rounded-md', isScrolled ? 'hover:bg-muted' : 'hover:bg-white/10')}
               style={textStyle}
               aria-label="Sign in to your Pulse Pro account"
             >
@@ -105,7 +109,7 @@ export function MarketingNav() {
             </Link>
             <Link
               href="/sign-up"
-              className="px-5 py-1.5 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 rounded-full transition-colors"
+              className="px-5 py-1.5 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 rounded-full"
             >
               Get Started
             </Link>
@@ -114,7 +118,7 @@ export function MarketingNav() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className={cn('md:hidden p-2 rounded-md transition-colors', isScrolled ? 'hover:bg-muted' : 'hover:bg-white/10')}
+            className={cn('md:hidden p-2 rounded-md', isScrolled ? 'hover:bg-muted' : 'hover:bg-white/10')}
             style={textStyle}
             aria-label="Toggle menu"
           >
