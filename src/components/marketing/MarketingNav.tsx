@@ -11,11 +11,9 @@ export function MarketingNav() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const { theme, toggleTheme } = useTheme()
 
-  // Over the dark hero = white text; after scrolling = explicit dark/light text
+  // Over the dark hero = white text; after scrolling = theme-aware foreground
   const isDark = theme === 'dark'
-  const textColor = isScrolled
-    ? (isDark ? 'text-white' : 'text-[#0a0a0a]')
-    : 'text-white'
+  const textColor = isScrolled ? 'text-foreground' : 'text-white'
   const hoverBg = isScrolled ? 'hover:bg-muted' : 'hover:bg-white/10'
 
   useEffect(() => {
