@@ -13,8 +13,8 @@ export default function MaintenancePage() {
         </p>
         <p className="text-xs text-muted-foreground mt-6">
           If you need immediate help, contact{' '}
-          <a href="mailto:support@pulsepro.work" className="text-primary hover:underline">
-            support@pulsepro.work
+          <a href="mailto:info@pulsepro.work" className="text-primary hover:underline">
+            info@pulsepro.work
           </a>
         </p>
       </div>
