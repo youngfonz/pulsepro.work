@@ -1,30 +1,22 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { PulseLogo } from '@/components/PulseLogo'
 import { useTheme } from '@/components/ThemeProvider'
-import { cn } from '@/lib/utils'
 
 export function MarketingNav() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const { theme, toggleTheme } = useTheme()
   const isDark = theme === 'dark'
-  const headerRef = useRef<HTMLElement>(null)
-
-  const handleScroll = useCallback(() => {
-    const scrolled = window.scrollY > 10
-    setIsScrolled(scrolled)
-    // Direct DOM manipulation as backup — bypasses React rendering pipeline
-    headerRef.current?.setAttribute('data-scrolled', String(scrolled))
-  }, [])
 
   useEffect(() => {
-    handleScroll()
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [handleScroll])
+    const onScroll = () => setIsScrolled(window.scrollY > 10)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   const navLinks = [
     { label: 'Features', href: '#features' },
@@ -32,31 +24,26 @@ export function MarketingNav() {
     { label: 'FAQ', href: '#faq' },
   ]
 
+  // Text color class via template literal — no cn()/twMerge
+  const tc = isScrolled ? 'text-foreground' : 'text-white'
+
+  // Header background — fully opaque, no backdrop-filter
+  const headerBg = isScrolled
+    ? (isDark ? 'bg-[#09090b] border-b border-white/10 shadow-sm' : 'bg-white border-b border-black/5 shadow-sm')
+    : ''
+
   return (
     <>
     <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-[60] focus:p-4 focus:bg-background focus:text-foreground focus:border focus:border-border focus:rounded-md focus:top-2 focus:left-2">
       Skip to main content
     </a>
-    <header ref={headerRef} data-scrolled={isScrolled ? 'true' : 'false'} className="fixed top-0 w-full z-50 h-12">
-      {/* Backdrop layer — isolated compositing context for blur effects */}
-      <div
-        className={cn(
-          'absolute inset-0',
-          isScrolled
-            ? (isDark
-                ? 'bg-[#09090b]/95 backdrop-blur-xl backdrop-saturate-[180%] border-b border-white/10 shadow-sm'
-                : 'bg-white/95 backdrop-blur-xl backdrop-saturate-[180%] border-b border-black/5 shadow-sm')
-            : 'bg-transparent'
-        )}
-        style={{ transition: 'background-color 300ms, border-color 300ms, box-shadow 300ms' }}
-      />
-      {/* Content layer — renders above backdrop in clean compositing context */}
-      <div className="relative z-[1] max-w-6xl mx-auto px-4 md:px-8 h-full">
+    <header className={`fixed top-0 w-full z-50 h-12 ${headerBg}`}>
+      <div className="max-w-6xl mx-auto px-4 md:px-8 h-full">
         <div className="relative flex items-center justify-between h-full">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
             <PulseLogo size={32} variant={isScrolled ? 'light' : 'dark'} />
-            <span data-nav-text className="text-lg font-semibold font-[family-name:var(--font-display)]">Pulse Pro</span>
+            <span className={`text-lg font-semibold font-[family-name:var(--font-display)] ${tc}`}>Pulse Pro</span>
           </Link>
 
           {/* Desktop Navigation — true center */}
@@ -65,8 +52,7 @@ export function MarketingNav() {
               <a
                 key={link.href}
                 href={link.href}
-                data-nav-text
-                className="text-sm font-medium hover:opacity-70"
+                className={`text-sm font-medium hover:opacity-70 ${tc}`}
               >
                 {link.label}
               </a>
@@ -77,34 +63,22 @@ export function MarketingNav() {
           <div className="hidden md:flex items-center gap-3">
             <button
               onClick={toggleTheme}
-              data-nav-text
-              className={cn('p-2 rounded-md', isScrolled ? 'hover:bg-muted' : 'hover:bg-white/10')}
+              className={`p-2 rounded-md ${tc} ${isScrolled ? 'hover:bg-muted' : 'hover:bg-white/10'}`}
               aria-label="Toggle theme"
             >
               {theme === 'dark' ? (
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                  />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
               ) : (
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-                  />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                 </svg>
               )}
             </button>
             <Link
               href="/sign-in"
-              data-nav-text
-              className={cn('px-4 py-2 text-sm font-medium rounded-md', isScrolled ? 'hover:bg-muted' : 'hover:bg-white/10')}
+              className={`px-4 py-2 text-sm font-medium rounded-md ${tc} ${isScrolled ? 'hover:bg-muted' : 'hover:bg-white/10'}`}
               aria-label="Sign in to your Pulse Pro account"
             >
               Sign In
@@ -120,27 +94,16 @@ export function MarketingNav() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            data-nav-text
-            className={cn('md:hidden p-2 rounded-md', isScrolled ? 'hover:bg-muted' : 'hover:bg-white/10')}
+            className={`md:hidden p-2 rounded-md ${tc} ${isScrolled ? 'hover:bg-muted' : 'hover:bg-white/10'}`}
             aria-label="Toggle menu"
           >
             {isMobileMenuOpen ? (
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             ) : (
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             )}
           </button>
@@ -168,24 +131,14 @@ export function MarketingNav() {
                   {theme === 'dark' ? (
                     <>
                       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                        />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                       </svg>
                       <span>Light mode</span>
                     </>
                   ) : (
                     <>
                       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-                        />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                       </svg>
                       <span>Dark mode</span>
                     </>
