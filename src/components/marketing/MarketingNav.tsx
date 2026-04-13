@@ -1,31 +1,18 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { PulseLogo } from '@/components/PulseLogo'
 import { useTheme } from '@/components/ThemeProvider'
 import { cn } from '@/lib/utils'
 
 export function MarketingNav() {
-  const [isScrolled, setIsScrolled] = useState(true)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const { theme, toggleTheme } = useTheme()
-
-  // Inline style for nav text — Tailwind classes were not rendering in production
   const isDark = theme === 'dark'
-  const navColor = isScrolled ? (isDark ? '#fafafa' : '#0a0a0a') : '#ffffff'
-  const textStyle = { color: navColor }
-  const hoverBg = isScrolled ? 'hover:bg-muted' : 'hover:bg-white/10'
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10)
-    }
-
-    handleScroll() // Check initial position (e.g. page refreshed mid-scroll)
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+  // Always-visible nav: solid background, inline color that can't be overridden
+  const textStyle = { color: isDark ? '#fafafa' : '#0a0a0a' }
 
   const navLinks = [
     { label: 'Features', href: '#features' },
@@ -40,19 +27,17 @@ export function MarketingNav() {
     </a>
     <header
       className={cn(
-        'fixed top-0 w-full z-50 h-12 transition-all duration-300',
-        isScrolled
-          ? (isDark
-              ? 'bg-[#09090b]/95 backdrop-blur-xl backdrop-saturate-[180%] border-b border-white/10 shadow-sm'
-              : 'bg-white/95 backdrop-blur-xl backdrop-saturate-[180%] border-b border-black/5 shadow-sm')
-          : 'bg-transparent'
+        'fixed top-0 w-full z-50 h-12',
+        isDark
+          ? 'bg-[#09090b]/80 backdrop-blur-xl backdrop-saturate-[180%] border-b border-white/10'
+          : 'bg-white/80 backdrop-blur-xl backdrop-saturate-[180%] border-b border-black/5'
       )}
     >
       <div className="max-w-6xl mx-auto px-4 md:px-8 h-full">
         <div className="relative flex items-center justify-between h-full">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
-            <PulseLogo size={32} variant={isScrolled ? 'light' : 'dark'} />
+            <PulseLogo size={32} variant="light" />
             <span className="text-lg font-semibold font-[family-name:var(--font-display)]" style={textStyle}>Pulse Pro</span>
           </Link>
 
@@ -74,7 +59,7 @@ export function MarketingNav() {
           <div className="hidden md:flex items-center gap-3">
             <button
               onClick={toggleTheme}
-              className={cn('p-2 rounded-md transition-colors', hoverBg)}
+              className="p-2 rounded-md transition-colors hover:bg-muted"
               style={textStyle}
               aria-label="Toggle theme"
             >
@@ -100,7 +85,7 @@ export function MarketingNav() {
             </button>
             <Link
               href="/sign-in"
-              className={cn('px-4 py-2 text-sm font-medium rounded-md transition-colors', hoverBg)}
+              className="px-4 py-2 text-sm font-medium rounded-md transition-colors hover:bg-muted"
               style={textStyle}
               aria-label="Sign in to your Pulse Pro account"
             >
@@ -117,7 +102,7 @@ export function MarketingNav() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className={cn('md:hidden p-2 rounded-md transition-colors', hoverBg)}
+            className="md:hidden p-2 rounded-md transition-colors hover:bg-muted"
             style={textStyle}
             aria-label="Toggle menu"
           >
