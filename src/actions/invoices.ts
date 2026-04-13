@@ -300,6 +300,11 @@ export async function createInvoice(data: InvoiceInput) {
     const client = await prisma.client.findFirst({ where: { id: data.clientId, userId } })
     if (!client) throw new Error('Client not found')
 
+    // Prevent email header injection
+    if (data.fromEmail && /[\r\n]/.test(data.fromEmail)) throw new Error('Invalid email format')
+    if (data.fromName && /[\r\n]/.test(data.fromName)) throw new Error('Invalid name format')
+    if (data.fromAddress && /[\r\n]/.test(data.fromAddress)) throw new Error('Invalid address format')
+
     const number = await getNextInvoiceNumber()
 
     const invoice = await prisma.$transaction(async (tx) => {
@@ -351,6 +356,11 @@ export async function updateInvoice(id: string, data: InvoiceInput) {
     // Verify the client belongs to this user (prevent IDOR)
     const client = await prisma.client.findFirst({ where: { id: data.clientId, userId } })
     if (!client) throw new Error('Client not found')
+
+    // Prevent email header injection
+    if (data.fromEmail && /[\r\n]/.test(data.fromEmail)) throw new Error('Invalid email format')
+    if (data.fromName && /[\r\n]/.test(data.fromName)) throw new Error('Invalid name format')
+    if (data.fromAddress && /[\r\n]/.test(data.fromAddress)) throw new Error('Invalid address format')
 
     await prisma.$transaction(async (tx) => {
       // Delete existing items and recreate
