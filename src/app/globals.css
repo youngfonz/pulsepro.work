@@ -139,3 +139,17 @@ body {
 a.link, .text-link {
   color: var(--link);
 }
+
+/* Marketing nav text — forced colors that override all Tailwind/inline styles */
+[data-scrolled="false"] [data-nav-text] {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+[data-scrolled="true"] [data-nav-text] {
+  color: #0a0a0a !important;
+  -webkit-text-fill-color: #0a0a0a !important;
+}
+.dark [data-scrolled="true"] [data-nav-text] {
+  color: #fafafa !important;
+  -webkit-text-fill-color: #fafafa !important;
+}

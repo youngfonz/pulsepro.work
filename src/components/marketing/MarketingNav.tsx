@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import { PulseLogo } from '@/components/PulseLogo'
 import { useTheme } from '@/components/ThemeProvider'
@@ -11,13 +11,20 @@ export function MarketingNav() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const { theme, toggleTheme } = useTheme()
   const isDark = theme === 'dark'
+  const headerRef = useRef<HTMLElement>(null)
+
+  const handleScroll = useCallback(() => {
+    const scrolled = window.scrollY > 10
+    setIsScrolled(scrolled)
+    // Direct DOM manipulation as backup — bypasses React rendering pipeline
+    headerRef.current?.setAttribute('data-scrolled', String(scrolled))
+  }, [])
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 10)
     handleScroll()
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+  }, [handleScroll])
 
   const navLinks = [
     { label: 'Features', href: '#features' },
@@ -27,15 +34,10 @@ export function MarketingNav() {
 
   return (
     <>
-    {/* Nav text colors via CSS !important — bypasses all Tailwind/inline style issues */}
-    <style>{`
-      [data-scrolled="false"] [data-nav-text] { color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; }
-      [data-scrolled="true"] [data-nav-text] { color: var(--foreground) !important; -webkit-text-fill-color: var(--foreground) !important; }
-    `}</style>
     <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-[60] focus:p-4 focus:bg-background focus:text-foreground focus:border focus:border-border focus:rounded-md focus:top-2 focus:left-2">
       Skip to main content
     </a>
-    <header data-scrolled={isScrolled ? 'true' : 'false'} className="fixed top-0 w-full z-50 h-12">
+    <header ref={headerRef} data-scrolled={isScrolled ? 'true' : 'false'} className="fixed top-0 w-full z-50 h-12">
       {/* Backdrop layer — isolated compositing context for blur effects */}
       <div
         className={cn(
