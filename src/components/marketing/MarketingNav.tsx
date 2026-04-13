@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { PulseLogo } from '@/components/PulseLogo'
 import { useTheme } from '@/components/ThemeProvider'
@@ -10,31 +10,13 @@ export function MarketingNav() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const { theme, toggleTheme } = useTheme()
   const isDark = theme === 'dark'
-  const headerRef = useRef<HTMLElement>(null)
-
-  const updateNavColors = useCallback((scrolled: boolean) => {
-    const dark = document.documentElement.classList.contains('dark')
-    const color = scrolled ? (dark ? '#fafafa' : '#0a0a0a') : '#ffffff'
-    headerRef.current?.querySelectorAll('[data-nt]').forEach(el => {
-      ;(el as HTMLElement).style.setProperty('color', color, 'important')
-    })
-  }, [])
 
   useEffect(() => {
-    const onScroll = () => {
-      const scrolled = window.scrollY > 10
-      setIsScrolled(scrolled)
-      updateNavColors(scrolled)
-    }
+    const onScroll = () => setIsScrolled(window.scrollY > 10)
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
-  }, [updateNavColors])
-
-  // Update colors when theme toggles
-  useEffect(() => {
-    updateNavColors(isScrolled)
-  }, [isDark, isScrolled, updateNavColors])
+  }, [])
 
   const navLinks = [
     { label: 'Features', href: '#features' },
@@ -42,26 +24,34 @@ export function MarketingNav() {
     { label: 'FAQ', href: '#faq' },
   ]
 
-  // Text color class via template literal — no cn()/twMerge
-  const tc = isScrolled ? 'text-foreground' : 'text-white'
+  // All visual properties computed in JS — no Tailwind for colors/bg
+  const textColor = isScrolled
+    ? (isDark ? '#fafafa' : '#0a0a0a')
+    : '#ffffff'
 
-  // Header background — fully opaque, no backdrop-filter
-  const headerBg = isScrolled
-    ? (isDark ? 'bg-[#09090b] border-b border-white/10 shadow-sm' : 'bg-white border-b border-black/5 shadow-sm')
-    : ''
+  const headerStyle: React.CSSProperties = {
+    transition: 'background-color 0.2s, border-color 0.2s, box-shadow 0.2s',
+    backgroundColor: isScrolled
+      ? (isDark ? '#09090b' : '#ffffff')
+      : 'transparent',
+    borderBottom: isScrolled
+      ? (isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.05)')
+      : '1px solid transparent',
+    boxShadow: isScrolled ? '0 1px 2px rgba(0,0,0,0.05)' : 'none',
+  }
 
   return (
     <>
     <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-[60] focus:p-4 focus:bg-background focus:text-foreground focus:border focus:border-border focus:rounded-md focus:top-2 focus:left-2">
       Skip to main content
     </a>
-    <header ref={headerRef} className={`fixed top-0 w-full z-50 h-12 ${headerBg}`}>
+    <header style={headerStyle} className="fixed top-0 w-full z-50 h-12">
       <div className="max-w-6xl mx-auto px-4 md:px-8 h-full">
         <div className="relative flex items-center justify-between h-full">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
+          <Link href="/" style={{ color: textColor }} className="flex items-center gap-2 hover:opacity-90 transition-opacity">
             <PulseLogo size={32} variant={isScrolled ? 'light' : 'dark'} />
-            <span data-nt className={`text-lg font-semibold font-[family-name:var(--font-display)] ${tc}`}>Pulse Pro</span>
+            <span style={{ color: textColor }} className="text-lg font-semibold font-[family-name:var(--font-display)]">Pulse Pro</span>
           </Link>
 
           {/* Desktop Navigation — true center */}
@@ -70,8 +60,8 @@ export function MarketingNav() {
               <a
                 key={link.href}
                 href={link.href}
-                data-nt
-                className={`text-sm font-medium hover:opacity-70 ${tc}`}
+                style={{ color: textColor }}
+                className="text-sm font-medium hover:opacity-70"
               >
                 {link.label}
               </a>
@@ -82,8 +72,8 @@ export function MarketingNav() {
           <div className="hidden md:flex items-center gap-3">
             <button
               onClick={toggleTheme}
-              data-nt
-              className={`p-2 rounded-md ${tc} ${isScrolled ? 'hover:bg-muted' : 'hover:bg-white/10'}`}
+              style={{ color: textColor }}
+              className={`p-2 rounded-md ${isScrolled ? 'hover:bg-muted' : 'hover:bg-white/10'}`}
               aria-label="Toggle theme"
             >
               {theme === 'dark' ? (
@@ -98,8 +88,8 @@ export function MarketingNav() {
             </button>
             <Link
               href="/sign-in"
-              data-nt
-              className={`px-4 py-2 text-sm font-medium rounded-md ${tc} ${isScrolled ? 'hover:bg-muted' : 'hover:bg-white/10'}`}
+              style={{ color: textColor }}
+              className={`px-4 py-2 text-sm font-medium rounded-md ${isScrolled ? 'hover:bg-muted' : 'hover:bg-white/10'}`}
               aria-label="Sign in to your Pulse Pro account"
             >
               Sign In
@@ -115,8 +105,8 @@ export function MarketingNav() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            data-nt
-            className={`md:hidden p-2 rounded-md ${tc} ${isScrolled ? 'hover:bg-muted' : 'hover:bg-white/10'}`}
+            style={{ color: textColor }}
+            className={`md:hidden p-2 rounded-md ${isScrolled ? 'hover:bg-muted' : 'hover:bg-white/10'}`}
             aria-label="Toggle menu"
           >
             {isMobileMenuOpen ? (
@@ -133,7 +123,15 @@ export function MarketingNav() {
 
         {/* Mobile Menu Dropdown */}
         {isMobileMenuOpen && (
-          <div className="md:hidden absolute top-12 left-0 right-0 bg-background/95 backdrop-blur-xl border-b border-border/50 shadow-lg">
+          <div
+            className="md:hidden absolute top-12 left-0 right-0 shadow-lg"
+            style={{
+              backgroundColor: isDark ? 'rgba(9,9,11,0.95)' : 'rgba(255,255,255,0.95)',
+              backdropFilter: 'blur(24px) saturate(180%)',
+              WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+              borderBottom: isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.05)',
+            }}
+          >
             <nav className="flex flex-col px-4 py-4 space-y-3">
               {navLinks.map((link) => (
                 <a
