@@ -12,7 +12,7 @@ You will be testing across three plan tiers: **Free**, **Pro ($12/month)**, and 
 
 **App URL:** pulsepro.work
 
-**Fonz's contact:** Fonz@PulsePro.org — message him when you're ready for a plan upgrade, or if something is completely broken and you cannot continue.
+**Fonz's contact:** info@pulsepro.work — message him when you're ready for a plan upgrade, or if something is completely broken and you cannot continue.
 
 ---
 
@@ -700,7 +700,7 @@ Note anything that seems wrong, off, or confusing.
 
 ### DONE — Send Your Full Bug Report
 
-Email your complete bug report to: **Fonz@PulsePro.org**
+Email your complete bug report to: **info@pulsepro.work**
 
 In the subject line, write: `Pulse Pro QA Testing — Bug Report`
 

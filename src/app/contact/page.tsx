@@ -26,8 +26,8 @@ export default function ContactPage() {
             <h2 className="text-xl font-semibold text-foreground">General Inquiries</h2>
             <p>
               For general questions, partnership ideas, or feedback on how we can make Pulse Pro better, reach us at{' '}
-              <a href="mailto:hello@pulsepro.work" className="text-primary hover:underline">
-                hello@pulsepro.work
+              <a href="mailto:info@pulsepro.work" className="text-primary hover:underline">
+                info@pulsepro.work
               </a>. We appreciate hearing what&apos;s working well and what could be improved.
             </p>
           </section>
@@ -57,8 +57,8 @@ export default function ContactPage() {
             <h2 className="text-xl font-semibold text-foreground">Feature Requests</h2>
             <p>
               We build Pulse Pro based on real feedback from our users. If there&apos;s a feature you&apos;d like to see, send it to{' '}
-              <a href="mailto:hello@pulsepro.work" className="text-primary hover:underline">
-                hello@pulsepro.work
+              <a href="mailto:info@pulsepro.work" className="text-primary hover:underline">
+                info@pulsepro.work
               </a> with &quot;Feature Request&quot; in the subject line. We review every suggestion and prioritize based on what will help the most people.
             </p>
           </section>
