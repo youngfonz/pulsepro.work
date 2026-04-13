@@ -36,8 +36,8 @@ export default function ContactPage() {
             <h2 className="text-xl font-semibold text-foreground">Technical Support</h2>
             <p>
               Need help with your account, experiencing a bug, or have a technical issue? Email our support team at{' '}
-              <a href="mailto:support@pulsepro.work" className="text-primary hover:underline">
-                support@pulsepro.work
+              <a href="mailto:info@pulsepro.work" className="text-primary hover:underline">
+                info@pulsepro.work
               </a>. When reporting an issue, please include what you were doing when it happened and any error messages you saw — it helps us resolve things faster.
             </p>
           </section>
@@ -46,8 +46,8 @@ export default function ContactPage() {
             <h2 className="text-xl font-semibold text-foreground">Privacy and Data Requests</h2>
             <p>
               For privacy-related questions, data export requests, or account deletion inquiries, contact{' '}
-              <a href="mailto:privacy@pulsepro.work" className="text-primary hover:underline">
-                privacy@pulsepro.work
+              <a href="mailto:info@pulsepro.work" className="text-primary hover:underline">
+                info@pulsepro.work
               </a>. You can learn more about how we handle your information in our{' '}
               <a href="/privacy" className="text-primary hover:underline">privacy policy</a>.
             </p>

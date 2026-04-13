@@ -14,7 +14,7 @@ export default function TermsPage() {
       <main id="main-content" className="max-w-3xl mx-auto px-4 md:px-8 py-20">
         <h1 className="text-3xl font-bold text-foreground mb-8">Terms of Service</h1>
         <div className="prose prose-sm dark:prose-invert max-w-none space-y-6 text-muted-foreground">
-          <p className="text-foreground font-medium">Last updated: February 17, 2026</p>
+          <p className="text-foreground font-medium">Last updated: April 12, 2026</p>
 
           <section className="space-y-3">
             <h2 className="text-xl font-semibold text-foreground">1. Acceptance of Terms</h2>
@@ -23,7 +23,7 @@ export default function TermsPage() {
 
           <section className="space-y-3">
             <h2 className="text-xl font-semibold text-foreground">2. Description of Service</h2>
-            <p>Pulse Pro is a project and task management tool designed for freelancers, consultants, and small teams. The service allows you to create and manage projects, tasks, clients, and deadlines in one place. We offer a free tier with limited usage (3 projects, 50 tasks, 1 client) and a paid Pro tier with unlimited access to all features.</p>
+            <p>Pulse Pro is a project and task management tool designed for freelancers, consultants, and small teams. The service allows you to create and manage projects, tasks, clients, and deadlines in one place. We offer a free tier with limited usage (3 projects, 50 tasks, 1 client), a Pro tier ($12/month) with unlimited access and integrations, and a Team tier ($29/month) with expanded collaboration features.</p>
           </section>
 
           <section className="space-y-3">
@@ -57,13 +57,20 @@ export default function TermsPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-xl font-semibold text-foreground">9. Changes to Terms</h2>
+            <h2 className="text-xl font-semibold text-foreground">9. Age Requirement</h2>
+            <p>Pulse Pro is not intended for use by anyone under the age of 16. By creating an account, you confirm that you are at least 16 years old. If we learn that an account has been created by someone under 16, we will promptly terminate that account and delete all associated data.</p>
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-xl font-semibold text-foreground">10. Changes to Terms</h2>
             <p>We may update these terms from time to time to reflect changes in our service or applicable laws. We will notify registered users of material changes via email at least 14 days before they take effect. Your continued use of Pulse Pro after changes take effect constitutes acceptance of the revised terms.</p>
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-xl font-semibold text-foreground">10. Contact</h2>
-            <p>For questions about these terms or any other legal matter, contact us at support@pulsepro.work.</p>
+            <h2 className="text-xl font-semibold text-foreground">11. Contact</h2>
+            <p>For questions about these terms or any other legal matter, contact us at{' '}
+              <a href="mailto:info@pulsepro.work" className="text-primary hover:underline">info@pulsepro.work</a>.
+            </p>
           </section>
         </div>
       </main>
