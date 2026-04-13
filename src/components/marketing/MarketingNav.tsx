@@ -7,7 +7,7 @@ import { useTheme } from '@/components/ThemeProvider'
 import { cn } from '@/lib/utils'
 
 export function MarketingNav() {
-  const [isScrolled, setIsScrolled] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(true)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const { theme, toggleTheme } = useTheme()
 
