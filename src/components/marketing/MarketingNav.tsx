@@ -11,8 +11,11 @@ export function MarketingNav() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const { theme, toggleTheme } = useTheme()
 
-  // Over the dark hero = white text; after scrolling = normal foreground
-  const textColor = isScrolled ? 'text-foreground' : 'text-white'
+  // Over the dark hero = white text; after scrolling = explicit dark/light text
+  const isDark = theme === 'dark'
+  const textColor = isScrolled
+    ? (isDark ? 'text-white' : 'text-[#0a0a0a]')
+    : 'text-white'
   const hoverBg = isScrolled ? 'hover:bg-muted' : 'hover:bg-white/10'
 
   useEffect(() => {
@@ -40,7 +43,9 @@ export function MarketingNav() {
       className={cn(
         'fixed top-0 w-full z-50 h-12 transition-all duration-300',
         isScrolled
-          ? 'bg-background backdrop-blur-xl backdrop-saturate-[180%] border-b border-border/50'
+          ? (isDark
+              ? 'bg-[#09090b]/95 backdrop-blur-xl backdrop-saturate-[180%] border-b border-white/10 shadow-sm'
+              : 'bg-white/95 backdrop-blur-xl backdrop-saturate-[180%] border-b border-black/5 shadow-sm')
           : 'bg-transparent'
       )}
     >
