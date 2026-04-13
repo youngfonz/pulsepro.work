@@ -12,11 +12,6 @@ export function MarketingNav() {
   const { theme, toggleTheme } = useTheme()
   const isDark = theme === 'dark'
 
-  // Inline styles — Tailwind color classes don't render in production builds
-  const textStyle = {
-    color: isScrolled ? (isDark ? '#fafafa' : '#0a0a0a') : '#ffffff',
-  }
-
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10)
     handleScroll()
@@ -32,10 +27,15 @@ export function MarketingNav() {
 
   return (
     <>
+    {/* Nav text colors via CSS !important — bypasses all Tailwind/inline style issues */}
+    <style>{`
+      [data-scrolled="false"] [data-nav-text] { color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; }
+      [data-scrolled="true"] [data-nav-text] { color: var(--foreground) !important; -webkit-text-fill-color: var(--foreground) !important; }
+    `}</style>
     <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-[60] focus:p-4 focus:bg-background focus:text-foreground focus:border focus:border-border focus:rounded-md focus:top-2 focus:left-2">
       Skip to main content
     </a>
-    <header className="fixed top-0 w-full z-50 h-12">
+    <header data-scrolled={isScrolled ? 'true' : 'false'} className="fixed top-0 w-full z-50 h-12">
       {/* Backdrop layer — isolated compositing context for blur effects */}
       <div
         className={cn(
@@ -54,7 +54,7 @@ export function MarketingNav() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
             <PulseLogo size={32} variant={isScrolled ? 'light' : 'dark'} />
-            <span className="text-lg font-semibold font-[family-name:var(--font-display)]" style={textStyle}>Pulse Pro</span>
+            <span data-nav-text className="text-lg font-semibold font-[family-name:var(--font-display)]">Pulse Pro</span>
           </Link>
 
           {/* Desktop Navigation — true center */}
@@ -63,8 +63,8 @@ export function MarketingNav() {
               <a
                 key={link.href}
                 href={link.href}
+                data-nav-text
                 className="text-sm font-medium hover:opacity-70"
-                style={textStyle}
               >
                 {link.label}
               </a>
@@ -75,8 +75,8 @@ export function MarketingNav() {
           <div className="hidden md:flex items-center gap-3">
             <button
               onClick={toggleTheme}
+              data-nav-text
               className={cn('p-2 rounded-md', isScrolled ? 'hover:bg-muted' : 'hover:bg-white/10')}
-              style={textStyle}
               aria-label="Toggle theme"
             >
               {theme === 'dark' ? (
@@ -101,8 +101,8 @@ export function MarketingNav() {
             </button>
             <Link
               href="/sign-in"
+              data-nav-text
               className={cn('px-4 py-2 text-sm font-medium rounded-md', isScrolled ? 'hover:bg-muted' : 'hover:bg-white/10')}
-              style={textStyle}
               aria-label="Sign in to your Pulse Pro account"
             >
               Sign In
@@ -118,8 +118,8 @@ export function MarketingNav() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            data-nav-text
             className={cn('md:hidden p-2 rounded-md', isScrolled ? 'hover:bg-muted' : 'hover:bg-white/10')}
-            style={textStyle}
             aria-label="Toggle menu"
           >
             {isMobileMenuOpen ? (
