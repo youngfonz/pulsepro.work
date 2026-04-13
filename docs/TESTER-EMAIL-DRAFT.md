@@ -27,7 +27,7 @@ The testing is split into 3 phases -- one for each plan tier (Free, Pro, Team). 
 
 **For bug reports:**
 
-If you find anything broken, confusing, or just "off," send the details to **Fonz@PulsePro.org**. Screenshots are always helpful. Even small things matter -- if a button looks weird or something doesn't make sense, I want to know.
+If you find anything broken, confusing, or just "off," send the details to **info@pulsepro.work**. Screenshots are always helpful. Even small things matter -- if a button looks weird or something doesn't make sense, I want to know.
 
 Your feedback on this is genuinely valuable. You're testing the real experience that actual users will have, and catching issues now saves a lot of headaches later. I really appreciate you taking the time.
 
