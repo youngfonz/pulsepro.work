@@ -60,9 +60,15 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Validate file extension matches allowed types
+    const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf', 'md', 'markdown']
+    const ext = file.name.split('.').pop()?.toLowerCase()
+    if (!ext || !allowedExtensions.includes(ext)) {
+      return NextResponse.json({ error: 'Invalid file extension' }, { status: 400 })
+    }
+
     // Create unique filename
     const timestamp = Date.now()
-    const ext = file.name.split('.').pop()
     const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_')
     const filename = `${type}/${timestamp}-${originalName}`
 

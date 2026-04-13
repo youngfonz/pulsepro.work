@@ -257,8 +257,8 @@ export function ApiAccessCard() {
                     <div className="font-medium text-foreground mb-1">Step 3: Add &quot;Get Contents of URL&quot;</div>
                     <p>Search for <b>Get Contents of URL</b> and tap it to add it below the input action. Tap the URL field and paste:</p>
                     <div className="mt-1.5 flex items-center gap-2 bg-muted rounded-md px-2.5 py-1.5">
-                      <code className="text-foreground text-[11px] flex-1 break-all">https://www.pulsepro.work/api/v1/tasks</code>
-                      <CopyButton value="https://www.pulsepro.work/api/v1/tasks" label="Copy" />
+                      <code className="text-foreground text-[11px] flex-1 break-all">https://pulsepro.work/api/v1/tasks</code>
+                      <CopyButton value="https://pulsepro.work/api/v1/tasks" label="Copy" />
                     </div>
                   </div>
 
@@ -324,7 +324,7 @@ export function ApiAccessCard() {
                 API Example
               </p>
               <code className="block px-3 py-2 bg-muted rounded-lg text-[11px] font-mono text-muted-foreground whitespace-pre-wrap break-all">
-{`curl -X POST https://www.pulsepro.work/api/v1/tasks \\
+{`curl -X POST https://pulsepro.work/api/v1/tasks \\
   -H "Authorization: Bearer ${freshToken && showToken ? freshToken : 'YOUR_TOKEN'}" \\
   -H "Content-Type: application/json" \\
   -d '{"title": "Buy groceries", "priority": "high"}'`}
