@@ -4,24 +4,18 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { PulseLogo } from '@/components/PulseLogo'
 import { useTheme } from '@/components/ThemeProvider'
-import { cn } from '@/lib/utils'
 
 export function MarketingNav() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const { theme, toggleTheme } = useTheme()
-
-  // Over the dark hero = white text; after scrolling = normal foreground
-  const textColor = isScrolled ? 'text-foreground' : 'text-white'
-  const hoverBg = isScrolled ? 'hover:bg-muted' : 'hover:bg-white/10'
+  const isDark = theme === 'dark'
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20)
-    }
-
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
+    const onScroll = () => setIsScrolled(window.scrollY > 10)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
   const navLinks = [
@@ -30,25 +24,34 @@ export function MarketingNav() {
     { label: 'FAQ', href: '#faq' },
   ]
 
+  // All visual properties computed in JS — no Tailwind for colors/bg
+  const textColor = isScrolled
+    ? (isDark ? '#fafafa' : '#0a0a0a')
+    : '#ffffff'
+
+  const headerStyle: React.CSSProperties = {
+    transition: 'background-color 0.2s, border-color 0.2s, box-shadow 0.2s',
+    backgroundColor: isScrolled
+      ? (isDark ? '#09090b' : '#ffffff')
+      : 'transparent',
+    borderBottom: isScrolled
+      ? (isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.05)')
+      : '1px solid transparent',
+    boxShadow: isScrolled ? '0 1px 2px rgba(0,0,0,0.05)' : 'none',
+  }
+
   return (
     <>
     <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-[60] focus:p-4 focus:bg-background focus:text-foreground focus:border focus:border-border focus:rounded-md focus:top-2 focus:left-2">
       Skip to main content
     </a>
-    <header
-      className={cn(
-        'fixed top-0 w-full z-50 h-12 transition-all duration-300',
-        isScrolled
-          ? 'bg-background backdrop-blur-xl backdrop-saturate-[180%] border-b border-border/50'
-          : 'bg-transparent'
-      )}
-    >
+    <header style={headerStyle} className="fixed top-0 w-full z-50 h-12">
       <div className="max-w-6xl mx-auto px-4 md:px-8 h-full">
         <div className="relative flex items-center justify-between h-full">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
+          <Link href="/" style={{ color: textColor }} className="flex items-center gap-2 hover:opacity-90 transition-opacity">
             <PulseLogo size={32} variant={isScrolled ? 'light' : 'dark'} />
-            <span className={cn('text-lg font-semibold font-[family-name:var(--font-display)]', textColor)}>Pulse Pro</span>
+            <span style={{ color: textColor }} className="text-lg font-semibold font-[family-name:var(--font-display)]">Pulse Pro</span>
           </Link>
 
           {/* Desktop Navigation — true center */}
@@ -57,7 +60,8 @@ export function MarketingNav() {
               <a
                 key={link.href}
                 href={link.href}
-                className={cn('text-sm font-medium transition-colors hover:opacity-70', textColor)}
+                style={{ color: textColor }}
+                className="text-sm font-medium hover:opacity-70"
               >
                 {link.label}
               </a>
@@ -68,39 +72,31 @@ export function MarketingNav() {
           <div className="hidden md:flex items-center gap-3">
             <button
               onClick={toggleTheme}
-              className={cn('p-2 rounded-md transition-colors', textColor, hoverBg)}
+              style={{ color: textColor }}
+              className={`p-2 rounded-md ${isScrolled ? 'hover:bg-muted' : 'hover:bg-white/10'}`}
               aria-label="Toggle theme"
             >
               {theme === 'dark' ? (
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                  />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
               ) : (
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-                  />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                 </svg>
               )}
             </button>
             <Link
               href="/sign-in"
-              className={cn('px-4 py-2 text-sm font-medium rounded-md transition-colors', textColor, hoverBg)}
+              style={{ color: textColor }}
+              className={`px-4 py-2 text-sm font-medium rounded-md ${isScrolled ? 'hover:bg-muted' : 'hover:bg-white/10'}`}
               aria-label="Sign in to your Pulse Pro account"
             >
               Sign In
             </Link>
             <Link
               href="/sign-up"
-              className="px-5 py-1.5 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 rounded-full transition-colors"
+              className="px-5 py-1.5 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 rounded-full"
             >
               Get Started
             </Link>
@@ -109,26 +105,17 @@ export function MarketingNav() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className={cn('md:hidden p-2 rounded-md transition-colors', textColor, hoverBg)}
+            style={{ color: textColor }}
+            className={`md:hidden p-2 rounded-md ${isScrolled ? 'hover:bg-muted' : 'hover:bg-white/10'}`}
             aria-label="Toggle menu"
           >
             {isMobileMenuOpen ? (
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             ) : (
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             )}
           </button>
@@ -136,7 +123,15 @@ export function MarketingNav() {
 
         {/* Mobile Menu Dropdown */}
         {isMobileMenuOpen && (
-          <div className="md:hidden absolute top-12 left-0 right-0 bg-background/95 backdrop-blur-xl border-b border-border/50 shadow-lg">
+          <div
+            className="md:hidden absolute top-12 left-0 right-0 shadow-lg"
+            style={{
+              backgroundColor: isDark ? 'rgba(9,9,11,0.95)' : 'rgba(255,255,255,0.95)',
+              backdropFilter: 'blur(24px) saturate(180%)',
+              WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+              borderBottom: isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.05)',
+            }}
+          >
             <nav className="flex flex-col px-4 py-4 space-y-3">
               {navLinks.map((link) => (
                 <a
@@ -156,24 +151,14 @@ export function MarketingNav() {
                   {theme === 'dark' ? (
                     <>
                       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                        />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                       </svg>
                       <span>Light mode</span>
                     </>
                   ) : (
                     <>
                       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-                        />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                       </svg>
                       <span>Dark mode</span>
                     </>
