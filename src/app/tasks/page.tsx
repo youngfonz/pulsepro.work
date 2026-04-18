@@ -9,6 +9,7 @@ import { TaskCheckbox } from './TaskCheckbox'
 import { AddTaskDialog } from './AddTaskDialog'
 import { CompletedSection } from './CompletedSection'
 import { ProgressRing } from '@/components/ui/ProgressRing'
+import { RefreshOnFocus } from '@/components/RefreshOnFocus'
 
 export const dynamic = 'force-dynamic'
 
@@ -56,6 +57,7 @@ export default async function TasksPage({ searchParams }: Props) {
 
   return (
     <div className="space-y-4 md:space-y-6">
+      <RefreshOnFocus />
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <Link

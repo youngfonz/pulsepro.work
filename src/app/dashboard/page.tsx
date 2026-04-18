@@ -21,6 +21,7 @@ import {
 } from '@/actions/dashboard'
 import { InsightsPanel } from '@/components/InsightsPanel'
 import { InsightsPanelWithAI } from '@/components/InsightsPanelWithAI'
+import { RefreshOnFocus } from '@/components/RefreshOnFocus'
 import { statusColors, statusLabels, priorityColors, priorityLabels, formatDate } from '@/lib/utils'
 
 export default async function DashboardPage() {
@@ -334,6 +335,7 @@ export default async function DashboardPage() {
   return (
     <DashboardProvider>
       <div className="space-y-4 md:space-y-6">
+        <RefreshOnFocus />
         <OnboardingOverlay userId={userId} />
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <DashboardGreeting />
