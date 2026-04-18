@@ -5,31 +5,39 @@ import crypto from 'crypto'
 
 export async function POST(request: NextRequest) {
   try {
-    // Require and verify webhook secret (timing-safe)
-    const webhookSecret = process.env.RESEND_WEBHOOK_SECRET
-    if (!webhookSecret) {
+    // Postmark Inbound authenticates via HTTP Basic Auth embedded in the webhook URL.
+    // POSTMARK_INBOUND_AUTH format: "user:password"
+    const auth = process.env.POSTMARK_INBOUND_AUTH
+    if (!auth) {
       return NextResponse.json({ error: 'Webhook not configured' }, { status: 503 })
     }
-    const signature = request.headers.get('x-resend-signature') || request.headers.get('webhook-secret')
-    if (!signature ||
-        signature.length !== webhookSecret.length ||
-        !crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(webhookSecret))) {
-      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
+    const header = request.headers.get('authorization') || ''
+    const expected = 'Basic ' + Buffer.from(auth).toString('base64')
+    const headerBuf = Buffer.from(header)
+    const expectedBuf = Buffer.from(expected)
+    if (headerBuf.length !== expectedBuf.length ||
+        !crypto.timingSafeEqual(headerBuf, expectedBuf)) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const body = await request.json()
 
-    // Resend inbound parse sends: from, to, subject, text, html
-    const { to, from, subject, text, html } = body
+    // Postmark inbound parse sends PascalCase fields: From, To, Subject, TextBody, HtmlBody, MailboxHash
+    const to = body.To as string | undefined
+    const subject = body.Subject as string | undefined
+    const text = body.TextBody as string | undefined
+    const html = body.HtmlBody as string | undefined
+    const mailboxHash = body.MailboxHash as string | undefined
 
     if (!to || !subject) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    // Extract token from the "to" address
-    // Format: {token}@in.pulsepro.work or tasks+{token}@in.pulsepro.work
-    const toAddress = Array.isArray(to) ? to[0] : to
-    const token = extractToken(toAddress)
+    // Postmark parses `tasks+{token}@domain` into MailboxHash natively.
+    // Fall back to regex on the To address for `{token}@domain` direct format.
+    const token = (mailboxHash && /^[a-f0-9]{32}$/i.test(mailboxHash))
+      ? mailboxHash
+      : extractToken(to)
 
     if (!token) {
       return NextResponse.json({ error: 'Invalid inbound address' }, { status: 400 })
@@ -50,7 +58,7 @@ export async function POST(request: NextRequest) {
 
     // Parse the email into a task
     const title = cleanSubject(subject)
-    const description = buildDescription(text || html)
+    const description = buildDescription(text || html || null)
 
     // Check for [ProjectName] pattern in subject
     let projectId: string | undefined
