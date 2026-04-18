@@ -118,6 +118,9 @@ export default async function RootLayout({
             __html: `
               (function() {
                 try {
+                  var path = window.location.pathname;
+                  var marketing = ['/', '/about', '/contact', '/privacy', '/terms', '/maintenance', '/suspended'];
+                  if (marketing.indexOf(path) !== -1 || path.indexOf('/invoice/') === 0) return;
                   var stored = localStorage.getItem('theme');
                   if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                     document.documentElement.classList.add('dark');
