@@ -1,11 +1,62 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireUserId } from '@/lib/auth';
+import { promises as dns } from 'node:dns';
+import net from 'node:net';
 
 interface BookmarkMetadata {
   title: string;
   description?: string;
   thumbnailUrl?: string;
   type: 'youtube' | 'twitter' | 'website';
+}
+
+// Private/reserved IPv4 ranges. Any address that matches — including those
+// reached via attacker-controlled DNS — must not be fetched.
+function isPrivateIPv4(ip: string): boolean {
+  const parts = ip.split('.').map(Number);
+  if (parts.length !== 4 || parts.some((n) => Number.isNaN(n) || n < 0 || n > 255)) {
+    return true; // malformed — treat as unsafe
+  }
+  const [a, b] = parts;
+  return (
+    a === 0 ||                                 // 0.0.0.0/8
+    a === 10 ||                                // 10.0.0.0/8
+    a === 127 ||                               // 127.0.0.0/8 (loopback)
+    (a === 169 && b === 254) ||                // 169.254.0.0/16 (link-local, incl. cloud metadata)
+    (a === 172 && b >= 16 && b <= 31) ||       // 172.16.0.0/12
+    (a === 192 && b === 168) ||                // 192.168.0.0/16
+    (a === 100 && b >= 64 && b <= 127) ||      // 100.64.0.0/10 (CGNAT)
+    a === 224 ||                               // 224.0.0.0/4 (multicast)
+    a >= 240                                   // 240.0.0.0/4 (reserved)
+  );
+}
+
+function isPrivateIPv6(ip: string): boolean {
+  const lower = ip.toLowerCase();
+  // IPv4-mapped IPv6 (e.g. ::ffff:127.0.0.1) — unwrap and re-check
+  const mapped = lower.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/);
+  if (mapped) return isPrivateIPv4(mapped[1]);
+  if (lower === '::' || lower === '::1') return true;          // unspecified / loopback
+  if (lower.startsWith('fe80:') || lower.startsWith('fe80::')) return true; // link-local
+  if (lower.startsWith('fc') || lower.startsWith('fd')) return true;        // unique local fc00::/7
+  if (lower.startsWith('ff')) return true;                                  // multicast ff00::/8
+  return false;
+}
+
+function isPrivateIp(ip: string, family?: number): boolean {
+  if (family === 6 || net.isIPv6(ip)) return isPrivateIPv6(ip);
+  if (family === 4 || net.isIPv4(ip)) return isPrivateIPv4(ip);
+  return true; // unknown family — fail closed
+}
+
+async function resolvesToPublicIp(hostname: string): Promise<boolean> {
+  try {
+    const addrs = await dns.lookup(hostname, { all: true });
+    if (addrs.length === 0) return false;
+    return addrs.every((a) => !isPrivateIp(a.address, a.family));
+  } catch {
+    return false;
+  }
 }
 
 function isUnsafeUrl(url: string): boolean {
@@ -16,21 +67,22 @@ function isUnsafeUrl(url: string): boolean {
     // Block non-http(s) protocols
     if (!['http:', 'https:'].includes(urlObj.protocol)) return true;
 
-    // Block private/internal IPs, localhost, and cloud metadata endpoints
+    // Literal-IP fast path — if the hostname IS an IP, check it directly.
+    // Strip IPv6 brackets if present.
+    const stripped = hostname.startsWith('[') && hostname.endsWith(']')
+      ? hostname.slice(1, -1)
+      : hostname;
+    if (net.isIP(stripped)) {
+      return isPrivateIp(stripped);
+    }
+
+    // Blocklist a few name-based cases that DNS-resolution won't always catch
+    // (e.g. operators mapping internal names to private IPs). Real SSRF
+    // prevention happens via resolvesToPublicIp() below, called by the caller.
     if (
       hostname === 'localhost' ||
-      hostname === '127.0.0.1' ||
-      hostname === '0.0.0.0' ||
-      hostname.startsWith('10.') ||
-      hostname.startsWith('192.168.') ||
-      hostname.startsWith('172.16.') || hostname.startsWith('172.17.') ||
-      hostname.startsWith('172.18.') || hostname.startsWith('172.19.') ||
-      hostname.startsWith('172.2') || hostname.startsWith('172.30.') ||
-      hostname.startsWith('172.31.') ||
-      hostname.startsWith('169.254.') ||
       hostname.endsWith('.local') ||
       hostname.endsWith('.internal') ||
-      hostname === '[::1]' ||
       hostname === 'metadata.google.internal'
     ) return true;
 
@@ -190,12 +242,20 @@ async function fetchWebsiteMetadata(url: string): Promise<BookmarkMetadata | nul
       redirect: 'manual',
     });
 
-    // Block redirects to prevent SSRF via redirect to internal IPs
+    // Block redirects to prevent SSRF via redirect to internal IPs.
+    // Re-validate both the literal-IP/protocol gate AND the DNS resolution
+    // so an attacker can't redirect from a public host to a private one.
     if (response.status >= 300 && response.status < 400) {
       const location = response.headers.get('location')
-      if (location && isUnsafeUrl(location)) return null
-      // For safe redirects, re-fetch the final URL
-      const redirectResponse = await fetch(location || url, {
+      if (!location) return null
+      if (isUnsafeUrl(location)) return null
+      try {
+        const redirectHost = new URL(location).hostname
+        if (!net.isIP(redirectHost) && !(await resolvesToPublicIp(redirectHost))) return null
+      } catch {
+        return null
+      }
+      const redirectResponse = await fetch(location, {
         headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)' },
         redirect: 'manual',
       })
@@ -234,6 +294,17 @@ export async function POST(request: NextRequest) {
         { error: 'Invalid URL' },
         { status: 400 }
       );
+    }
+
+    // SSRF defence: resolve the hostname and reject if any resolved IP is
+    // private/reserved. The literal-IP case is handled inside isUnsafeUrl.
+    try {
+      const hostname = new URL(url).hostname;
+      if (!net.isIP(hostname) && !(await resolvesToPublicIp(hostname))) {
+        return NextResponse.json({ error: 'Invalid URL' }, { status: 400 });
+      }
+    } catch {
+      return NextResponse.json({ error: 'Invalid URL' }, { status: 400 });
     }
 
     const bookmarkType = getBookmarkType(url);
