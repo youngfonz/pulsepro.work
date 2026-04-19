@@ -4,7 +4,7 @@ import type { Insight } from '@/actions/dashboard'
 const dotColor = {
   red: 'bg-rose-500',
   amber: 'bg-amber-500',
-  blue: 'bg-blue-500',
+  blue: 'bg-primary',
   green: 'bg-emerald-500',
 }
 

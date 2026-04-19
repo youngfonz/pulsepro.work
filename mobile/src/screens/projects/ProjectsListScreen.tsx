@@ -1,5 +1,5 @@
 import React, { useLayoutEffect } from 'react'
-import { View, Text, FlatList, TouchableOpacity, RefreshControl, StyleSheet } from 'react-native'
+import { View, Text, FlatList, TouchableOpacity, RefreshControl, StyleSheet, ActivityIndicator } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Plus } from 'lucide-react-native'
@@ -54,13 +54,17 @@ export function ProjectsListScreen({ navigation }: Props) {
         renderItem={renderItem}
         contentContainerStyle={styles.list}
         refreshControl={<RefreshControl refreshing={isFetching && !!data} onRefresh={refetch} tintColor={colors.primary} />}
-        ListEmptyComponent={!isLoading ? (
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyEmoji}>📁</Text>
-            <Text style={styles.emptyTitle}>No projects yet</Text>
-            <Text style={styles.empty}>Tap + to start your first project.</Text>
-          </View>
-        ) : null}
+        ListEmptyComponent={
+          isLoading
+            ? <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 80 }} />
+            : (
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyEmoji}>📁</Text>
+                <Text style={styles.emptyTitle}>No projects yet</Text>
+                <Text style={styles.empty}>Tap + to start your first project.</Text>
+              </View>
+            )
+        }
       />
     </SafeAreaView>
   )

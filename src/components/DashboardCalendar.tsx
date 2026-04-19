@@ -179,7 +179,7 @@ export function DashboardCalendar() {
                     hasHighPriority
                       ? 'bg-rose-600'
                       : hasPendingTasks
-                      ? 'bg-blue-600'
+                      ? 'bg-primary'
                       : 'bg-emerald-600'
                   }`}
                 />

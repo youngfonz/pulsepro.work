@@ -96,7 +96,7 @@ export default async function TasksPage({ searchParams }: Props) {
             value={tasksDueThisWeekCount}
             max={Math.max(stats.pendingTasks, 1)}
             label={String(tasksDueThisWeekCount)}
-            className={tasksDueThisWeekCount === 0 ? 'text-emerald-500' : tasksDueThisWeekCount > 5 ? 'text-amber-500' : 'text-blue-500'}
+            className={tasksDueThisWeekCount === 0 ? 'text-emerald-500' : tasksDueThisWeekCount > 5 ? 'text-amber-500' : 'text-primary'}
           />
           <div>
             <p className="text-xs text-muted-foreground">Due This Week</p>
@@ -104,7 +104,7 @@ export default async function TasksPage({ searchParams }: Props) {
           </div>
         </div>
         <div className="hidden sm:flex items-center gap-3 rounded-lg border border-border px-4 py-3">
-          <ProgressRing value={stats.activeProjects} max={stats.totalProjects} className="text-blue-500" />
+          <ProgressRing value={stats.activeProjects} max={stats.totalProjects} className="text-primary" />
           <div>
             <p className="text-xs text-muted-foreground">Active Projects</p>
             <p className="text-lg font-semibold text-foreground">{stats.activeProjects}<span className="text-sm font-normal text-muted-foreground">/{stats.totalProjects}</span></p>

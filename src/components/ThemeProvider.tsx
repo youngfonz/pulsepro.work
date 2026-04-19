@@ -1,7 +1,6 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState } from 'react'
-import { usePathname } from 'next/navigation'
 
 type Theme = 'light' | 'dark'
 
@@ -12,46 +11,20 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
-const MARKETING_PATHS = new Set([
-  '/',
-  '/about',
-  '/contact',
-  '/privacy',
-  '/terms',
-  '/maintenance',
-  '/suspended',
-])
-
-function isMarketingPath(pathname: string): boolean {
-  return MARKETING_PATHS.has(pathname) || pathname.startsWith('/invoice/')
+function getInitialTheme(): Theme {
+  if (typeof window === 'undefined') return 'light'
+  const stored = localStorage.getItem('theme')
+  if (stored === 'dark' || stored === 'light') return stored
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname()
-  const [theme, setTheme] = useState<Theme>('light')
-  const [mounted, setMounted] = useState(false)
+  const [theme, setTheme] = useState<Theme>(getInitialTheme)
 
   useEffect(() => {
-    setMounted(true)
-    const stored = localStorage.getItem('theme') as Theme | null
-    if (stored) {
-      setTheme(stored)
-    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      setTheme('dark')
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!mounted) return
-    const html = document.documentElement
-    // Marketing pages always render in light mode; preserve user preference in localStorage
-    if (isMarketingPath(pathname)) {
-      html.classList.remove('dark')
-    } else {
-      html.classList.toggle('dark', theme === 'dark')
-    }
+    document.documentElement.classList.toggle('dark', theme === 'dark')
     localStorage.setItem('theme', theme)
-  }, [theme, mounted, pathname])
+  }, [theme])
 
   const toggleTheme = () => {
     setTheme((prev) => (prev === 'light' ? 'dark' : 'light'))

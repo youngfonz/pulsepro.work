@@ -145,7 +145,7 @@ function TasksScreen() {
           </div>
           {[
             { task: 'Review wireframes', project: 'CloudSync', dot: 'bg-amber-400', done: false },
-            { task: 'Update API docs', project: 'DevPortal', dot: 'bg-blue-400', done: false },
+            { task: 'Update API docs', project: 'DevPortal', dot: 'bg-primary/70', done: false },
             { task: 'Design onboarding flow', project: 'Bloom Studio', dot: 'bg-amber-400', done: false },
             { task: 'Fix checkout bug', project: 'ShopFront', dot: 'bg-red-400', done: true },
             { task: 'Weekly standup notes', project: 'Internal', dot: 'bg-gray-300', done: true },

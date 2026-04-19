@@ -25,14 +25,15 @@ export function MarketingNav() {
   ]
 
   // All visual properties computed in JS — no Tailwind for colors/bg
+  // Hero flips with theme: white over dark hero (dark mode), black over light hero (light mode)
   const textColor = isScrolled
     ? (isDark ? '#fafafa' : '#0a0a0a')
-    : '#ffffff'
+    : (isDark ? '#ffffff' : '#0a0a0a')
 
   const headerStyle: React.CSSProperties = {
     transition: 'background-color 0.2s, border-color 0.2s, box-shadow 0.2s',
     backgroundColor: isScrolled
-      ? (isDark ? '#09090b' : '#ffffff')
+      ? (isDark ? '#1a1a1a' : '#ffffff')
       : 'transparent',
     borderBottom: isScrolled
       ? (isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.05)')
@@ -50,7 +51,7 @@ export function MarketingNav() {
         <div className="relative flex items-center justify-between h-full">
           {/* Logo */}
           <Link href="/" style={{ color: textColor }} className="flex items-center gap-2 hover:opacity-90 transition-opacity">
-            <PulseLogo size={32} variant={isScrolled ? 'light' : 'dark'} />
+            <PulseLogo size={32} variant={isDark ? 'dark' : 'light'} />
             <span style={{ color: textColor }} className="text-lg font-semibold font-[family-name:var(--font-display)]">Pulse Pro</span>
           </Link>
 
@@ -73,7 +74,7 @@ export function MarketingNav() {
             <button
               onClick={toggleTheme}
               style={{ color: textColor }}
-              className={`p-2 rounded-md ${isScrolled ? 'hover:bg-muted' : 'hover:bg-white/10'}`}
+              className={`p-2 rounded-md ${isScrolled ? 'hover:bg-muted' : (isDark ? 'hover:bg-white/10' : 'hover:bg-black/5')}`}
               aria-label="Toggle theme"
             >
               {theme === 'dark' ? (
@@ -89,7 +90,7 @@ export function MarketingNav() {
             <Link
               href="/sign-in"
               style={{ color: textColor }}
-              className={`px-4 py-2 text-sm font-medium rounded-md ${isScrolled ? 'hover:bg-muted' : 'hover:bg-white/10'}`}
+              className={`px-4 py-2 text-sm font-medium rounded-md ${isScrolled ? 'hover:bg-muted' : (isDark ? 'hover:bg-white/10' : 'hover:bg-black/5')}`}
               aria-label="Sign in to your Pulse Pro account"
             >
               Sign In
@@ -106,7 +107,7 @@ export function MarketingNav() {
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             style={{ color: textColor }}
-            className={`md:hidden p-2 rounded-md ${isScrolled ? 'hover:bg-muted' : 'hover:bg-white/10'}`}
+            className={`md:hidden p-2 rounded-md ${isScrolled ? 'hover:bg-muted' : (isDark ? 'hover:bg-white/10' : 'hover:bg-black/5')}`}
             aria-label="Toggle menu"
           >
             {isMobileMenuOpen ? (
@@ -126,7 +127,7 @@ export function MarketingNav() {
           <div
             className="md:hidden absolute top-12 left-0 right-0 shadow-lg"
             style={{
-              backgroundColor: isDark ? 'rgba(9,9,11,0.95)' : 'rgba(255,255,255,0.95)',
+              backgroundColor: isDark ? 'rgba(26,26,26,0.95)' : 'rgba(255,255,255,0.95)',
               backdropFilter: 'blur(24px) saturate(180%)',
               WebkitBackdropFilter: 'blur(24px) saturate(180%)',
               borderBottom: isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.05)',

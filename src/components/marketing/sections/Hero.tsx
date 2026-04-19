@@ -35,13 +35,13 @@ function RotatingBadge() {
   }, [cycle]);
 
   return (
-    <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur-md px-4 py-1.5">
+    <div className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-black/[0.04] dark:border-white/10 dark:bg-white/[0.04] backdrop-blur-md px-4 py-1.5">
       <span className="relative flex h-2 w-2">
         <span className="absolute inset-0 animate-ping rounded-full bg-[#F0613E] opacity-75" />
         <span className="relative inline-flex h-2 w-2 rounded-full bg-[#F0613E]" />
       </span>
       <span
-        className="text-sm font-medium text-white/80 transition-opacity duration-300"
+        className="text-sm font-medium text-gray-800 dark:text-white/80 transition-opacity duration-300"
         style={{ opacity: visible ? 1 : 0 }}
       >
         {announcements[index]}
@@ -50,8 +50,13 @@ function RotatingBadge() {
   );
 }
 
-// Phone mock — mirrors the redesigned iOS LoginScreen
+// Phone mock — shows the actual Pulse Pro mobile app (dashboard view)
 function HeroPhoneMock() {
+  const tasks = [
+    { task: 'Brand guidelines', meta: 'Acme · today', priority: 'high' },
+    { task: 'Review wireframes', meta: 'CloudSync · 4pm', priority: 'medium' },
+    { task: 'Send invoice #1042', meta: 'Bloom · today', priority: 'high' },
+  ];
   return (
     <div className="relative w-[240px] h-[490px]">
       {/* Phone chassis */}
@@ -59,47 +64,70 @@ function HeroPhoneMock() {
         {/* Notch */}
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 w-24 h-6 rounded-full bg-black" />
         {/* Screen */}
-        <div className="relative h-full w-full rounded-[38px] overflow-hidden bg-gradient-to-br from-[#1a1a1a] via-[#231714] to-[#2a1410]">
-          {/* Ambient coral glow inside phone */}
-          <div className="absolute -top-20 -left-16 w-56 h-56 rounded-full bg-[#E54D2E] opacity-30 blur-3xl" />
-          <div className="absolute top-1/3 -right-20 w-56 h-56 rounded-full bg-[#F0613E] opacity-25 blur-3xl" />
+        <div className="relative h-full w-full rounded-[38px] overflow-hidden bg-white">
+          <div className="relative h-full flex flex-col px-4 pt-10 pb-4 text-gray-900">
+            {/* Top bar */}
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <p className="text-[9px] font-medium tracking-[0.14em] uppercase text-gray-400">Wednesday</p>
+                <p className="font-[family-name:var(--font-display)] text-[17px] font-extrabold tracking-tight">Good morning</p>
+              </div>
+              <div className="w-7 h-7 rounded-full bg-orange-100 flex items-center justify-center text-[10px] font-bold text-[#E54D2E]">JD</div>
+            </div>
 
-          {/* Content */}
-          <div className="relative h-full flex flex-col px-6 pt-12 pb-6 text-white">
-            <div className="flex items-center gap-2 mb-auto">
-              <div className="w-8 h-8 rounded-[10px] bg-[#E54D2E] flex items-center justify-center shadow-lg shadow-[#E54D2E]/40">
-                <svg viewBox="0 0 24 24" className="w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" strokeLinecap="round" strokeLinejoin="round" />
+            {/* Activity rings — compact */}
+            <div className="bg-gradient-to-br from-[#fff8f5] to-[#ffeee6] rounded-2xl p-3 ring-1 ring-orange-100/60 mb-3">
+              <div className="flex items-center gap-3">
+                <svg viewBox="0 0 120 120" className="w-16 h-16 shrink-0">
+                  <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(229,77,46,0.18)" strokeWidth="12" />
+                  <circle cx="60" cy="60" r="52" fill="none" stroke="#E54D2E" strokeWidth="12" strokeDasharray="327" strokeDashoffset="98" strokeLinecap="round" transform="rotate(-90 60 60)" />
+                  <circle cx="60" cy="60" r="36" fill="none" stroke="rgba(245,158,11,0.18)" strokeWidth="12" />
+                  <circle cx="60" cy="60" r="36" fill="none" stroke="#f59e0b" strokeWidth="12" strokeDasharray="226" strokeDashoffset="50" strokeLinecap="round" transform="rotate(-90 60 60)" />
+                  <circle cx="60" cy="60" r="20" fill="none" stroke="rgba(34,197,94,0.18)" strokeWidth="12" />
+                  <circle cx="60" cy="60" r="20" fill="none" stroke="#22c55e" strokeWidth="12" strokeDasharray="126" strokeDashoffset="40" strokeLinecap="round" transform="rotate(-90 60 60)" />
                 </svg>
+                <div className="min-w-0">
+                  <p className="font-[family-name:var(--font-display)] text-[22px] font-extrabold leading-none">3</p>
+                  <p className="text-[9px] text-gray-500 uppercase tracking-wider mt-0.5">Due today</p>
+                  <p className="text-[10px] text-gray-500 mt-1.5">
+                    <span className="font-semibold text-gray-900">5</span> active
+                    <span className="mx-1 text-gray-300">·</span>
+                    <span className="font-semibold text-gray-900">12</span> done
+                  </p>
+                </div>
               </div>
-              <span className="font-[family-name:var(--font-display)] text-base font-extrabold tracking-tight">Pulse Pro</span>
             </div>
 
-            {/* Hero copy */}
-            <div className="mb-5">
-              <p className="text-[10px] font-medium tracking-[0.18em] uppercase text-[#F0613E] mb-2">For freelancers & teams</p>
-              <h3 className="font-[family-name:var(--font-display)] text-[28px] font-extrabold leading-[30px] tracking-tight">
-                Think less.
-                <br />
-                <span className="italic text-[#F0613E]">Run smoother.</span>
-              </h3>
-              <p className="text-xs text-white/55 leading-relaxed mt-3">
-                Calm command center for projects, tasks, and clients.
-              </p>
+            {/* Due today list */}
+            <p className="text-[9px] font-semibold uppercase tracking-[0.14em] text-gray-400 mb-1.5">Due today</p>
+            <div className="space-y-1.5 flex-1">
+              {tasks.map((t) => (
+                <div key={t.task} className="flex items-center gap-2 bg-gray-50 rounded-lg px-2.5 py-2 ring-1 ring-black/[0.04]">
+                  <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${t.priority === 'high' ? 'bg-[#E54D2E]' : 'bg-amber-400'}`} />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[11px] font-semibold text-gray-900 truncate">{t.task}</p>
+                    <p className="text-[9px] text-gray-400 truncate">{t.meta}</p>
+                  </div>
+                  <div className="w-4 h-4 rounded-full border border-gray-200" />
+                </div>
+              ))}
             </div>
 
-            {/* Pill CTAs */}
-            <div className="space-y-2">
-              <div className="rounded-full bg-[#E54D2E] py-3.5 text-center text-[13px] font-bold shadow-[0_10px_30px_-5px_rgba(229,77,46,0.6)]">
-                Continue with Google
+            {/* Add task pill at bottom */}
+            <div className="mt-2 flex items-center gap-2 rounded-full bg-[#E54D2E] px-3 py-2 shadow-[0_10px_30px_-5px_rgba(229,77,46,0.5)]">
+              <svg viewBox="0 0 24 24" className="w-3 h-3 text-white" fill="none" stroke="currentColor" strokeWidth="3">
+                <path d="M12 4v16m8-8H4" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <span className="text-[10px] font-bold text-white tracking-tight">Add task</span>
+              <div className="ml-auto flex items-center gap-0.5">
+                <span className="w-1 h-1 rounded-full bg-white/70" />
+                <span className="w-1 h-1 rounded-full bg-white/50" />
+                <span className="w-1 h-1 rounded-full bg-white/30" />
               </div>
-              <div className="rounded-full border border-white/15 bg-white/[0.03] py-3.5 text-center text-[12px] font-semibold text-white/80">
-                Sign in with email
-              </div>
-              <p className="pt-1 text-center text-[11px] text-white/45">
-                Don&apos;t have an account? <span className="text-[#F0613E] font-semibold">Sign up</span>
-              </p>
             </div>
+
+            {/* Home indicator */}
+            <div className="mt-3 mx-auto w-20 h-1 rounded-full bg-gray-900/80" />
           </div>
         </div>
       </div>
@@ -239,12 +267,12 @@ function HeroDashboardMock() {
 export function Hero() {
   return (
     <section className="relative overflow-hidden">
-      {/* Dark base with gradient fade to page bg */}
-      <div className="relative bg-gradient-to-b from-[#1a1a1a] via-[#1a1a1a] via-[75%] to-[#f5f5f7] dark:to-background pt-28 pb-20 md:pb-28">
+      {/* Base gradient — light in light mode, dark in dark mode */}
+      <div className="relative bg-gradient-to-b from-white via-white via-[75%] to-[#f5f5f7] dark:from-[#1a1a1a] dark:via-[#1a1a1a] dark:to-background pt-28 pb-20 md:pb-28">
         {/* Ambient coral blobs — atmospheric mesh-gradient feel */}
         <div className="pointer-events-none absolute top-[15%] -left-20 w-[520px] h-[520px] rounded-full bg-[#E54D2E] opacity-[0.18] blur-[140px]" />
         <div className="pointer-events-none absolute top-[35%] -right-32 w-[620px] h-[620px] rounded-full bg-[#F0613E] opacity-[0.12] blur-[160px]" />
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.35)_100%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.35)_100%)] opacity-0 dark:opacity-100" />
 
         <div className="relative max-w-6xl mx-auto px-4 md:px-8 w-full">
           <div className="text-center max-w-3xl mx-auto">
@@ -253,14 +281,14 @@ export function Hero() {
             </ScrollReveal>
 
             <ScrollReveal delay={100}>
-              <h1 className="mt-6 font-[family-name:var(--font-display)] text-[44px] md:text-6xl lg:text-7xl font-extrabold text-white leading-[1.02] tracking-[-0.04em]">
+              <h1 className="mt-6 font-[family-name:var(--font-display)] text-[44px] md:text-6xl lg:text-7xl font-extrabold text-gray-900 dark:text-white leading-[1.02] tracking-[-0.04em]">
                 Think less.{' '}
                 <span className="italic text-[#F0613E]">Run smoother.</span>
               </h1>
             </ScrollReveal>
 
             <ScrollReveal delay={200}>
-              <p className="text-base md:text-lg text-white/55 mt-6 max-w-xl mx-auto leading-relaxed">
+              <p className="text-base md:text-lg text-gray-600 dark:text-white/55 mt-6 max-w-xl mx-auto leading-relaxed">
                 The calm command center for your projects, tasks, and clients.
                 Add your first task in five seconds. No project boards, no learning curve.
               </p>
@@ -279,7 +307,7 @@ export function Hero() {
                 </Link>
                 <a
                   href="#pricing"
-                  className="inline-flex items-center justify-center px-8 py-3.5 rounded-full border border-white/15 bg-white/[0.03] backdrop-blur-sm text-white font-semibold hover:border-white/30 hover:bg-white/[0.06] transition-all duration-200"
+                  className="inline-flex items-center justify-center px-8 py-3.5 rounded-full border border-black/15 bg-black/[0.03] dark:border-white/15 dark:bg-white/[0.03] backdrop-blur-sm text-gray-900 dark:text-white font-semibold hover:border-black/30 hover:bg-black/[0.06] dark:hover:border-white/30 dark:hover:bg-white/[0.06] transition-all duration-200"
                 >
                   See pricing
                 </a>

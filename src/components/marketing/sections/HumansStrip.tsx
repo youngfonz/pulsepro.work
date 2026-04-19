@@ -48,7 +48,7 @@ export function HumansStrip() {
 
       <div className="relative max-w-6xl mx-auto px-4 md:px-8">
         <div className="text-center max-w-2xl mx-auto">
-          <div className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/70 backdrop-blur-md px-3.5 py-1.5 text-[11px] font-medium tracking-[0.14em] uppercase text-foreground/70">
+          <div className="inline-flex items-center gap-2 rounded-full border border-black/10 dark:border-white/10 bg-white/70 dark:bg-white/5 backdrop-blur-md px-3.5 py-1.5 text-[11px] font-medium tracking-[0.14em] uppercase text-foreground/70">
             <span className="size-1.5 rounded-full bg-[#E54D2E]" />
             Real people, real work
           </div>
@@ -89,7 +89,7 @@ export function HumansStrip() {
                         }}
                       />
                       <div
-                        className={`${sizes.box} ${sizes.ring} rounded-full overflow-hidden ring-white shadow-[0_18px_40px_-12px_rgba(0,0,0,0.25)]`}
+                        className={`${sizes.box} ${sizes.ring} rounded-full overflow-hidden ring-white dark:ring-[#2d2d2f] shadow-[0_18px_40px_-12px_rgba(0,0,0,0.25)]`}
                       >
                         <Image
                           src={h.avatar}
@@ -126,7 +126,7 @@ export function HumansStrip() {
                           background: 'radial-gradient(closest-side, rgba(229,77,46,0.45), transparent 70%)',
                         }}
                       />
-                      <div className={`${sizes.box} ${sizes.ring} rounded-full overflow-hidden ring-white shadow-[0_14px_30px_-10px_rgba(0,0,0,0.25)]`}>
+                      <div className={`${sizes.box} ${sizes.ring} rounded-full overflow-hidden ring-white dark:ring-[#2d2d2f] shadow-[0_14px_30px_-10px_rgba(0,0,0,0.25)]`}>
                         <Image
                           src={h.avatar}
                           alt={`${h.name}, ${h.role}`}
@@ -157,7 +157,7 @@ export function HumansStrip() {
             {snippets.map((s) => (
               <div
                 key={s.name}
-                className="rounded-2xl bg-white ring-1 ring-black/5 p-5 hover:ring-[#E54D2E]/25 hover:-translate-y-0.5 transition-all duration-300"
+                className="rounded-2xl bg-white dark:bg-[#2d2d2f] ring-1 ring-black/5 dark:ring-white/5 p-5 hover:ring-[#E54D2E]/25 hover:-translate-y-0.5 transition-all duration-300"
               >
                 <p className="text-[15px] text-foreground leading-relaxed tracking-tight">
                   {s.body}

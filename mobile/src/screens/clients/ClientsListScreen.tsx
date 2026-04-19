@@ -1,5 +1,5 @@
 import React, { useLayoutEffect } from 'react'
-import { Text, FlatList, TouchableOpacity, RefreshControl, StyleSheet, View } from 'react-native'
+import { Text, FlatList, TouchableOpacity, RefreshControl, StyleSheet, View, ActivityIndicator } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Plus } from 'lucide-react-native'
@@ -43,13 +43,17 @@ export function ClientsListScreen({ navigation }: Props) {
         renderItem={renderItem}
         contentContainerStyle={styles.list}
         refreshControl={<RefreshControl refreshing={isFetching && !!data} onRefresh={refetch} tintColor={colors.primary} />}
-        ListEmptyComponent={!isLoading ? (
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyEmoji}>🤝</Text>
-            <Text style={styles.emptyTitle}>No clients yet</Text>
-            <Text style={styles.empty}>Tap + to add your first client.</Text>
-          </View>
-        ) : null}
+        ListEmptyComponent={
+          isLoading
+            ? <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 80 }} />
+            : (
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyEmoji}>🤝</Text>
+                <Text style={styles.emptyTitle}>No clients yet</Text>
+                <Text style={styles.empty}>Tap + to add your first client.</Text>
+              </View>
+            )
+        }
       />
     </SafeAreaView>
   )

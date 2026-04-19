@@ -21,12 +21,13 @@ import * as WebBrowser from 'expo-web-browser'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import type { AuthStackParamList } from '../../types/navigation'
 import { colors, spacing, radii, shadows, fontFamily } from '../../theme'
+import { AppPreview } from './AppPreview'
 
 const appIcon = require('../../../assets/icon.png')
 
 WebBrowser.maybeCompleteAuthSession()
 
-const { width, height } = Dimensions.get('window')
+const { height } = Dimensions.get('window')
 
 type Props = {
   navigation: NativeStackNavigationProp<AuthStackParamList, 'Login'>
@@ -45,31 +46,13 @@ export function LoginScreen({ navigation }: Props) {
   // Entry animation
   const fade = useRef(new Animated.Value(0)).current
   const rise = useRef(new Animated.Value(28)).current
-  // Ambient blob drift
-  const blob1 = useRef(new Animated.Value(0)).current
-  const blob2 = useRef(new Animated.Value(0)).current
 
   useEffect(() => {
     Animated.parallel([
       Animated.timing(fade, { toValue: 1, duration: 900, delay: 150, useNativeDriver: true }),
       Animated.timing(rise, { toValue: 0, duration: 900, delay: 150, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
     ]).start()
-
-    const loop = (anim: Animated.Value, duration: number) =>
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(anim, { toValue: 1, duration, easing: Easing.inOut(Easing.quad), useNativeDriver: true }),
-          Animated.timing(anim, { toValue: 0, duration, easing: Easing.inOut(Easing.quad), useNativeDriver: true }),
-        ])
-      )
-    loop(blob1, 8000).start()
-    loop(blob2, 11000).start()
   }, [])
-
-  const blob1X = blob1.interpolate({ inputRange: [0, 1], outputRange: [-40, 30] })
-  const blob1Y = blob1.interpolate({ inputRange: [0, 1], outputRange: [-20, 20] })
-  const blob2X = blob2.interpolate({ inputRange: [0, 1], outputRange: [40, -30] })
-  const blob2Y = blob2.interpolate({ inputRange: [0, 1], outputRange: [30, -10] })
 
   const handleGoogleSignIn = useCallback(async () => {
     setError('')
@@ -116,36 +99,6 @@ export function LoginScreen({ navigation }: Props) {
         style={StyleSheet.absoluteFill}
       />
 
-      {/* Drifting human portraits — real people behind the hero */}
-      <Animated.View
-        pointerEvents="none"
-        style={[
-          styles.blobGlow,
-          styles.blob1Glow,
-          { transform: [{ translateX: blob1X }, { translateY: blob1Y }] },
-        ]}
-      >
-        <Animated.Image
-          source={{ uri: 'https://randomuser.me/api/portraits/women/44.jpg' }}
-          style={styles.blobImage}
-          resizeMode="cover"
-        />
-      </Animated.View>
-      <Animated.View
-        pointerEvents="none"
-        style={[
-          styles.blobGlow,
-          styles.blob2Glow,
-          { transform: [{ translateX: blob2X }, { translateY: blob2Y }] },
-        ]}
-      >
-        <Animated.Image
-          source={{ uri: 'https://randomuser.me/api/portraits/men/32.jpg' }}
-          style={styles.blobImage}
-          resizeMode="cover"
-        />
-      </Animated.View>
-
       {/* Subtle bottom fade for contrast on CTAs */}
       <LinearGradient
         pointerEvents="none"
@@ -161,15 +114,18 @@ export function LoginScreen({ navigation }: Props) {
             <Text style={styles.brand}>Pulse Pro</Text>
           </Animated.View>
 
+          {/* Rotating app preview — mobile ↔ desktop */}
+          <Animated.View style={[styles.previewStage, { opacity: fade }]}>
+            <AppPreview />
+          </Animated.View>
+
           {/* Hero copy */}
           <Animated.View style={[styles.heroBlock, { opacity: fade, transform: [{ translateY: rise }] }]}>
-            <Text style={styles.eyebrow}>For freelancers & small teams</Text>
             <Text style={styles.headline}>
-              Think less.{'\n'}
-              <Text style={styles.headlineAccent}>Run smoother.</Text>
+              Think less. <Text style={styles.headlineAccent}>Run smoother.</Text>
             </Text>
             <Text style={styles.sub}>
-              The calm command center for your projects, tasks, and clients. Add your first task in five seconds.
+              Projects, tasks, and clients — calm and in one place.
             </Text>
           </Animated.View>
 
@@ -245,33 +201,11 @@ export function LoginScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.backgroundDark },
 
-  blobGlow: {
-    position: 'absolute',
-    overflow: 'hidden',
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.7,
-    shadowRadius: 80,
-  },
-  blob1Glow: {
-    top: -120,
-    left: -80,
-    width: 420,
-    height: 420,
-    borderRadius: 210,
-    opacity: 0.55,
-  },
-  blob2Glow: {
-    top: height * 0.35,
-    right: -120,
-    width: 340,
-    height: 340,
-    borderRadius: 170,
-    opacity: 0.45,
-  },
-  blobImage: {
-    width: '100%',
-    height: '100%',
+  previewStage: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: spacing.sm,
   },
 
   bottomFade: {
@@ -306,22 +240,16 @@ const styles = StyleSheet.create({
   // Hero
   heroBlock: {
     paddingHorizontal: spacing.xxl,
-    paddingBottom: spacing.xl,
-  },
-  eyebrow: {
-    fontFamily: fontFamily.bodyMedium,
-    fontSize: 12,
-    letterSpacing: 1.4,
-    textTransform: 'uppercase',
-    color: colors.primaryDark,
-    marginBottom: spacing.md,
+    paddingBottom: spacing.md,
+    alignItems: 'center',
   },
   headline: {
     fontFamily: fontFamily.displayExtraBold,
-    fontSize: 48,
+    fontSize: 30,
     color: colors.textOnDark,
-    lineHeight: 54,
-    letterSpacing: -1.6,
+    lineHeight: 34,
+    letterSpacing: -0.9,
+    textAlign: 'center',
   },
   headlineAccent: {
     color: colors.primaryDark,
@@ -330,11 +258,12 @@ const styles = StyleSheet.create({
   },
   sub: {
     fontFamily: fontFamily.body,
-    fontSize: 16,
-    color: 'rgba(255,255,255,0.62)',
-    lineHeight: 24,
-    marginTop: spacing.lg,
-    maxWidth: 380,
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.58)',
+    lineHeight: 20,
+    marginTop: spacing.sm,
+    textAlign: 'center',
+    maxWidth: 320,
   },
 
   // Bottom

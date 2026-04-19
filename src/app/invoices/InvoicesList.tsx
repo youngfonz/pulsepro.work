@@ -21,7 +21,7 @@ interface Invoice {
 
 const invoiceStatusColors: Record<string, string> = {
   draft: 'bg-muted text-muted-foreground',
-  sent: 'bg-blue-500/10 text-blue-500 border-blue-500/30',
+  sent: 'bg-primary/10 text-primary border-primary/30',
   paid: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30',
   overdue: 'bg-rose-500/10 text-rose-500 border-rose-500/30',
 }

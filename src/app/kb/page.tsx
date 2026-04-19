@@ -40,7 +40,7 @@ function Kbd({ children }: { children: React.ReactNode }) {
 function Badge({ children, variant = 'default' }: { children: React.ReactNode; variant?: 'default' | 'pro' | 'team' }) {
   const styles = {
     default: 'bg-muted text-muted-foreground',
-    pro: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+    pro: 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary',
     team: 'bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300',
   }
   return (

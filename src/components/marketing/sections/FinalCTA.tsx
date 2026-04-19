@@ -3,15 +3,15 @@ import { ScrollReveal } from '@/components/marketing/ScrollReveal'
 
 export function FinalCTA() {
   return (
-    <section className="py-20 md:py-28 bg-[#1a1a1a]">
+    <section className="py-20 md:py-28 bg-[#f5f5f7] dark:bg-[#1a1a1a]">
       <div className="max-w-4xl mx-auto px-4 md:px-8">
         <ScrollReveal>
           <div className="text-center">
-            <h2 className="text-3xl md:text-4xl font-semibold text-white tracking-tight font-[family-name:var(--font-display)]">
+            <h2 className="text-3xl md:text-4xl font-semibold text-gray-900 dark:text-white tracking-tight font-[family-name:var(--font-display)]">
               Stop losing work to tab overload.
             </h2>
 
-            <p className="text-base text-white/60 mt-4 max-w-md mx-auto">
+            <p className="text-base text-gray-600 dark:text-white/60 mt-4 max-w-md mx-auto">
               Every client, project, and deadline in one place.
               Set up in 5 minutes. Free forever.
             </p>
@@ -26,7 +26,7 @@ export function FinalCTA() {
               </svg>
             </Link>
 
-            <p className="mt-4 text-sm text-white/30">
+            <p className="mt-4 text-sm text-gray-400 dark:text-white/30">
               Free forever. No credit card required.
             </p>
           </div>

@@ -83,7 +83,7 @@ export function Pricing() {
                 key={plan.name}
                 className={`relative rounded-3xl p-8 transition-all duration-300 ${
                   plan.highlighted
-                    ? 'bg-[#1a1a1a] text-white shadow-[0_30px_60px_-15px_rgba(229,77,46,0.45),0_16px_40px_-10px_rgba(0,0,0,0.4)] md:-translate-y-2 md:scale-[1.02]'
+                    ? 'bg-[#1a1a1a] text-white dark:bg-white dark:text-gray-900 shadow-[0_30px_60px_-15px_rgba(229,77,46,0.45),0_16px_40px_-10px_rgba(0,0,0,0.4)] md:-translate-y-2 md:scale-[1.02]'
                     : 'bg-white dark:bg-[#232325] ring-1 ring-black/5 dark:ring-white/5 hover:ring-[#E54D2E]/30 hover:-translate-y-1'
                 }`}
               >
@@ -121,20 +121,20 @@ export function Pricing() {
 
                   <div className="mt-5 flex items-baseline gap-1">
                     <span
-                      className={`text-xl font-medium ${plan.highlighted ? 'text-white/60' : 'text-muted-foreground'}`}
+                      className={`text-xl font-medium ${plan.highlighted ? 'text-white/60 dark:text-gray-500' : 'text-muted-foreground'}`}
                     >
                       $
                     </span>
                     <span
                       className={`text-6xl md:text-7xl font-semibold tracking-[-0.05em] tabular-nums font-[family-name:var(--font-display)] ${
-                        plan.highlighted ? 'text-white' : 'text-foreground'
+                        plan.highlighted ? 'text-white dark:text-gray-900' : 'text-foreground'
                       }`}
                     >
                       {plan.price}
                     </span>
                     <span
                       className={`text-sm ml-1 ${
-                        plan.highlighted ? 'text-white/50' : 'text-muted-foreground'
+                        plan.highlighted ? 'text-white/50 dark:text-gray-500' : 'text-muted-foreground'
                       }`}
                     >
                       /month
@@ -143,7 +143,7 @@ export function Pricing() {
 
                   <p
                     className={`text-sm mt-3 ${
-                      plan.highlighted ? 'text-white/60' : 'text-muted-foreground'
+                      plan.highlighted ? 'text-white/60 dark:text-gray-600' : 'text-muted-foreground'
                     }`}
                   >
                     {plan.description}
@@ -151,7 +151,7 @@ export function Pricing() {
 
                   <div
                     className={`my-7 h-px ${
-                      plan.highlighted ? 'bg-white/10' : 'bg-black/5 dark:bg-white/10'
+                      plan.highlighted ? 'bg-white/10 dark:bg-black/10' : 'bg-black/5 dark:bg-white/10'
                     }`}
                   />
 
@@ -161,7 +161,7 @@ export function Pricing() {
                         <span
                           className={`mt-0.5 size-4 shrink-0 rounded-full flex items-center justify-center ${
                             plan.highlighted
-                              ? 'bg-[#E54D2E]/20 text-[#F0613E]'
+                              ? 'bg-[#E54D2E]/20 text-[#F0613E] dark:bg-[#E54D2E]/10 dark:text-[#E54D2E]'
                               : 'bg-[#E54D2E]/10 text-[#E54D2E]'
                           }`}
                         >
@@ -170,7 +170,7 @@ export function Pricing() {
                           </svg>
                         </span>
                         <span
-                          className={`text-sm ${plan.highlighted ? 'text-white/90' : 'text-foreground'}`}
+                          className={`text-sm ${plan.highlighted ? 'text-white/90 dark:text-gray-800' : 'text-foreground'}`}
                         >
                           {feature}
                         </span>
@@ -216,12 +216,12 @@ export function Pricing() {
                   </p>
                 </div>
               ))}
-              <div className="relative text-center py-4 px-3 rounded-xl bg-[#1a1a1a] text-white shadow-[0_14px_30px_-8px_rgba(229,77,46,0.5)]">
+              <div className="relative text-center py-4 px-3 rounded-xl bg-[#1a1a1a] text-white dark:bg-white dark:text-gray-900 shadow-[0_14px_30px_-8px_rgba(229,77,46,0.5)]">
                 <p className="text-[11px] text-[#F0613E] font-semibold tracking-wide">Pulse Pro</p>
-                <p className="mt-1 text-2xl font-semibold text-white tabular-nums font-[family-name:var(--font-display)]">
+                <p className="mt-1 text-2xl font-semibold text-white dark:text-gray-900 tabular-nums font-[family-name:var(--font-display)]">
                   $29
                 </p>
-                <p className="text-[10px] text-white/50 mt-0.5">flat</p>
+                <p className="text-[10px] text-white/50 dark:text-gray-500 mt-0.5">flat</p>
               </div>
             </div>
             <p className="mt-5 text-center text-sm text-muted-foreground">

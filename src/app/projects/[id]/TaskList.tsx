@@ -173,7 +173,7 @@ function TaskItem({ task, canEdit = true }: { task: Task; canEdit?: boolean }) {
                     ? 'bg-red-500/10 text-red-600 dark:text-red-400'
                     : task.bookmarkType === 'twitter'
                     ? 'bg-secondary text-secondary-foreground'
-                    : 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
+                    : 'bg-primary/10 text-primary'
                 }`}>
                   {task.bookmarkType === 'youtube' ? 'YouTube' : task.bookmarkType === 'twitter' ? 'X' : 'Link'}
                 </span>

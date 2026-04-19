@@ -224,7 +224,7 @@ export function Calendar({ initialYear, initialMonth }: CalendarProps) {
                                     ? 'bg-emerald-500'
                                     : task.priority === 'high'
                                     ? 'bg-rose-500'
-                                    : 'bg-blue-500'
+                                    : 'bg-primary'
                                 }`}
                               />
                             ))}
@@ -241,7 +241,7 @@ export function Calendar({ initialYear, initialMonth }: CalendarProps) {
                                     ? 'bg-rose-600 text-white'
                                     : task.priority === 'high'
                                     ? 'bg-rose-500 text-white'
-                                    : 'bg-blue-600 text-white'
+                                    : 'bg-primary text-primary-foreground'
                                 }`}
                               >
                                 {task.title}
@@ -347,7 +347,7 @@ export function Calendar({ initialYear, initialMonth }: CalendarProps) {
                 <span className="text-muted-foreground">High priority</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded bg-blue-600" />
+                <div className="w-3 h-3 rounded bg-primary" />
                 <span className="text-muted-foreground">Normal priority</span>
               </div>
               <div className="flex items-center gap-2">
