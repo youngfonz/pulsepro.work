@@ -16,21 +16,21 @@ import { useRecentlyViewed, RecentItem } from '../../hooks/useRecentlyViewed'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { ONBOARDING_KEY_PREFIX } from '../../hooks/useOnboardingStatus'
 import type { Insight } from '../../api/insights'
-import { colors } from '../../theme/colors'
-import { spacing } from '../../theme/spacing'
+import { colors, spacing, fontFamily, radii, shadows } from '../../theme'
 import { getHealthColor } from '../../utils/status'
 import type { DashboardStackParamList } from '../../types/navigation'
 
+// Fonz-aligned ring palette: coral (projects), amber (tasks), green (clients)
 const RING = {
-  projects: { a: '#fb7185', b: '#f43f5e', bg: 'rgba(244,63,94,0.12)' },
-  tasks:    { a: '#60a5fa', b: '#3b82f6', bg: 'rgba(59,130,246,0.12)' },
+  projects: { a: '#F0613E', b: '#E54D2E', bg: 'rgba(229,77,46,0.12)' },
+  tasks:    { a: '#fbbf24', b: '#f59e0b', bg: 'rgba(245,158,11,0.12)' },
   due:      { a: '#4ade80', b: '#22c55e', bg: 'rgba(34,197,94,0.12)' },
 }
 
 const insightDotColor: Record<string, string> = {
   red: '#f43f5e',
   amber: '#f59e0b',
-  blue: '#3b82f6',
+  blue: '#E54D2E', // coral (Fonz: no blue accents)
   green: '#22c55e',
 }
 
@@ -476,15 +476,18 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   greeting: {
-    fontSize: 24,
-    fontWeight: '700',
+    fontFamily: fontFamily.displayExtraBold,
+    fontSize: 28,
     color: colors.textPrimary,
-    letterSpacing: -0.3,
+    letterSpacing: -0.7,
+    lineHeight: 32,
   },
   dateText: {
-    fontSize: 14,
+    fontFamily: fontFamily.bodyMedium,
+    fontSize: 13,
     color: colors.textSecondary,
-    marginTop: 2,
+    marginTop: 4,
+    letterSpacing: 0.1,
   },
   searchBtn: {
     width: 38,
@@ -503,9 +506,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   avatarText: {
-    fontSize: 14,
-    fontWeight: '700',
+    fontFamily: fontFamily.displayExtraBold,
+    fontSize: 13,
     color: '#fff',
+    letterSpacing: -0.2,
   },
 
   // Quick Actions
@@ -536,20 +540,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   quickBtnText: {
+    fontFamily: fontFamily.bodySemiBold,
     fontSize: 13,
-    fontWeight: '600',
     color: colors.textPrimary,
+    letterSpacing: -0.1,
   },
 
-  // Cards
+  // Cards — soft shadow, no hairline, cinematic depth
   card: {
     backgroundColor: '#fff',
-    borderRadius: 14,
+    borderRadius: radii.lg,
     marginHorizontal: 16,
     marginBottom: 12,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.border,
     overflow: 'hidden',
+    ...shadows.sm,
   },
   overdueCard: {
     borderLeftWidth: 2,
@@ -569,14 +573,16 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   cardTitle: {
-    fontSize: 16,
-    fontWeight: '700',
+    fontFamily: fontFamily.displaySemiBold,
+    fontSize: 17,
     color: colors.textPrimary,
+    letterSpacing: -0.3,
   },
   viewAll: {
+    fontFamily: fontFamily.bodySemiBold,
     fontSize: 13,
-    fontWeight: '600',
     color: colors.primary,
+    letterSpacing: -0.1,
   },
 
   // List rows
@@ -659,18 +665,22 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   legendValue: {
-    fontSize: 17,
-    fontWeight: '700',
+    fontFamily: fontFamily.displayExtraBold,
+    fontSize: 22,
     color: colors.textPrimary,
+    letterSpacing: -0.6,
   },
   legendTotal: {
-    fontSize: 13,
-    fontWeight: '400',
-    color: colors.textSecondary,
+    fontFamily: fontFamily.body,
+    fontSize: 14,
+    color: colors.textTertiary,
   },
   legendLabel: {
+    fontFamily: fontFamily.bodyMedium,
     fontSize: 12,
     color: colors.textSecondary,
+    marginTop: 2,
+    letterSpacing: 0.1,
   },
 
   // Health

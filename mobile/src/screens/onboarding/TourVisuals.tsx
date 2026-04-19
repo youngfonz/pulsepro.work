@@ -2,25 +2,33 @@ import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import { Plus, Home, FolderKanban, CheckSquare, Calendar, MoreHorizontal, ArrowDown } from 'lucide-react-native'
 import { onboardingColors } from './onboardingTheme'
+import { fontFamily } from '../../theme'
 
 export function FABVisual() {
   return (
-    <View style={vis.mockPhone}>
-      {/* Mini task list */}
+    <View style={vis.container}>
+      <View style={vis.header}>
+        <View style={vis.miniLogo}>
+          <Text style={vis.miniLogoText}>P</Text>
+        </View>
+        <Text style={vis.miniTitle}>Tasks</Text>
+      </View>
+
+      {/* Task list */}
       <View style={vis.taskRow}>
-        <View style={[vis.checkbox, { borderColor: '#d1d1d6' }]} />
+        <View style={vis.checkbox} />
         <View style={vis.taskLine} />
       </View>
       <View style={vis.taskRow}>
-        <View style={[vis.checkbox, { borderColor: '#d1d1d6' }]} />
+        <View style={vis.checkbox} />
         <View style={[vis.taskLine, { width: '50%' }]} />
       </View>
       <View style={vis.taskRow}>
-        <View style={[vis.checkbox, { borderColor: '#d1d1d6' }]} />
+        <View style={vis.checkbox} />
         <View style={[vis.taskLine, { width: '70%' }]} />
       </View>
 
-      {/* Speed dial expanded */}
+      {/* Speed dial */}
       <View style={vis.speedDialArea}>
         <View style={vis.speedDialOption}>
           <Text style={vis.speedDialLabel}>New Task</Text>
@@ -36,9 +44,9 @@ export function FABVisual() {
         </View>
       </View>
 
-      {/* FAB button */}
+      {/* FAB */}
       <View style={vis.fab}>
-        <Plus size={24} color="#fff" />
+        <Plus size={22} color="#fff" />
       </View>
     </View>
   )
@@ -54,30 +62,24 @@ export function TabsVisual() {
   ]
 
   return (
-    <View style={vis.mockPhone}>
-      {/* Content area placeholder */}
+    <View style={vis.container}>
       <View style={vis.contentPlaceholder}>
-        <View style={[vis.placeholderBlock, { width: '60%', height: 14 }]} />
+        <View style={vis.header}>
+          <View style={vis.miniLogo}>
+            <Text style={vis.miniLogoText}>P</Text>
+          </View>
+          <Text style={vis.miniTitle}>Home</Text>
+        </View>
+        <View style={[vis.placeholderBlock, { width: '60%', height: 14, marginTop: 18 }]} />
         <View style={[vis.placeholderBlock, { width: '80%', height: 10, marginTop: 8 }]} />
         <View style={[vis.placeholderBlock, { width: '40%', height: 10, marginTop: 8 }]} />
       </View>
 
-      {/* Tab bar */}
       <View style={vis.tabBar}>
         {tabs.map((tab) => (
           <View key={tab.label} style={vis.tabItem}>
-            <tab.icon
-              size={20}
-              color={tab.active ? onboardingColors.coral : '#666'}
-            />
-            <Text
-              style={[
-                vis.tabLabel,
-                tab.active && { color: onboardingColors.coral },
-              ]}
-            >
-              {tab.label}
-            </Text>
+            <tab.icon size={18} color={tab.active ? onboardingColors.coral : '#b0b0b5'} />
+            <Text style={[vis.tabLabel, tab.active && { color: onboardingColors.coral }]}>{tab.label}</Text>
           </View>
         ))}
       </View>
@@ -87,26 +89,24 @@ export function TabsVisual() {
 
 export function PullRefreshVisual() {
   return (
-    <View style={vis.mockPhone}>
-      {/* Pull indicator */}
+    <View style={vis.container}>
       <View style={vis.pullIndicator}>
         <ArrowDown size={16} color={onboardingColors.coral} />
         <Text style={vis.pullText}>Pull to refresh</Text>
       </View>
 
-      {/* Task list being pulled */}
       <View style={[vis.taskRow, { marginTop: 16 }]}>
-        <View style={[vis.checkbox, { borderColor: '#d1d1d6' }]} />
+        <View style={vis.checkbox} />
         <View style={vis.taskLine} />
         <View style={vis.taskMeta} />
       </View>
       <View style={vis.taskRow}>
-        <View style={[vis.checkbox, { borderColor: '#d1d1d6' }]} />
+        <View style={vis.checkbox} />
         <View style={[vis.taskLine, { width: '55%' }]} />
         <View style={[vis.taskMeta, { backgroundColor: '#f59e0b33' }]} />
       </View>
       <View style={vis.taskRow}>
-        <View style={[vis.checkbox, { borderColor: '#d1d1d6' }]} />
+        <View style={vis.checkbox} />
         <View style={[vis.taskLine, { width: '65%' }]} />
         <View style={vis.taskMeta} />
       </View>
@@ -116,16 +116,14 @@ export function PullRefreshVisual() {
 
 export function ReadyVisual() {
   return (
-    <View style={vis.mockPhone}>
-      {/* Mini header */}
-      <View style={vis.miniHeader}>
+    <View style={vis.container}>
+      <View style={vis.header}>
         <View style={vis.miniLogo}>
           <Text style={vis.miniLogoText}>P</Text>
         </View>
         <Text style={vis.miniTitle}>Dashboard</Text>
       </View>
 
-      {/* Stats row */}
       <View style={vis.statsRow}>
         {[
           { label: 'Active', value: '3', color: onboardingColors.coral },
@@ -140,11 +138,10 @@ export function ReadyVisual() {
         ))}
       </View>
 
-      {/* Task previews */}
       {[
         { name: 'Finalize proposal', dot: onboardingColors.coral },
         { name: 'Review wireframes', dot: '#f59e0b' },
-        { name: 'Send invoice', dot: '#666' },
+        { name: 'Send invoice', dot: '#b0b0b5' },
       ].map((task) => (
         <View key={task.name} style={vis.taskRow}>
           <View style={[vis.dot, { backgroundColor: task.dot }]} />
@@ -156,36 +153,31 @@ export function ReadyVisual() {
 }
 
 const vis = StyleSheet.create({
-  mockPhone: {
-    backgroundColor: onboardingColors.surface,
-    borderRadius: 20,
-    padding: 16,
-    width: 260,
-    minHeight: 240,
-    alignSelf: 'center',
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#e5e5ea',
-  },
-  // Task list items
-  taskRow: {
-    flexDirection: 'row',
+  container: { flex: 1, width: '100%', overflow: 'hidden' },
+
+  header: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 14 },
+  miniLogo: {
+    width: 22,
+    height: 22,
+    borderRadius: 6,
+    backgroundColor: onboardingColors.coral,
     alignItems: 'center',
-    gap: 10,
-    paddingVertical: 8,
+    justifyContent: 'center',
   },
-  checkbox: {
-    width: 16,
-    height: 16,
-    borderRadius: 4,
-    borderWidth: 1.5,
+  miniLogoText: {
+    fontFamily: fontFamily.displayExtraBold,
+    fontSize: 12,
+    color: '#fff',
   },
-  taskLine: {
-    height: 10,
-    backgroundColor: '#e5e5ea',
-    borderRadius: 4,
-    width: '60%',
+  miniTitle: {
+    fontFamily: fontFamily.displaySemiBold,
+    fontSize: 14,
+    color: onboardingColors.textPrimary,
   },
+
+  taskRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 7 },
+  checkbox: { width: 16, height: 16, borderRadius: 4, borderWidth: 1.5, borderColor: '#d1d1d6' },
+  taskLine: { height: 10, backgroundColor: '#e5e5ea', borderRadius: 4, width: '60%' },
   taskMeta: {
     width: 32,
     height: 10,
@@ -193,32 +185,18 @@ const vis = StyleSheet.create({
     borderRadius: 4,
     marginLeft: 'auto',
   },
-  dot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-  },
+  dot: { width: 6, height: 6, borderRadius: 3 },
   taskName: {
+    fontFamily: fontFamily.bodyMedium,
     fontSize: 12,
     color: onboardingColors.textPrimary,
-    fontWeight: '500',
     flex: 1,
   },
 
-  // Speed dial
-  speedDialArea: {
-    position: 'absolute',
-    bottom: 60,
-    right: 16,
-    alignItems: 'flex-end',
-    gap: 8,
-  },
-  speedDialOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
+  speedDialArea: { position: 'absolute', bottom: 60, right: 12, alignItems: 'flex-end', gap: 6 },
+  speedDialOption: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   speedDialLabel: {
+    fontFamily: fontFamily.bodyMedium,
     fontSize: 11,
     color: onboardingColors.textPrimary,
     backgroundColor: '#f0f0f3',
@@ -231,116 +209,56 @@ const vis = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: '#e5e5ea',
+    backgroundColor: '#c0c0c5',
     alignItems: 'center',
     justifyContent: 'center',
   },
   fab: {
     position: 'absolute',
-    bottom: 16,
-    right: 16,
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    bottom: 12,
+    right: 12,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: onboardingColors.coral,
     alignItems: 'center',
     justifyContent: 'center',
   },
 
-  // Tab bar
   tabBar: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     borderTopWidth: 1,
     borderTopColor: '#e5e5ea',
-    paddingTop: 8,
+    paddingTop: 6,
     marginTop: 'auto',
+    marginBottom: -12,
+    marginHorizontal: -12,
+    paddingHorizontal: 12,
+    backgroundColor: '#fff',
   },
-  tabItem: {
-    alignItems: 'center',
-    gap: 2,
-  },
-  tabLabel: {
-    fontSize: 9,
-    color: '#8e8e93',
-    fontWeight: '500',
-  },
+  tabItem: { alignItems: 'center', gap: 2 },
+  tabLabel: { fontFamily: fontFamily.bodyMedium, fontSize: 9, color: '#8e8e93' },
 
-  // Content placeholder
-  contentPlaceholder: {
-    flex: 1,
-    justifyContent: 'center',
-    paddingVertical: 24,
-  },
-  placeholderBlock: {
-    height: 12,
-    backgroundColor: '#f0f0f3',
-    borderRadius: 4,
-  },
+  contentPlaceholder: { flex: 1, paddingTop: 6 },
+  placeholderBlock: { height: 12, backgroundColor: '#f0f0f3', borderRadius: 4 },
 
-  // Pull refresh
-  pullIndicator: {
-    alignItems: 'center',
-    gap: 4,
-    paddingBottom: 8,
-  },
-  pullText: {
-    fontSize: 11,
-    color: onboardingColors.coral,
-    fontWeight: '500',
-  },
+  pullIndicator: { alignItems: 'center', gap: 4, paddingBottom: 8 },
+  pullText: { fontFamily: fontFamily.bodyMedium, fontSize: 11, color: onboardingColors.coral },
 
-  // Mini dashboard
-  miniHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 16,
-  },
-  miniLogo: {
-    width: 22,
-    height: 22,
-    borderRadius: 6,
-    backgroundColor: onboardingColors.coral,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  miniLogoText: {
-    fontSize: 11,
-    fontWeight: '800',
-    color: '#fff',
-  },
-  miniTitle: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: onboardingColors.textPrimary,
-  },
-  statsRow: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 16,
-  },
-  statCard: {
-    flex: 1,
-    backgroundColor: '#f0f0f3',
-    borderRadius: 10,
-    padding: 10,
-  },
+  statsRow: { flexDirection: 'row', gap: 6, marginBottom: 14 },
+  statCard: { flex: 1, backgroundColor: '#f5f5f7', borderRadius: 10, padding: 10 },
   statValue: {
-    fontSize: 18,
-    fontWeight: '700',
+    fontFamily: fontFamily.displayExtraBold,
+    fontSize: 20,
     color: onboardingColors.textPrimary,
+    letterSpacing: -0.4,
   },
   statLabel: {
+    fontFamily: fontFamily.bodyMedium,
     fontSize: 9,
     color: onboardingColors.textSecondary,
     marginTop: 2,
   },
-  statBar: {
-    height: 3,
-    width: 20,
-    borderRadius: 2,
-    marginTop: 6,
-    opacity: 0.6,
-  },
+  statBar: { height: 3, width: 20, borderRadius: 2, marginTop: 6, opacity: 0.7 },
 })

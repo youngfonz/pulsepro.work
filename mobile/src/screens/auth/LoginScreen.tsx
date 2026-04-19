@@ -3,7 +3,7 @@ import {
   View,
   Text,
   TextInput,
-  TouchableOpacity,
+  Pressable,
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
@@ -13,18 +13,16 @@ import {
   Dimensions,
   Image,
 } from 'react-native'
-import { Video, ResizeMode } from 'expo-av'
+import { LinearGradient } from 'expo-linear-gradient'
 import { useSignIn } from '@clerk/expo/legacy'
-import { useOAuth } from '@clerk/expo'
+import { useSSO } from '@clerk/expo'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import Constants from 'expo-constants'
 import * as WebBrowser from 'expo-web-browser'
-import { makeRedirectUri } from 'expo-auth-session'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import type { AuthStackParamList } from '../../types/navigation'
+import { colors, spacing, radii, shadows, fontFamily } from '../../theme'
 
 const appIcon = require('../../../assets/icon.png')
-const loginVideo = require('../../../assets/login-bg.mp4')
 
 WebBrowser.maybeCompleteAuthSession()
 
@@ -36,7 +34,7 @@ type Props = {
 
 export function LoginScreen({ navigation }: Props) {
   const { signIn, setActive, isLoaded } = useSignIn()
-  const { startOAuthFlow } = useOAuth({ strategy: 'oauth_google' })
+  const { startSSOFlow } = useSSO()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -44,39 +42,51 @@ export function LoginScreen({ navigation }: Props) {
   const [googleLoading, setGoogleLoading] = useState(false)
   const [showEmailForm, setShowEmailForm] = useState(false)
 
-  const fadeIn = useRef(new Animated.Value(0)).current
-  const slideUp = useRef(new Animated.Value(20)).current
+  // Entry animation
+  const fade = useRef(new Animated.Value(0)).current
+  const rise = useRef(new Animated.Value(28)).current
+  // Ambient blob drift
+  const blob1 = useRef(new Animated.Value(0)).current
+  const blob2 = useRef(new Animated.Value(0)).current
 
   useEffect(() => {
     Animated.parallel([
-      Animated.timing(fadeIn, { toValue: 1, duration: 1000, delay: 200, useNativeDriver: true }),
-      Animated.timing(slideUp, { toValue: 0, duration: 1000, delay: 200, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+      Animated.timing(fade, { toValue: 1, duration: 900, delay: 150, useNativeDriver: true }),
+      Animated.timing(rise, { toValue: 0, duration: 900, delay: 150, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
     ]).start()
+
+    const loop = (anim: Animated.Value, duration: number) =>
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(anim, { toValue: 1, duration, easing: Easing.inOut(Easing.quad), useNativeDriver: true }),
+          Animated.timing(anim, { toValue: 0, duration, easing: Easing.inOut(Easing.quad), useNativeDriver: true }),
+        ])
+      )
+    loop(blob1, 8000).start()
+    loop(blob2, 11000).start()
   }, [])
+
+  const blob1X = blob1.interpolate({ inputRange: [0, 1], outputRange: [-40, 30] })
+  const blob1Y = blob1.interpolate({ inputRange: [0, 1], outputRange: [-20, 20] })
+  const blob2X = blob2.interpolate({ inputRange: [0, 1], outputRange: [40, -30] })
+  const blob2Y = blob2.interpolate({ inputRange: [0, 1], outputRange: [30, -10] })
 
   const handleGoogleSignIn = useCallback(async () => {
     setError('')
     setGoogleLoading(true)
     try {
-      const isExpoGo = Constants.appOwnership === 'expo'
-      const redirectUrl = makeRedirectUri({
-        ...(!isExpoGo && { scheme: 'pulsepro' }),
-        path: 'oauth-native-callback',
-      })
-      const { createdSessionId, setActive: setActiveSession } = await startOAuthFlow({ redirectUrl })
+      const { createdSessionId, setActive: setActiveSession } = await startSSOFlow({ strategy: 'oauth_google' })
       if (createdSessionId && setActiveSession) {
         await setActiveSession({ session: createdSessionId })
       }
     } catch (err: any) {
       const message = err?.errors?.[0]?.longMessage || err?.errors?.[0]?.message || err?.message || 'Google sign in failed'
-      if (!message.includes('cancel')) {
-        setError(message)
-      }
+      if (!message.includes('cancel')) setError(message)
       if (__DEV__) console.error('Google sign in error:', JSON.stringify(err, null, 2))
     } finally {
       setGoogleLoading(false)
     }
-  }, [startOAuthFlow])
+  }, [startSSOFlow])
 
   const handleSignIn = async () => {
     if (!isLoaded) return
@@ -98,36 +108,73 @@ export function LoginScreen({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
-      <Video
-        source={loginVideo}
+      {/* Base gradient: matte charcoal → deeper charcoal with warm undertone */}
+      <LinearGradient
+        colors={['#1a1a1a', '#231714', '#2a1410']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
         style={StyleSheet.absoluteFill}
-        resizeMode={ResizeMode.COVER}
-        shouldPlay
-        isLooping
-        isMuted
       />
-      <View style={styles.overlay} />
+
+      {/* Drifting human portraits — real people behind the hero */}
+      <Animated.View
+        pointerEvents="none"
+        style={[
+          styles.blobGlow,
+          styles.blob1Glow,
+          { transform: [{ translateX: blob1X }, { translateY: blob1Y }] },
+        ]}
+      >
+        <Animated.Image
+          source={{ uri: 'https://randomuser.me/api/portraits/women/44.jpg' }}
+          style={styles.blobImage}
+          resizeMode="cover"
+        />
+      </Animated.View>
+      <Animated.View
+        pointerEvents="none"
+        style={[
+          styles.blobGlow,
+          styles.blob2Glow,
+          { transform: [{ translateX: blob2X }, { translateY: blob2Y }] },
+        ]}
+      >
+        <Animated.Image
+          source={{ uri: 'https://randomuser.me/api/portraits/men/32.jpg' }}
+          style={styles.blobImage}
+          resizeMode="cover"
+        />
+      </Animated.View>
+
+      {/* Subtle bottom fade for contrast on CTAs */}
+      <LinearGradient
+        pointerEvents="none"
+        colors={['transparent', 'rgba(15,10,8,0.6)']}
+        style={styles.bottomFade}
+      />
+
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <SafeAreaView style={styles.safeArea}>
-          {/* Top icon + name */}
-          <Animated.View style={[styles.topBar, { opacity: fadeIn }]}>
+          {/* Top wordmark */}
+          <Animated.View style={[styles.topBar, { opacity: fade }]}>
             <Image source={appIcon} style={styles.appIcon} />
             <Text style={styles.brand}>Pulse Pro</Text>
           </Animated.View>
 
-          {/* Center headline — matches web hero copy */}
-          <Animated.View style={[styles.centerContent, { opacity: fadeIn, transform: [{ translateY: slideUp }] }]}>
+          {/* Hero copy */}
+          <Animated.View style={[styles.heroBlock, { opacity: fade, transform: [{ translateY: rise }] }]}>
+            <Text style={styles.eyebrow}>For freelancers & small teams</Text>
             <Text style={styles.headline}>
               Think less.{'\n'}
-              <Text style={styles.headlineAccent}>Run smoother</Text>.
+              <Text style={styles.headlineAccent}>Run smoother.</Text>
             </Text>
-            <Text style={styles.subheadline}>
-              Add your first task in 5 seconds. No setup, no project boards, no learning curve. Just your work, organized.
+            <Text style={styles.sub}>
+              The calm command center for your projects, tasks, and clients. Add your first task in five seconds.
             </Text>
           </Animated.View>
 
-          {/* Bottom actions */}
-          <Animated.View style={[styles.bottomSection, { opacity: fadeIn }]}>
+          {/* Bottom CTAs */}
+          <Animated.View style={[styles.bottom, { opacity: fade }]}>
             {error ? <Text style={styles.error}>{error}</Text> : null}
 
             {showEmailForm ? (
@@ -135,7 +182,7 @@ export function LoginScreen({ navigation }: Props) {
                 <TextInput
                   style={styles.input}
                   placeholder="Email"
-                  placeholderTextColor="rgba(255,255,255,0.4)"
+                  placeholderTextColor="rgba(255,255,255,0.35)"
                   value={email}
                   onChangeText={setEmail}
                   autoCapitalize="none"
@@ -144,41 +191,48 @@ export function LoginScreen({ navigation }: Props) {
                 <TextInput
                   style={styles.input}
                   placeholder="Password"
-                  placeholderTextColor="rgba(255,255,255,0.4)"
+                  placeholderTextColor="rgba(255,255,255,0.35)"
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry
                 />
-                <TouchableOpacity style={styles.primaryBtn} onPress={handleSignIn} disabled={loading} activeOpacity={0.7}>
-                  <Text style={styles.primaryBtnText}>{loading ? 'Signing in...' : 'Sign In'}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => setShowEmailForm(false)} style={styles.backBtn} activeOpacity={0.7}>
+                <Pressable
+                  style={({ pressed }) => [styles.primaryCta, shadows.coralGlow, pressed && styles.pressed]}
+                  onPress={handleSignIn}
+                  disabled={loading}
+                >
+                  <Text style={styles.primaryCtaText}>{loading ? 'Signing in…' : 'Sign In'}</Text>
+                </Pressable>
+                <Pressable onPress={() => setShowEmailForm(false)} style={styles.backBtn}>
                   <Text style={styles.backBtnText}>Back</Text>
-                </TouchableOpacity>
+                </Pressable>
               </View>
             ) : (
               <>
-                <TouchableOpacity style={styles.googleBtn} onPress={handleGoogleSignIn} disabled={googleLoading} activeOpacity={0.7}>
+                <Pressable
+                  style={({ pressed }) => [styles.primaryCta, shadows.coralGlow, pressed && styles.pressed]}
+                  onPress={handleGoogleSignIn}
+                  disabled={googleLoading}
+                >
                   {googleLoading ? (
-                    <ActivityIndicator size="small" color="#1c1c1e" />
+                    <ActivityIndicator color="#fff" />
                   ) : (
-                    <>
-                      <Text style={styles.googleG}>G</Text>
-                      <Text style={styles.googleBtnText}>Continue with Google</Text>
-                    </>
+                    <Text style={styles.primaryCtaText}>Continue with Google</Text>
                   )}
-                </TouchableOpacity>
+                </Pressable>
 
-                <TouchableOpacity style={styles.emailBtn} onPress={() => setShowEmailForm(true)} activeOpacity={0.7}>
-                  <Text style={styles.emailBtnText}>Sign in with email</Text>
-                </TouchableOpacity>
+                <Pressable
+                  style={({ pressed }) => [styles.secondaryCta, pressed && styles.pressed]}
+                  onPress={() => setShowEmailForm(true)}
+                >
+                  <Text style={styles.secondaryCtaText}>Sign in with email</Text>
+                </Pressable>
 
-
-                <TouchableOpacity onPress={() => navigation.navigate('SignUp')} style={styles.signUpRow} activeOpacity={0.7}>
+                <Pressable onPress={() => navigation.navigate('SignUp')} style={styles.signUpRow}>
                   <Text style={styles.signUpText}>
-                    Don&apos;t have an account? <Text style={styles.signUpLink}>Sign Up</Text>
+                    Don&apos;t have an account? <Text style={styles.signUpLink}>Sign up</Text>
                   </Text>
-                </TouchableOpacity>
+                </Pressable>
               </>
             )}
           </Animated.View>
@@ -189,14 +243,45 @@ export function LoginScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#1a1a1a',
+  container: { flex: 1, backgroundColor: colors.backgroundDark },
+
+  blobGlow: {
+    position: 'absolute',
+    overflow: 'hidden',
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.7,
+    shadowRadius: 80,
   },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(26, 26, 26, 0.55)',
+  blob1Glow: {
+    top: -120,
+    left: -80,
+    width: 420,
+    height: 420,
+    borderRadius: 210,
+    opacity: 0.55,
   },
+  blob2Glow: {
+    top: height * 0.35,
+    right: -120,
+    width: 340,
+    height: 340,
+    borderRadius: 170,
+    opacity: 0.45,
+  },
+  blobImage: {
+    width: '100%',
+    height: '100%',
+  },
+
+  bottomFade: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: height * 0.45,
+  },
+
   safeArea: {
     flex: 1,
     justifyContent: 'space-between',
@@ -206,137 +291,113 @@ const styles = StyleSheet.create({
   topBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    paddingHorizontal: 28,
-    paddingTop: 12,
+    gap: spacing.md,
+    paddingHorizontal: spacing.xxl,
+    paddingTop: spacing.sm,
   },
+  appIcon: { width: 48, height: 48, borderRadius: radii.md },
   brand: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: '#fff',
-    letterSpacing: -0.3,
-  },
-  appIcon: {
-    width: 52,
-    height: 52,
-    borderRadius: 14,
+    fontFamily: fontFamily.displayExtraBold,
+    fontSize: 22,
+    color: colors.textOnDark,
+    letterSpacing: -0.5,
   },
 
-  // Center
-  centerContent: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    paddingHorizontal: 28,
-    paddingBottom: 40,
+  // Hero
+  heroBlock: {
+    paddingHorizontal: spacing.xxl,
+    paddingBottom: spacing.xl,
+  },
+  eyebrow: {
+    fontFamily: fontFamily.bodyMedium,
+    fontSize: 12,
+    letterSpacing: 1.4,
+    textTransform: 'uppercase',
+    color: colors.primaryDark,
+    marginBottom: spacing.md,
   },
   headline: {
-    fontSize: 44,
-    fontWeight: '800',
-    color: '#fff',
-    lineHeight: 52,
-    letterSpacing: -1,
-    marginBottom: 14,
+    fontFamily: fontFamily.displayExtraBold,
+    fontSize: 48,
+    color: colors.textOnDark,
+    lineHeight: 54,
+    letterSpacing: -1.6,
   },
   headlineAccent: {
-    color: '#E54D2E',
+    color: colors.primaryDark,
+    fontStyle: 'italic',
+    fontFamily: fontFamily.displayExtraBold,
   },
-  subheadline: {
-    fontSize: 17,
-    color: 'rgba(255,255,255,0.6)',
-    lineHeight: 26,
+  sub: {
+    fontFamily: fontFamily.body,
+    fontSize: 16,
+    color: 'rgba(255,255,255,0.62)',
+    lineHeight: 24,
+    marginTop: spacing.lg,
+    maxWidth: 380,
   },
 
   // Bottom
-  bottomSection: {
-    paddingHorizontal: 24,
-    paddingBottom: Platform.OS === 'ios' ? 16 : 24,
+  bottom: {
+    paddingHorizontal: spacing.xl,
+    paddingBottom: Platform.OS === 'ios' ? spacing.lg : spacing.xxl,
+    gap: spacing.md,
   },
-  googleBtn: {
-    flexDirection: 'row',
+  primaryCta: {
+    backgroundColor: colors.primary,
+    borderRadius: radii.pill,
+    paddingVertical: 18,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 14,
-    paddingVertical: 16,
-    marginBottom: 10,
   },
-  googleG: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#4285F4',
-    marginRight: 10,
-  },
-  googleBtnText: {
+  primaryCtaText: {
+    fontFamily: fontFamily.bodyBold,
     fontSize: 16,
-    fontWeight: '600',
-    color: '#1c1c1e',
+    color: '#fff',
+    letterSpacing: -0.2,
   },
-  emailBtn: {
+  secondaryCta: {
+    borderRadius: radii.pill,
+    paddingVertical: 18,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 14,
-    paddingVertical: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.15)',
-    marginBottom: 20,
+    borderColor: 'rgba(255,255,255,0.16)',
+    backgroundColor: 'rgba(255,255,255,0.04)',
   },
-  emailBtnText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: 'rgba(255,255,255,0.7)',
-  },
-  signUpRow: {
-    alignItems: 'center',
-    paddingBottom: 8,
-  },
-  signUpText: {
+  secondaryCtaText: {
+    fontFamily: fontFamily.bodySemiBold,
     fontSize: 15,
-    color: 'rgba(255,255,255,0.5)',
+    color: 'rgba(255,255,255,0.82)',
+    letterSpacing: -0.1,
   },
-  signUpLink: {
-    color: '#E54D2E',
-    fontWeight: '700',
-  },
+  signUpRow: { alignItems: 'center', paddingTop: spacing.sm },
+  signUpText: { fontFamily: fontFamily.body, fontSize: 14, color: 'rgba(255,255,255,0.5)' },
+  signUpLink: { color: colors.primaryDark, fontFamily: fontFamily.bodyBold },
 
   // Email form
-  emailForm: {
-    gap: 10,
-  },
+  emailForm: { gap: spacing.sm },
   input: {
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    borderRadius: 14,
-    paddingHorizontal: 18,
-    paddingVertical: 16,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderRadius: radii.md,
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.lg,
     color: '#fff',
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
-  },
-  primaryBtn: {
-    backgroundColor: '#E54D2E',
-    borderRadius: 14,
-    paddingVertical: 16,
-    alignItems: 'center',
-    marginTop: 4,
-  },
-  primaryBtnText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  backBtn: {
-    alignItems: 'center',
-    paddingVertical: 12,
-  },
-  backBtnText: {
+    fontFamily: fontFamily.body,
     fontSize: 15,
-    fontWeight: '500',
-    color: 'rgba(255,255,255,0.5)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
   },
+  backBtn: { alignItems: 'center', paddingVertical: spacing.md },
+  backBtnText: { fontFamily: fontFamily.bodyMedium, fontSize: 14, color: 'rgba(255,255,255,0.5)' },
+
+  pressed: { opacity: 0.88, transform: [{ scale: 0.98 }] },
+
   error: {
-    color: '#f43f5e',
+    fontFamily: fontFamily.bodyMedium,
+    color: '#fca5a5',
     textAlign: 'center',
-    marginBottom: 12,
+    marginBottom: spacing.sm,
     fontSize: 13,
   },
 })

@@ -2,22 +2,27 @@ import React, { useState, useRef } from 'react'
 import {
   View,
   Text,
-  TouchableOpacity,
+  Pressable,
   StyleSheet,
   SafeAreaView,
   Animated,
   Easing,
+  Dimensions,
 } from 'react-native'
+import { LinearGradient } from 'expo-linear-gradient'
 import { useUser } from '@clerk/expo'
 import { onboardingColors } from './onboardingTheme'
 import { questions, tourSteps, TOTAL_STEPS } from './onboardingData'
 import { QuestionnaireStep } from './QuestionnaireStep'
 import { TourStep } from './TourStep'
 import { saveOnboardingAnswers } from '../../utils/onboardingStorage'
+import { fontFamily, radii, shadows, spacing } from '../../theme'
 
 interface OnboardingScreenProps {
   onComplete: () => void
 }
+
+const { width } = Dimensions.get('window')
 
 export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
   const { user } = useUser()
@@ -31,7 +36,7 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
   const animateProgress = (step: number) => {
     Animated.timing(progressAnim, {
       toValue: (step + 1) / TOTAL_STEPS,
-      duration: 300,
+      duration: 400,
       easing: Easing.out(Easing.cubic),
       useNativeDriver: false,
     }).start()
@@ -61,15 +66,11 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
   }
 
   const finishOnboarding = async () => {
-    if (user?.id) {
-      await saveOnboardingAnswers(user.id, answers)
-    }
+    if (user?.id) await saveOnboardingAnswers(user.id, answers)
     onComplete()
   }
 
-  const handleSkip = () => {
-    finishOnboarding()
-  }
+  const handleSkip = () => finishOnboarding()
 
   const progressWidth = progressAnim.interpolate({
     inputRange: [0, 1],
@@ -77,122 +78,137 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
   })
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Progress bar */}
-      <View style={styles.progressTrack}>
-        <Animated.View
-          style={[styles.progressFill, { width: progressWidth }]}
-        />
-      </View>
+    <View style={styles.root}>
+      {/* Atmospheric gradient */}
+      <LinearGradient
+        colors={[onboardingColors.gradientFrom, onboardingColors.gradientMid, onboardingColors.gradientTo]}
+        start={{ x: 0.1, y: 0 }}
+        end={{ x: 0.9, y: 1 }}
+        style={StyleSheet.absoluteFill}
+      />
+      {/* Coral glow blob top-right */}
+      <View pointerEvents="none" style={styles.glow} />
 
-      {/* Header with skip/back */}
-      <View style={styles.header}>
-        {currentStep > 0 ? (
-          <TouchableOpacity onPress={goBack} style={styles.headerButton}>
-            <Text style={styles.headerButtonText}>Back</Text>
-          </TouchableOpacity>
-        ) : (
-          <View style={styles.headerButton} />
-        )}
-
-        <Text style={styles.stepCounter}>
-          {currentStep + 1} of {TOTAL_STEPS}
-        </Text>
-
-        {isQuestionnaire ? (
-          <TouchableOpacity onPress={handleSkip} style={styles.headerButton}>
-            <Text style={styles.headerButtonText}>Skip</Text>
-          </TouchableOpacity>
-        ) : (
-          <View style={styles.headerButton} />
-        )}
-      </View>
-
-      {/* Content */}
-      <View style={styles.content}>
-        {isQuestionnaire ? (
-          <QuestionnaireStep
-            question={questions[currentStep]}
-            onAnswer={handleQuestionAnswer}
-          />
-        ) : (
-          <TourStep step={tourSteps[tourIndex]} />
-        )}
-      </View>
-
-      {/* Bottom navigation — only for tour steps */}
-      {!isQuestionnaire && (
-        <View style={styles.footer}>
-          {/* Dot indicators */}
-          <View style={styles.dots}>
-            {tourSteps.map((_, i) => (
-              <View
-                key={i}
-                style={[
-                  styles.dot,
-                  i === tourIndex && styles.dotActive,
-                ]}
-              />
-            ))}
-          </View>
-
-          <TouchableOpacity style={styles.continueButton} onPress={goNext}>
-            <Text style={styles.continueText}>
-              {tourIndex === tourSteps.length - 1 ? 'Get started' : 'Continue'}
-            </Text>
-          </TouchableOpacity>
+      <SafeAreaView style={styles.container}>
+        {/* Progress bar */}
+        <View style={styles.progressTrack}>
+          <Animated.View style={[styles.progressFill, { width: progressWidth }]} />
         </View>
-      )}
-    </SafeAreaView>
+
+        {/* Header */}
+        <View style={styles.header}>
+          {currentStep > 0 ? (
+            <Pressable onPress={goBack} style={styles.headerButton} hitSlop={10}>
+              <Text style={styles.headerButtonText}>Back</Text>
+            </Pressable>
+          ) : (
+            <View style={styles.headerButton} />
+          )}
+
+          <Text style={styles.stepCounter}>
+            {currentStep + 1} <Text style={{ color: onboardingColors.textTertiary }}>of {TOTAL_STEPS}</Text>
+          </Text>
+
+          {isQuestionnaire ? (
+            <Pressable onPress={handleSkip} style={styles.headerButton} hitSlop={10}>
+              <Text style={styles.headerButtonText}>Skip</Text>
+            </Pressable>
+          ) : (
+            <View style={styles.headerButton} />
+          )}
+        </View>
+
+        {/* Content */}
+        <View style={styles.content}>
+          {isQuestionnaire ? (
+            <QuestionnaireStep question={questions[currentStep]} onAnswer={handleQuestionAnswer} />
+          ) : (
+            <TourStep step={tourSteps[tourIndex]} />
+          )}
+        </View>
+
+        {/* Bottom CTA — tour only */}
+        {!isQuestionnaire && (
+          <View style={styles.footer}>
+            <View style={styles.dots}>
+              {tourSteps.map((_, i) => (
+                <View key={i} style={[styles.dot, i === tourIndex && styles.dotActive]} />
+              ))}
+            </View>
+
+            <Pressable
+              style={({ pressed }) => [styles.continueButton, shadows.coralGlow, pressed && styles.pressed]}
+              onPress={goNext}
+            >
+              <Text style={styles.continueText}>
+                {tourIndex === tourSteps.length - 1 ? 'Get started' : 'Continue'}
+              </Text>
+            </Pressable>
+          </View>
+        )}
+      </SafeAreaView>
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: onboardingColors.background,
+  root: { flex: 1 },
+  container: { flex: 1 },
+
+  glow: {
+    position: 'absolute',
+    top: -120,
+    right: -80,
+    width: 380,
+    height: 380,
+    borderRadius: 190,
+    backgroundColor: onboardingColors.coral,
+    opacity: 0.22,
   },
+
   progressTrack: {
     height: 3,
-    backgroundColor: onboardingColors.progressTrack,
+    backgroundColor: 'rgba(0,0,0,0.06)',
+    marginHorizontal: spacing.xl,
+    borderRadius: 2,
+    overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
     backgroundColor: onboardingColors.coral,
     borderRadius: 2,
   },
+
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.md,
+    paddingTop: spacing.lg,
   },
-  headerButton: {
-    minWidth: 50,
-  },
+  headerButton: { minWidth: 50 },
   headerButtonText: {
-    fontSize: 15,
+    fontFamily: fontFamily.bodyMedium,
+    fontSize: 14,
     color: onboardingColors.textSecondary,
-    fontWeight: '500',
   },
   stepCounter: {
+    fontFamily: fontFamily.bodySemiBold,
     fontSize: 13,
-    color: onboardingColors.textSecondary,
+    color: onboardingColors.textPrimary,
+    letterSpacing: 0.3,
   },
-  content: {
-    flex: 1,
-  },
+
+  content: { flex: 1 },
+
   footer: {
-    paddingHorizontal: 32,
-    paddingBottom: 20,
-    gap: 20,
+    paddingHorizontal: spacing.xl,
+    paddingBottom: spacing.lg,
+    gap: spacing.lg,
     alignItems: 'center',
   },
-  dots: {
-    flexDirection: 'row',
-    gap: 8,
-  },
+  dots: { flexDirection: 'row', gap: 6 },
   dot: {
     width: 8,
     height: 8,
@@ -200,19 +216,22 @@ const styles = StyleSheet.create({
     backgroundColor: onboardingColors.dotInactive,
   },
   dotActive: {
+    width: 24,
     backgroundColor: onboardingColors.dotActive,
   },
   continueButton: {
     backgroundColor: onboardingColors.coral,
-    borderRadius: 100,
-    paddingVertical: 16,
+    borderRadius: radii.pill,
+    paddingVertical: 18,
     paddingHorizontal: 48,
     alignSelf: 'stretch',
     alignItems: 'center',
   },
   continueText: {
+    fontFamily: fontFamily.bodyBold,
     fontSize: 16,
-    fontWeight: '600',
     color: '#ffffff',
+    letterSpacing: -0.2,
   },
+  pressed: { opacity: 0.9, transform: [{ scale: 0.98 }] },
 })

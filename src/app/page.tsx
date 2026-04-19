@@ -11,6 +11,7 @@ import { MobileApp } from '@/components/marketing/sections/MobileApp'
 import { TelegramFeature } from '@/components/marketing/sections/TelegramFeature'
 import { WhySwitch } from '@/components/marketing/sections/WhySwitch'
 import { StatsImpact } from '@/components/marketing/sections/StatsImpact'
+import { HumansStrip } from '@/components/marketing/sections/HumansStrip'
 import { FinalCTA } from '@/components/marketing/sections/FinalCTA'
 
 export const dynamic = 'force-dynamic'
@@ -28,6 +29,7 @@ export default async function MarketingPage() {
       <MarketingNav />
       <main id="main-content" className="relative z-0">
         <Hero />
+        <HumansStrip />
         <StatsImpact />
         <Features />
         <MobileApp />

@@ -48,7 +48,7 @@ function RotatingText() {
 
   return (
     <span
-      className={`inline-block text-primary transition-all duration-300 ${
+      className={`inline-block italic font-light text-[#E54D2E] transition-all duration-300 ${
         isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'
       }`}
     >
@@ -59,32 +59,53 @@ function RotatingText() {
 
 export function Testimonials() {
   return (
-    <section className="py-20 md:py-28 bg-[#f5f5f7] dark:bg-[#1d1d1f]">
-      <div className="max-w-6xl mx-auto px-4 md:px-8">
-        <h2 className="text-3xl font-semibold text-foreground tracking-tight text-center font-[family-name:var(--font-display)]">
-          Trusted by <RotatingText /> who ship.
-        </h2>
+    <section className="relative overflow-hidden py-24 md:py-32 bg-[#f5f5f7] dark:bg-[#1d1d1f]">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -left-32 top-1/2 -translate-y-1/2 h-[420px] w-[420px] rounded-full blur-[130px] opacity-30 dark:opacity-20"
+        style={{ background: 'radial-gradient(closest-side, rgba(229,77,46,0.4), transparent 70%)' }}
+      />
+
+      <div className="relative max-w-6xl mx-auto px-4 md:px-8">
+        <div className="text-center max-w-2xl mx-auto">
+          <div className="inline-flex items-center gap-2 rounded-full border border-black/10 dark:border-white/10 bg-white/60 dark:bg-white/5 backdrop-blur-md px-3.5 py-1.5 text-[11px] font-medium tracking-[0.14em] uppercase text-foreground/70">
+            <span className="size-1.5 rounded-full bg-[#E54D2E]" />
+            What our users say
+          </div>
+          <h2 className="mt-6 text-4xl md:text-5xl font-semibold text-foreground tracking-[-0.03em] font-[family-name:var(--font-display)]">
+            Trusted by <RotatingText /> who ship.
+          </h2>
+        </div>
 
         <ScrollReveal>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mt-14 md:mt-16">
             {testimonials.map((testimonial, index) => (
-              <div key={index} className="rounded-2xl p-6 bg-white dark:bg-[#2d2d2f] hover:shadow-lg transition-all duration-200">
-                <p className="text-foreground leading-relaxed">
-                  &ldquo;{testimonial.quote}&rdquo;
+              <div
+                key={index}
+                className="group relative rounded-2xl p-7 bg-white dark:bg-[#2d2d2f] ring-1 ring-black/5 dark:ring-white/5 hover:ring-[#E54D2E]/30 hover:-translate-y-1 transition-all duration-300"
+              >
+                <span
+                  aria-hidden
+                  className="absolute -top-4 left-6 text-7xl leading-none text-[#E54D2E]/20 font-[family-name:var(--font-display)] select-none"
+                >
+                  &ldquo;
+                </span>
+                <p className="relative text-[15px] text-foreground leading-relaxed tracking-tight">
+                  {testimonial.quote}
                 </p>
 
-                <div className="mt-6 pt-4 border-t border-black/5 dark:border-white/10 flex items-center gap-3">
+                <div className="mt-6 pt-5 border-t border-black/5 dark:border-white/10 flex items-center gap-3">
                   <Image
                     src={testimonial.avatar}
                     alt="Testimonial author"
-                    width={36}
-                    height={36}
-                    sizes="36px"
-                    className="w-9 h-9 rounded-full object-cover ring-1 ring-border"
+                    width={40}
+                    height={40}
+                    sizes="40px"
+                    className="w-10 h-10 rounded-full object-cover ring-2 ring-[#E54D2E]/20"
                     loading="lazy"
                   />
                   <div>
-                    <div className="text-sm font-medium text-foreground">
+                    <div className="text-sm font-semibold text-foreground tracking-tight">
                       {testimonial.name}
                     </div>
                     <div className="text-xs text-muted-foreground">

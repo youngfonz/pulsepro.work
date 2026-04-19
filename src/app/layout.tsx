@@ -111,7 +111,7 @@ export default async function RootLayout({
   );
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className={`${bricolage.variable} ${jakartaSans.variable} ${geistMono.variable}`}>
       <head>
         <script
           dangerouslySetInnerHTML={{ // ship-safe-ignore
@@ -131,7 +131,7 @@ export default async function RootLayout({
           }}
         />
       </head>
-      <body className={`${bricolage.variable} ${jakartaSans.variable} ${geistMono.variable} antialiased`}>
+      <body className="antialiased">
         {clerkEnabled ? (
           <ClerkProvider>
             <AuthGuard>

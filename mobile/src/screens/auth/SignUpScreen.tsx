@@ -1,11 +1,9 @@
 import React, { useState, useCallback } from 'react'
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native'
 import { useSignUp } from '@clerk/expo/legacy'
-import { useOAuth } from '@clerk/expo'
+import { useSSO } from '@clerk/expo'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import Constants from 'expo-constants'
 import * as WebBrowser from 'expo-web-browser'
-import { makeRedirectUri } from 'expo-auth-session'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { colors } from '../../theme/colors'
 import { spacing } from '../../theme/spacing'
@@ -19,7 +17,7 @@ type Props = {
 
 export function SignUpScreen({ navigation }: Props) {
   const { signUp, setActive, isLoaded } = useSignUp()
-  const { startOAuthFlow } = useOAuth({ strategy: 'oauth_google' })
+  const { startSSOFlow } = useSSO()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -32,12 +30,7 @@ export function SignUpScreen({ navigation }: Props) {
     setError('')
     setGoogleLoading(true)
     try {
-      const isExpoGo = Constants.appOwnership === 'expo'
-      const redirectUrl = makeRedirectUri({
-        ...(!isExpoGo && { scheme: 'pulsepro' }),
-        path: 'oauth-native-callback',
-      })
-      const { createdSessionId, setActive: setActiveSession } = await startOAuthFlow({ redirectUrl })
+      const { createdSessionId, setActive: setActiveSession } = await startSSOFlow({ strategy: 'oauth_google' })
       if (createdSessionId && setActiveSession) {
         await setActiveSession({ session: createdSessionId })
       }
@@ -50,7 +43,7 @@ export function SignUpScreen({ navigation }: Props) {
     } finally {
       setGoogleLoading(false)
     }
-  }, [startOAuthFlow])
+  }, [startSSOFlow])
 
   const handleSignUp = async () => {
     if (!isLoaded) return

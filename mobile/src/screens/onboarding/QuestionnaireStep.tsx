@@ -23,6 +23,7 @@ import {
 } from 'lucide-react-native'
 import * as Haptics from 'expo-haptics'
 import { onboardingColors } from './onboardingTheme'
+import { fontFamily, shadows } from '../../theme'
 import type { Question } from './onboardingData'
 
 const iconMap: Record<string, React.ComponentType<{ size: number; color: string }>> = {
@@ -154,18 +155,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
   },
   title: {
-    fontSize: 28,
-    fontWeight: '700',
+    fontFamily: fontFamily.displayExtraBold,
+    fontSize: 30,
     color: onboardingColors.textPrimary,
     textAlign: 'center',
-    letterSpacing: -0.5,
+    letterSpacing: -0.8,
+    lineHeight: 34,
   },
   subtitle: {
-    fontSize: 16,
+    fontFamily: fontFamily.body,
+    fontSize: 15,
     color: onboardingColors.textSecondary,
     textAlign: 'center',
     marginTop: 8,
-    marginBottom: 40,
+    marginBottom: 36,
+    lineHeight: 22,
   },
   grid: {
     flexDirection: 'row',
@@ -175,40 +179,45 @@ const styles = StyleSheet.create({
   },
   option: {
     width: '47%',
-    backgroundColor: onboardingColors.surface,
-    borderRadius: 16,
-    paddingVertical: 24,
-    paddingHorizontal: 16,
+    backgroundColor: 'rgba(255,255,255,0.72)',
+    borderRadius: 18,
+    paddingVertical: 22,
+    paddingHorizontal: 14,
     alignItems: 'center',
-    gap: 12,
-    borderWidth: 2,
-    borderColor: 'transparent',
+    gap: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.9)',
+    ...shadows.sm,
   },
   optionSelected: {
     borderColor: onboardingColors.coral,
-    backgroundColor: onboardingColors.coralTint,
+    backgroundColor: '#fff',
+    ...shadows.md,
   },
   optionLabel: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontFamily: fontFamily.bodySemiBold,
+    fontSize: 13,
     color: onboardingColors.textPrimary,
     textAlign: 'center',
+    letterSpacing: -0.1,
   },
   optionLabelSelected: {
     color: onboardingColors.coral,
   },
   continueButton: {
-    marginTop: 32,
+    marginTop: 28,
     backgroundColor: onboardingColors.coral,
-    borderRadius: 100,
-    paddingVertical: 16,
+    borderRadius: 999,
+    paddingVertical: 18,
     alignItems: 'center',
     alignSelf: 'center',
-    paddingHorizontal: 48,
+    paddingHorizontal: 56,
+    ...shadows.coralGlow,
   },
   continueText: {
+    fontFamily: fontFamily.bodyBold,
     fontSize: 16,
-    fontWeight: '600',
     color: '#ffffff',
+    letterSpacing: -0.2,
   },
 })

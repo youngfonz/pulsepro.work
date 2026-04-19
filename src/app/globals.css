@@ -26,27 +26,27 @@
 }
 
 .dark {
-  --background: #09090b;
+  --background: #1a1a1a;
   --foreground: #fafafa;
-  --card: #0a0a0a;
+  --card: #2d2d2f;
   --card-foreground: #fafafa;
-  --muted: #171717;
+  --muted: #232325;
   --muted-foreground: #a3a3a3;
-  --border: #262626;
-  --input: #171717;
+  --border: #2e2e30;
+  --input: #232325;
   --primary: #F0613E;
   --primary-foreground: #ffffff;
-  --secondary: #171717;
+  --secondary: #232325;
   --secondary-foreground: #fafafa;
-  --accent: #171717;
+  --accent: #232325;
   --accent-foreground: #fafafa;
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
   --ring: #F0613E;
-  --sidebar: #09090b;
+  --sidebar: #1a1a1a;
   --sidebar-foreground: #fafafa;
-  --sidebar-border: #262626;
-  --sidebar-accent: #171717;
+  --sidebar-border: #2e2e30;
+  --sidebar-accent: #232325;
   --link: #fafafa;
 }
 
@@ -138,5 +138,15 @@ body {
 /* Link colors */
 a.link, .text-link {
   color: var(--link);
+}
+
+/* HumansStrip constellation drift */
+@keyframes humanDrift {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-10px);
+  }
 }
 
