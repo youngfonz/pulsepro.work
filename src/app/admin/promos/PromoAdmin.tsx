@@ -150,7 +150,7 @@ export function PromoAdmin({ initialCodes }: { initialCodes: PromoCode[] }) {
                   <td className="px-4 py-3">
                     <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
                       c.plan === 'team'
-                        ? 'bg-blue-500/10 text-blue-500'
+                        ? 'bg-primary/10 text-primary'
                         : 'bg-emerald-500/10 text-emerald-500'
                     }`}>
                       {c.plan.toUpperCase()}

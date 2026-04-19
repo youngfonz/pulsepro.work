@@ -281,7 +281,7 @@ export function AddBookmarkButton({ projects, defaultOpen = false }: { projects:
                       ) : metadata.type === 'twitter' ? (
                         <Twitter className="w-4 h-4 text-foreground" />
                       ) : (
-                        <Globe className="w-4 h-4 text-blue-500" />
+                        <Globe className="w-4 h-4 text-primary" />
                       )}
                       <span className="text-xs font-medium text-muted-foreground uppercase">{metadata.type}</span>
                     </div>

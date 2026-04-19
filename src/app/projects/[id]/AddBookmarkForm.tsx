@@ -203,7 +203,7 @@ export function AddBookmarkForm({ projectId }: AddBookmarkFormProps) {
                   ) : metadata.type === 'twitter' ? (
                     <Twitter className="w-5 h-5 text-foreground" />
                   ) : (
-                    <Globe className="w-5 h-5 text-blue-500" />
+                    <Globe className="w-5 h-5 text-primary" />
                   )}
                   <span className="text-xs font-medium text-muted-foreground uppercase">
                     {metadata.type}

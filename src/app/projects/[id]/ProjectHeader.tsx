@@ -40,14 +40,14 @@ const statusLabels: Record<string, string> = {
 
 const statusColors: Record<string, string> = {
   not_started: 'border border-zinc-400/50 text-zinc-500 dark:text-zinc-400 bg-zinc-500/5',
-  in_progress: 'border border-blue-500/50 text-blue-600 dark:text-blue-400 bg-blue-500/5',
+  in_progress: 'border border-primary/50 text-primary bg-primary/5',
   on_hold: 'border border-amber-500/50 text-amber-600 dark:text-amber-400 bg-amber-500/5',
   completed: 'border border-emerald-500/50 text-emerald-600 dark:text-emerald-400 bg-emerald-500/5',
 }
 
 const priorityColors: Record<string, string> = {
   low: 'border border-zinc-400/50 text-zinc-600 dark:text-zinc-300 bg-zinc-500/5',
-  medium: 'border border-blue-500/50 text-blue-600 dark:text-blue-400 bg-blue-500/5',
+  medium: 'border border-primary/50 text-primary bg-primary/5',
   high: 'border border-rose-500/50 text-rose-600 dark:text-rose-400 bg-rose-500/5',
 }
 

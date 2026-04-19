@@ -20,7 +20,7 @@ export function AIInsightsFeature() {
     <section className="py-20 md:py-28 bg-[#f5f5f7] dark:bg-[#1d1d1f]">
       <div className="max-w-4xl mx-auto px-4 md:px-8">
         <ScrollReveal delay={0}>
-          <div className="overflow-hidden rounded-2xl bg-[#1a1a1a] border border-white/10 p-8 md:p-12">
+          <div className="overflow-hidden rounded-2xl bg-[#1a1a1a] dark:bg-[#2d2d2f] border border-white/10 p-8 md:p-12">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
               {/* Left: copy */}
               <div>

@@ -11,7 +11,7 @@ type UsageData = Awaited<ReturnType<typeof getUsageLimits>>
 const PLAN_DISPLAY = {
   free: { label: 'Free', price: null, badge: 'bg-muted text-muted-foreground' },
   pro: { label: 'Pro', price: '$12/month', badge: 'bg-emerald-500/10 text-emerald-500' },
-  team: { label: 'Team', price: '$29/month', badge: 'bg-blue-500/10 text-blue-500' },
+  team: { label: 'Team', price: '$29/month', badge: 'bg-primary/10 text-primary' },
 } as const
 
 export function BillingCard() {

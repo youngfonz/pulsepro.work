@@ -1,5 +1,5 @@
 import React, { useLayoutEffect, useRef, useCallback, useState, useMemo } from 'react'
-import { View, Text, FlatList, TouchableOpacity, RefreshControl, StyleSheet, Animated, ScrollView } from 'react-native'
+import { View, Text, FlatList, TouchableOpacity, RefreshControl, StyleSheet, Animated, ScrollView, ActivityIndicator } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Swipeable } from 'react-native-gesture-handler'
@@ -232,22 +232,26 @@ export function TasksListScreen({ navigation }: Props) {
         renderItem={renderItem}
         contentContainerStyle={styles.list}
         refreshControl={<RefreshControl refreshing={isFetching && !!data} onRefresh={refetch} tintColor={colors.primary} />}
-        ListEmptyComponent={!isLoading ? (
-          <View style={styles.emptyContainer}>
-            {activeFilterCount > 0 ? (
-              <>
-                <Text style={styles.emptyTitle}>No matches</Text>
-                <Text style={styles.empty}>No tasks match the current filters.</Text>
-              </>
-            ) : (
-              <>
-                <Text style={styles.emptyEmoji}>✅</Text>
-                <Text style={styles.emptyTitle}>All clear</Text>
-                <Text style={styles.empty}>No tasks yet. Tap + to create one.</Text>
-              </>
-            )}
-          </View>
-        ) : null}
+        ListEmptyComponent={
+          isLoading
+            ? <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 80 }} />
+            : (
+              <View style={styles.emptyContainer}>
+                {activeFilterCount > 0 ? (
+                  <>
+                    <Text style={styles.emptyTitle}>No matches</Text>
+                    <Text style={styles.empty}>No tasks match the current filters.</Text>
+                  </>
+                ) : (
+                  <>
+                    <Text style={styles.emptyEmoji}>✅</Text>
+                    <Text style={styles.emptyTitle}>All clear</Text>
+                    <Text style={styles.empty}>No tasks yet. Tap + to create one.</Text>
+                  </>
+                )}
+              </View>
+            )
+        }
       />
     </SafeAreaView>
   )

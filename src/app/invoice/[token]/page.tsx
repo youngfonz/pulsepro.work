@@ -121,7 +121,7 @@ export default async function PublicInvoicePage({ params }: Props) {
                     : invoice.status === 'overdue'
                     ? 'border-rose-300 text-rose-700 bg-rose-50'
                     : invoice.status === 'sent'
-                    ? 'border-blue-300 text-blue-700 bg-blue-50'
+                    ? 'border-primary/40 text-primary bg-primary/5'
                     : 'border-gray-300 text-gray-600 bg-gray-50',
                 ].join(' ')}
               >

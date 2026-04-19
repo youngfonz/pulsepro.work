@@ -380,7 +380,7 @@ export default async function DashboardPage() {
                   {/* Background rings */}
                   <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full">
                     <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" className="text-rose-500/15" strokeWidth="6" />
-                    <circle cx="50" cy="50" r="32" fill="none" stroke="currentColor" className="text-blue-500/15" strokeWidth="6" />
+                    <circle cx="50" cy="50" r="32" fill="none" stroke="currentColor" className="text-primary/15" strokeWidth="6" />
                     <circle cx="50" cy="50" r="22" fill="none" stroke="currentColor" className="text-emerald-500/15" strokeWidth="6" />
                   </svg>
 
@@ -443,7 +443,7 @@ export default async function DashboardPage() {
                   </Link>
 
                   <Link href="/tasks" className="group flex items-center gap-2.5 p-1.5 rounded-lg hover:bg-muted/50 transition-colors">
-                    <div className="w-2.5 h-2.5 rounded-full bg-blue-500 flex-shrink-0" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-primary flex-shrink-0" />
                     <div>
                       <div className="text-lg font-semibold text-foreground">{completedTasks}<span className="text-sm font-normal text-muted-foreground">/{stats.totalTasks}</span></div>
                       <div className="text-xs text-muted-foreground">Tasks Done</div>

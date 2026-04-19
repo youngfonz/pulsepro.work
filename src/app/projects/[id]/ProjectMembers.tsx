@@ -111,7 +111,7 @@ export function ProjectMembers({
 
   const roleBadgeColors: Record<string, string> = {
     viewer: 'bg-muted text-muted-foreground',
-    editor: 'bg-blue-500/10 text-blue-500',
+    editor: 'bg-primary/10 text-primary',
     manager: 'bg-amber-500/10 text-amber-500',
   }
 
