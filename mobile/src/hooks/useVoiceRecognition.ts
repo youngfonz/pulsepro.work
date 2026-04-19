@@ -1,8 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react'
-import {
-  ExpoSpeechRecognitionModule,
-  useSpeechRecognitionEvent,
-} from 'expo-speech-recognition'
+import { useState, useCallback, useRef } from 'react'
 import * as Haptics from 'expo-haptics'
 
 interface UseVoiceRecognitionResult {
@@ -15,6 +11,26 @@ interface UseVoiceRecognitionResult {
   resetTranscript: () => void
 }
 
+let speechModule: {
+  Module: typeof import('expo-speech-recognition').ExpoSpeechRecognitionModule | null
+  useEvent: typeof import('expo-speech-recognition').useSpeechRecognitionEvent | null
+  available: boolean
+} = { Module: null, useEvent: null, available: false }
+
+try {
+  // Requires a custom dev build — Expo Go will throw
+  const speech = require('expo-speech-recognition') as typeof import('expo-speech-recognition')
+  speechModule = {
+    Module: speech.ExpoSpeechRecognitionModule,
+    useEvent: speech.useSpeechRecognitionEvent,
+    available: true,
+  }
+} catch {
+  // Running in Expo Go or native module not linked — voice disabled
+}
+
+const noopEvent: typeof import('expo-speech-recognition').useSpeechRecognitionEvent = () => {}
+
 export function useVoiceRecognition(): UseVoiceRecognitionResult {
   const [transcript, setTranscript] = useState('')
   const [interimTranscript, setInterimTranscript] = useState('')
@@ -22,18 +38,20 @@ export function useVoiceRecognition(): UseVoiceRecognitionResult {
   const [error, setError] = useState<string | null>(null)
   const isListeningRef = useRef(false)
 
-  useSpeechRecognitionEvent('start', () => {
+  const useSpeechEvent = speechModule.useEvent ?? noopEvent
+
+  useSpeechEvent('start', () => {
     isListeningRef.current = true
     setIsListening(true)
     setError(null)
   })
 
-  useSpeechRecognitionEvent('end', () => {
+  useSpeechEvent('end', () => {
     isListeningRef.current = false
     setIsListening(false)
   })
 
-  useSpeechRecognitionEvent('result', (event) => {
+  useSpeechEvent('result', (event) => {
     const results = event.results
     if (results && results.length > 0) {
       const latest = results[results.length - 1]
@@ -50,7 +68,7 @@ export function useVoiceRecognition(): UseVoiceRecognitionResult {
     }
   })
 
-  useSpeechRecognitionEvent('error', (event) => {
+  useSpeechEvent('error', (event) => {
     isListeningRef.current = false
     setIsListening(false)
     const code = event.error
@@ -70,7 +88,12 @@ export function useVoiceRecognition(): UseVoiceRecognitionResult {
     setTranscript('')
     setInterimTranscript('')
 
-    const { granted } = await ExpoSpeechRecognitionModule.requestPermissionsAsync()
+    if (!speechModule.available || !speechModule.Module) {
+      setError('Voice input needs a native build. Run `npx expo run:ios`.')
+      return
+    }
+
+    const { granted } = await speechModule.Module.requestPermissionsAsync()
     if (!granted) {
       setError('Microphone permission is required for voice input.')
       return
@@ -78,7 +101,7 @@ export function useVoiceRecognition(): UseVoiceRecognitionResult {
 
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
 
-    ExpoSpeechRecognitionModule.start({
+    speechModule.Module.start({
       lang: 'en-US',
       interimResults: true,
       continuous: false,
@@ -86,8 +109,8 @@ export function useVoiceRecognition(): UseVoiceRecognitionResult {
   }, [])
 
   const stopListening = useCallback(() => {
-    if (isListeningRef.current) {
-      ExpoSpeechRecognitionModule.stop()
+    if (isListeningRef.current && speechModule.Module) {
+      speechModule.Module.stop()
     }
   }, [])
 

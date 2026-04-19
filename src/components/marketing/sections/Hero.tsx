@@ -35,8 +35,11 @@ function RotatingBadge() {
   }, [cycle]);
 
   return (
-    <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5">
-      <span className="w-2 h-2 rounded-full bg-[#F0613E] animate-pulse" />
+    <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur-md px-4 py-1.5">
+      <span className="relative flex h-2 w-2">
+        <span className="absolute inset-0 animate-ping rounded-full bg-[#F0613E] opacity-75" />
+        <span className="relative inline-flex h-2 w-2 rounded-full bg-[#F0613E]" />
+      </span>
       <span
         className="text-sm font-medium text-white/80 transition-opacity duration-300"
         style={{ opacity: visible ? 1 : 0 }}
@@ -47,16 +50,73 @@ function RotatingBadge() {
   );
 }
 
+// Phone mock — mirrors the redesigned iOS LoginScreen
+function HeroPhoneMock() {
+  return (
+    <div className="relative w-[240px] h-[490px]">
+      {/* Phone chassis */}
+      <div className="absolute inset-0 rounded-[46px] bg-[#0d0d0d] p-2 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.55)] ring-1 ring-white/10">
+        {/* Notch */}
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 w-24 h-6 rounded-full bg-black" />
+        {/* Screen */}
+        <div className="relative h-full w-full rounded-[38px] overflow-hidden bg-gradient-to-br from-[#1a1a1a] via-[#231714] to-[#2a1410]">
+          {/* Ambient coral glow inside phone */}
+          <div className="absolute -top-20 -left-16 w-56 h-56 rounded-full bg-[#E54D2E] opacity-30 blur-3xl" />
+          <div className="absolute top-1/3 -right-20 w-56 h-56 rounded-full bg-[#F0613E] opacity-25 blur-3xl" />
+
+          {/* Content */}
+          <div className="relative h-full flex flex-col px-6 pt-12 pb-6 text-white">
+            <div className="flex items-center gap-2 mb-auto">
+              <div className="w-8 h-8 rounded-[10px] bg-[#E54D2E] flex items-center justify-center shadow-lg shadow-[#E54D2E]/40">
+                <svg viewBox="0 0 24 24" className="w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+              <span className="font-[family-name:var(--font-display)] text-base font-extrabold tracking-tight">Pulse Pro</span>
+            </div>
+
+            {/* Hero copy */}
+            <div className="mb-5">
+              <p className="text-[10px] font-medium tracking-[0.18em] uppercase text-[#F0613E] mb-2">For freelancers & teams</p>
+              <h3 className="font-[family-name:var(--font-display)] text-[28px] font-extrabold leading-[30px] tracking-tight">
+                Think less.
+                <br />
+                <span className="italic text-[#F0613E]">Run smoother.</span>
+              </h3>
+              <p className="text-xs text-white/55 leading-relaxed mt-3">
+                Calm command center for projects, tasks, and clients.
+              </p>
+            </div>
+
+            {/* Pill CTAs */}
+            <div className="space-y-2">
+              <div className="rounded-full bg-[#E54D2E] py-3.5 text-center text-[13px] font-bold shadow-[0_10px_30px_-5px_rgba(229,77,46,0.6)]">
+                Continue with Google
+              </div>
+              <div className="rounded-full border border-white/15 bg-white/[0.03] py-3.5 text-center text-[12px] font-semibold text-white/80">
+                Sign in with email
+              </div>
+              <p className="pt-1 text-center text-[11px] text-white/45">
+                Don&apos;t have an account? <span className="text-[#F0613E] font-semibold">Sign up</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function HeroDashboardMock() {
   return (
-    <div className="bg-white rounded-xl border border-black/10 shadow-2xl overflow-hidden text-left">
+    <div className="relative bg-white rounded-2xl shadow-[0_40px_100px_-20px_rgba(0,0,0,0.35)] ring-1 ring-black/5 overflow-hidden text-left">
       {/* Top bar */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100">
         <div className="flex items-center gap-3">
           <div className="w-7 h-7 rounded-lg bg-[#E54D2E] flex items-center justify-center">
-            <svg viewBox="0 0 24 24" className="w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            <svg viewBox="0 0 24 24" className="w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" strokeLinecap="round" strokeLinejoin="round" /></svg>
           </div>
-          <span className="text-sm font-semibold text-gray-900">Pulse Pro</span>
+          <span className="font-[family-name:var(--font-display)] text-sm font-extrabold tracking-tight text-gray-900">Pulse Pro</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 rounded-lg text-xs text-gray-400">
@@ -64,14 +124,14 @@ function HeroDashboardMock() {
             Search...
             <span className="ml-4 text-[10px] text-gray-300 border border-gray-200 rounded px-1">⌘K</span>
           </div>
-          <div className="w-7 h-7 rounded-full bg-orange-100 flex items-center justify-center text-[10px] font-semibold text-[#E54D2E]">JD</div>
+          <div className="w-7 h-7 rounded-full bg-orange-100 flex items-center justify-center text-[10px] font-bold text-[#E54D2E]">JD</div>
         </div>
       </div>
 
       <div className="flex">
         {/* Sidebar */}
         <div className="hidden md:flex flex-col w-44 border-r border-gray-100 py-3 px-3 gap-0.5 shrink-0">
-          <div className="flex items-center gap-2 px-2 py-1.5 bg-orange-50 rounded-md text-xs font-medium text-[#E54D2E]">
+          <div className="flex items-center gap-2 px-2 py-1.5 bg-orange-50 rounded-md text-xs font-semibold text-[#E54D2E]">
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0h4" /></svg>
             Dashboard
           </div>
@@ -92,28 +152,28 @@ function HeroDashboardMock() {
         <div className="flex-1 p-4 md:p-5 min-w-0">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <p className="text-sm font-semibold text-gray-900">Good morning, Jordan</p>
+              <p className="font-[family-name:var(--font-display)] text-sm font-extrabold tracking-tight text-gray-900">Good morning, Jordan</p>
               <p className="text-[11px] text-gray-400 mt-0.5">You have 3 tasks due today</p>
             </div>
             <div className="flex gap-2">
-              <div className="px-2.5 py-1 bg-[#E54D2E] text-white rounded-md text-[10px] font-medium">+ Add Task</div>
+              <div className="px-2.5 py-1 bg-[#E54D2E] text-white rounded-md text-[10px] font-semibold shadow-sm shadow-[#E54D2E]/40">+ Add Task</div>
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-            {/* Activity rings */}
-            <div className="lg:col-span-2 bg-gray-50 rounded-lg p-4">
-              <p className="text-[11px] font-medium text-gray-500 mb-3">Activity</p>
+            {/* Activity rings — Fonz palette: coral / amber / green (no blue) */}
+            <div className="lg:col-span-2 bg-gradient-to-br from-[#fff8f5] to-[#ffeee6] rounded-xl p-4 ring-1 ring-orange-100/60">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-3">Activity</p>
               <div className="flex items-center justify-center py-2">
                 <svg viewBox="0 0 120 120" className="w-24 h-24">
-                  <circle cx="60" cy="60" r="52" fill="none" stroke="#fecdd3" strokeWidth="8" />
-                  <circle cx="60" cy="60" r="52" fill="none" stroke="#f43f5e" strokeWidth="8" strokeDasharray="327" strokeDashoffset="98" strokeLinecap="round" transform="rotate(-90 60 60)" />
-                  <circle cx="60" cy="60" r="40" fill="none" stroke="#bfdbfe" strokeWidth="8" />
-                  <circle cx="60" cy="60" r="40" fill="none" stroke="#3b82f6" strokeWidth="8" strokeDasharray="251" strokeDashoffset="50" strokeLinecap="round" transform="rotate(-90 60 60)" />
-                  <circle cx="60" cy="60" r="28" fill="none" stroke="#bbf7d0" strokeWidth="8" />
+                  <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(229,77,46,0.18)" strokeWidth="8" />
+                  <circle cx="60" cy="60" r="52" fill="none" stroke="#E54D2E" strokeWidth="8" strokeDasharray="327" strokeDashoffset="98" strokeLinecap="round" transform="rotate(-90 60 60)" />
+                  <circle cx="60" cy="60" r="40" fill="none" stroke="rgba(245,158,11,0.18)" strokeWidth="8" />
+                  <circle cx="60" cy="60" r="40" fill="none" stroke="#f59e0b" strokeWidth="8" strokeDasharray="251" strokeDashoffset="50" strokeLinecap="round" transform="rotate(-90 60 60)" />
+                  <circle cx="60" cy="60" r="28" fill="none" stroke="rgba(34,197,94,0.18)" strokeWidth="8" />
                   <circle cx="60" cy="60" r="28" fill="none" stroke="#22c55e" strokeWidth="8" strokeDasharray="176" strokeDashoffset="88" strokeLinecap="round" transform="rotate(-90 60 60)" />
-                  <text x="60" y="57" textAnchor="middle" className="text-lg font-bold fill-gray-900" fontSize="18">3</text>
-                  <text x="60" y="70" textAnchor="middle" className="fill-gray-400" fontSize="8">due this week</text>
+                  <text x="60" y="58" textAnchor="middle" className="fill-gray-900" fontSize="20" fontWeight="800">3</text>
+                  <text x="60" y="72" textAnchor="middle" className="fill-gray-400" fontSize="8">due this week</text>
                 </svg>
               </div>
               <div className="grid grid-cols-3 gap-2 mt-2">
@@ -123,25 +183,25 @@ function HeroDashboardMock() {
                   { n: '3', l: 'Due' },
                 ].map((s) => (
                   <div key={s.l} className="text-center">
-                    <p className="text-xs font-semibold text-gray-900">{s.n}</p>
-                    <p className="text-[9px] text-gray-400">{s.l}</p>
+                    <p className="font-[family-name:var(--font-display)] text-base font-extrabold tracking-tight text-gray-900">{s.n}</p>
+                    <p className="text-[9px] text-gray-400 uppercase tracking-wider">{s.l}</p>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Tasks + Health */}
-            <div className="lg:col-span-3 bg-gray-50 rounded-lg p-4">
-              <p className="text-[11px] font-medium text-gray-500 mb-3">Due Today</p>
+            <div className="lg:col-span-3 bg-gray-50 rounded-xl p-4 ring-1 ring-black/[0.03]">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-3">Due Today</p>
               <div className="space-y-2">
                 {[
                   { task: 'Finalize brand guidelines', project: 'Acme Rebrand', priority: 'high' },
                   { task: 'Review wireframes', project: 'CloudSync App', priority: 'medium' },
                   { task: 'Send invoice #1042', project: 'Bloom Studio', priority: 'high' },
                 ].map((item) => (
-                  <div key={item.task} className="flex items-center justify-between bg-white rounded-md px-3 py-2 border border-gray-100">
+                  <div key={item.task} className="flex items-center justify-between bg-white rounded-md px-3 py-2 ring-1 ring-black/[0.04]">
                     <div className="flex items-center gap-2 min-w-0">
-                      <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${item.priority === 'high' ? 'bg-red-400' : 'bg-amber-400'}`} />
+                      <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${item.priority === 'high' ? 'bg-[#E54D2E]' : 'bg-amber-400'}`} />
                       <span className="text-[11px] text-gray-800 font-medium truncate">{item.task}</span>
                     </div>
                     <span className="text-[9px] text-gray-400 ml-2 shrink-0">{item.project}</span>
@@ -149,7 +209,7 @@ function HeroDashboardMock() {
                 ))}
               </div>
 
-              <p className="text-[11px] font-medium text-gray-500 mt-4 mb-2">Project Health</p>
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-500 mt-4 mb-2">Project Health</p>
               <div className="grid grid-cols-2 gap-2">
                 {[
                   { name: 'Acme Rebrand', status: 'green', tasks: '8/12' },
@@ -157,12 +217,12 @@ function HeroDashboardMock() {
                   { name: 'Bloom Studio', status: 'green', tasks: '15/18' },
                   { name: 'Meridian Site', status: 'red', tasks: '1/7' },
                 ].map((p) => (
-                  <div key={p.name} className="flex items-center gap-2 bg-white rounded-md px-3 py-2 border border-gray-100">
+                  <div key={p.name} className="flex items-center gap-2 bg-white rounded-md px-3 py-2 ring-1 ring-black/[0.04]">
                     <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                      p.status === 'green' ? 'bg-emerald-400' : p.status === 'amber' ? 'bg-amber-400' : 'bg-red-400'
+                      p.status === 'green' ? 'bg-emerald-400' : p.status === 'amber' ? 'bg-amber-400' : 'bg-[#E54D2E]'
                     }`} />
                     <div className="min-w-0">
-                      <p className="text-[10px] font-medium text-gray-800 truncate">{p.name}</p>
+                      <p className="text-[10px] font-semibold text-gray-800 truncate">{p.name}</p>
                       <p className="text-[9px] text-gray-400">{p.tasks} tasks</p>
                     </div>
                   </div>
@@ -179,41 +239,47 @@ function HeroDashboardMock() {
 export function Hero() {
   return (
     <section className="relative overflow-hidden">
-      {/* Dark top with gradient fade to page background */}
-      <div className="bg-gradient-to-b from-[#1a1a1a] via-[#1a1a1a] via-[80%] to-[#f5f5f7] dark:to-background pt-28 pb-16">
-        <div className="max-w-5xl mx-auto px-4 md:px-8 w-full">
+      {/* Dark base with gradient fade to page bg */}
+      <div className="relative bg-gradient-to-b from-[#1a1a1a] via-[#1a1a1a] via-[75%] to-[#f5f5f7] dark:to-background pt-28 pb-20 md:pb-28">
+        {/* Ambient coral blobs — atmospheric mesh-gradient feel */}
+        <div className="pointer-events-none absolute top-[15%] -left-20 w-[520px] h-[520px] rounded-full bg-[#E54D2E] opacity-[0.18] blur-[140px]" />
+        <div className="pointer-events-none absolute top-[35%] -right-32 w-[620px] h-[620px] rounded-full bg-[#F0613E] opacity-[0.12] blur-[160px]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.35)_100%)]" />
+
+        <div className="relative max-w-6xl mx-auto px-4 md:px-8 w-full">
           <div className="text-center max-w-3xl mx-auto">
             <ScrollReveal delay={0}>
               <RotatingBadge />
             </ScrollReveal>
 
             <ScrollReveal delay={100}>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-[1.1] tracking-tight mt-6 font-[family-name:var(--font-display)]">
+              <h1 className="mt-6 font-[family-name:var(--font-display)] text-[44px] md:text-6xl lg:text-7xl font-extrabold text-white leading-[1.02] tracking-[-0.04em]">
                 Think less.{' '}
-                <span className="text-[#F0613E]">Run smoother</span>.
+                <span className="italic text-[#F0613E]">Run smoother.</span>
               </h1>
             </ScrollReveal>
 
             <ScrollReveal delay={200}>
-              <p className="text-lg md:text-xl text-white/60 mt-6 max-w-2xl mx-auto leading-relaxed">
-                Add your first task in 5 seconds. No setup, no project boards, no learning curve. Just your work, organized.
+              <p className="text-base md:text-lg text-white/55 mt-6 max-w-xl mx-auto leading-relaxed">
+                The calm command center for your projects, tasks, and clients.
+                Add your first task in five seconds. No project boards, no learning curve.
               </p>
             </ScrollReveal>
 
             <ScrollReveal delay={300}>
-              <div className="mt-10 flex gap-4 flex-wrap justify-center">
+              <div className="mt-10 flex gap-3 flex-wrap justify-center">
                 <Link
                   href="/sign-up"
-                  className="inline-flex items-center justify-center px-8 py-3 rounded-full bg-[#E54D2E] text-white font-medium hover:bg-[#D4431F] transition-all duration-200"
+                  className="group inline-flex items-center justify-center px-8 py-3.5 rounded-full bg-[#E54D2E] text-white font-semibold shadow-[0_16px_40px_-8px_rgba(229,77,46,0.55)] hover:bg-[#D4431F] hover:shadow-[0_20px_50px_-8px_rgba(229,77,46,0.75)] transition-all duration-200"
                 >
                   Start for free
-                  <svg className="ml-2 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <svg className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.25}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                   </svg>
                 </Link>
                 <a
                   href="#pricing"
-                  className="inline-flex items-center justify-center px-8 py-3 rounded-full border border-white/20 text-white font-medium hover:border-white/40 transition-colors"
+                  className="inline-flex items-center justify-center px-8 py-3.5 rounded-full border border-white/15 bg-white/[0.03] backdrop-blur-sm text-white font-semibold hover:border-white/30 hover:bg-white/[0.06] transition-all duration-200"
                 >
                   See pricing
                 </a>
@@ -221,10 +287,19 @@ export function Hero() {
             </ScrollReveal>
           </div>
 
-          {/* Product showcase — the visual centerpiece */}
+          {/* Dual-mock showcase: desktop dashboard + floating phone */}
           <ScrollReveal delay={400}>
-            <div className="mt-16">
-              <HeroDashboardMock />
+            <div className="relative mt-16 md:mt-20">
+              {/* Desktop dashboard — primary centerpiece */}
+              <div className="relative mx-auto max-w-5xl">
+                <HeroDashboardMock />
+                {/* Phone mock — floats over right edge on md+, hidden on mobile */}
+                <div className="hidden md:block absolute -right-4 lg:-right-10 -bottom-14 lg:-bottom-16 z-10 origin-bottom-right rotate-[4deg]">
+                  <HeroPhoneMock />
+                </div>
+              </div>
+              {/* Reflection/grounding glow under mocks */}
+              <div className="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 w-[60%] h-12 bg-[#E54D2E] opacity-30 blur-[60px]" />
             </div>
           </ScrollReveal>
         </div>

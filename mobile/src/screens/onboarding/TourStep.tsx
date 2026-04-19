@@ -1,7 +1,8 @@
 import React, { useRef, useEffect } from 'react'
-import { View, Text, StyleSheet, Animated, Easing } from 'react-native'
+import { View, Text, StyleSheet, Animated, Easing, Dimensions } from 'react-native'
 import { onboardingColors } from './onboardingTheme'
 import { FABVisual, TabsVisual, ReadyVisual } from './TourVisuals'
+import { fontFamily, shadows, spacing, radii } from '../../theme'
 import type { TourStep as TourStepType } from './onboardingData'
 
 const visualComponents: Record<string, React.ComponentType> = {
@@ -10,46 +11,42 @@ const visualComponents: Record<string, React.ComponentType> = {
   ready: ReadyVisual,
 }
 
+const { height } = Dimensions.get('window')
+
 interface TourStepProps {
   step: TourStepType
 }
 
 export function TourStep({ step }: TourStepProps) {
-  const fadeIn = useRef(new Animated.Value(0)).current
-  const slideUp = useRef(new Animated.Value(24)).current
+  const fade = useRef(new Animated.Value(0)).current
+  const rise = useRef(new Animated.Value(24)).current
+  const phoneScale = useRef(new Animated.Value(0.94)).current
 
   useEffect(() => {
-    fadeIn.setValue(0)
-    slideUp.setValue(24)
+    fade.setValue(0)
+    rise.setValue(24)
+    phoneScale.setValue(0.94)
     Animated.parallel([
-      Animated.timing(fadeIn, {
-        toValue: 1,
-        duration: 400,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideUp, {
-        toValue: 0,
-        duration: 400,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
-      }),
+      Animated.timing(fade, { toValue: 1, duration: 480, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+      Animated.timing(rise, { toValue: 0, duration: 480, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+      Animated.spring(phoneScale, { toValue: 1, friction: 7, tension: 40, useNativeDriver: true }),
     ]).start()
   }, [step.id])
 
   const VisualComponent = visualComponents[step.visual]
 
   return (
-    <Animated.View
-      style={[
-        styles.container,
-        { opacity: fadeIn, transform: [{ translateY: slideUp }] },
-      ]}
-    >
+    <Animated.View style={[styles.container, { opacity: fade, transform: [{ translateY: rise }] }]}>
+      {/* Phone-frame mock */}
       <View style={styles.visualArea}>
-        {VisualComponent && <VisualComponent />}
+        <Animated.View style={[styles.phoneFrame, { transform: [{ scale: phoneScale }] }, shadows.lg]}>
+          <View style={styles.phoneNotch} />
+          <View style={styles.phoneScreen}>{VisualComponent && <VisualComponent />}</View>
+          <View style={styles.phoneHomeBar} />
+        </Animated.View>
       </View>
 
+      {/* Copy */}
       <View style={styles.textArea}>
         <Text style={styles.title}>{step.title}</Text>
         <Text style={styles.description}>{step.description}</Text>
@@ -58,33 +55,75 @@ export function TourStep({ step }: TourStepProps) {
   )
 }
 
+const PHONE_WIDTH = 252
+const PHONE_HEIGHT = 460
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-  },
+  container: { flex: 1, justifyContent: 'center' },
+
   visualArea: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 32,
+    paddingHorizontal: spacing.xxl,
+    paddingTop: spacing.md,
   },
+  phoneFrame: {
+    width: PHONE_WIDTH,
+    height: PHONE_HEIGHT,
+    backgroundColor: '#1a1a1a',
+    borderRadius: 42,
+    padding: 7,
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    position: 'relative',
+  },
+  phoneNotch: {
+    position: 'absolute',
+    top: 14,
+    width: 86,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: '#0a0a0a',
+    zIndex: 2,
+  },
+  phoneScreen: {
+    flex: 1,
+    width: '100%',
+    backgroundColor: '#ffffff',
+    borderRadius: 36,
+    overflow: 'hidden',
+    paddingTop: 40,
+    paddingHorizontal: 12,
+  },
+  phoneHomeBar: {
+    position: 'absolute',
+    bottom: 12,
+    width: 110,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: 'rgba(255,255,255,0.35)',
+  },
+
   textArea: {
-    paddingHorizontal: 32,
-    paddingBottom: 16,
+    paddingHorizontal: spacing.xxl,
+    paddingBottom: spacing.md,
+    paddingTop: spacing.lg,
   },
   title: {
-    fontSize: 28,
-    fontWeight: '700',
+    fontFamily: fontFamily.displayExtraBold,
+    fontSize: 30,
     color: onboardingColors.textPrimary,
     textAlign: 'center',
-    letterSpacing: -0.5,
+    letterSpacing: -0.8,
+    lineHeight: 34,
   },
   description: {
-    fontSize: 16,
+    fontFamily: fontFamily.body,
+    fontSize: 15,
     color: onboardingColors.textSecondary,
     textAlign: 'center',
-    marginTop: 8,
+    marginTop: spacing.sm,
     lineHeight: 22,
   },
 })
