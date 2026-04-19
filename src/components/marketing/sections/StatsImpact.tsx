@@ -55,7 +55,7 @@ export function StatsImpact() {
               >
                 <div className="flex items-baseline justify-center">
                   <span
-                    className="text-7xl md:text-[128px] leading-none font-semibold tracking-[-0.06em] tabular-nums font-[family-name:var(--font-display)] bg-clip-text text-transparent bg-[linear-gradient(180deg,var(--foreground)_0%,var(--foreground)_55%,#E54D2E_115%)]"
+                    className="text-7xl md:text-[128px] leading-none font-semibold tracking-[-0.04em] tabular-nums font-[family-name:var(--font-display)] bg-clip-text text-transparent bg-[linear-gradient(180deg,var(--foreground)_0%,var(--foreground)_55%,#E54D2E_115%)] pr-[0.08em]"
                   >
                     {stat.number}
                   </span>
