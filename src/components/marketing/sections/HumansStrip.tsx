@@ -12,19 +12,19 @@ type Human = {
 }
 
 const humans: Human[] = [
-  { name: 'Sarah',   role: 'Designer',     avatar: 'https://randomuser.me/api/portraits/women/44.jpg', size: 'md', offset: '4%',   delay: 0 },
-  { name: 'Marcus',  role: 'Consultant',   avatar: 'https://randomuser.me/api/portraits/men/32.jpg',   size: 'lg', offset: '18%',  delay: 120 },
-  { name: 'Elena',   role: 'Strategist',   avatar: 'https://randomuser.me/api/portraits/women/68.jpg', size: 'sm', offset: '2%',   delay: 240 },
-  { name: 'Theo',    role: 'Founder',      avatar: 'https://randomuser.me/api/portraits/men/76.jpg',   size: 'md', offset: '22%',  delay: 360 },
-  { name: 'Priya',   role: 'Producer',     avatar: 'https://randomuser.me/api/portraits/women/55.jpg', size: 'lg', offset: '6%',   delay: 480 },
-  { name: 'Jamal',   role: 'Engineer',     avatar: 'https://randomuser.me/api/portraits/men/85.jpg',   size: 'sm', offset: '20%',  delay: 600 },
-  { name: 'Noa',     role: 'Art Director', avatar: 'https://randomuser.me/api/portraits/women/22.jpg', size: 'md', offset: '4%',   delay: 720 },
+  { name: 'Amara',   role: 'Designer',     avatar: 'https://images.unsplash.com/photo-1554151228-14d9def656e4?w=256&auto=format&fit=crop&crop=faces', size: 'md', offset: '4%',   delay: 0 },
+  { name: 'Diego',   role: 'Consultant',   avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=256&auto=format&fit=crop&crop=faces',   size: 'lg', offset: '18%',  delay: 120 },
+  { name: 'Sofia',   role: 'Strategist',   avatar: 'https://images.unsplash.com/photo-1541823709867-1b206113eafd?w=256&auto=format&fit=crop&crop=faces', size: 'sm', offset: '2%',   delay: 240 },
+  { name: 'Marcus',  role: 'Founder',      avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=256&auto=format&fit=crop&crop=faces',   size: 'md', offset: '22%',  delay: 360 },
+  { name: 'Priya',   role: 'Producer',     avatar: 'https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=256&auto=format&fit=crop&crop=faces', size: 'lg', offset: '6%',   delay: 480 },
+  { name: 'Jamal',   role: 'Engineer',     avatar: 'https://images.unsplash.com/photo-1463453091185-61582044d556?w=256&auto=format&fit=crop&crop=faces',   size: 'sm', offset: '20%',  delay: 600 },
+  { name: 'Elena',   role: 'Art Director', avatar: 'https://images.unsplash.com/photo-1499714608240-22fc6ad53fb2?w=256&auto=format&fit=crop&crop=faces', size: 'md', offset: '4%',   delay: 720 },
 ]
 
 const snippets = [
-  { body: '"Six clients. Zero spreadsheets. I feel human again."', name: 'Sarah', role: 'Freelance designer' },
-  { body: '"Set up in five minutes. Ten more things shipped that afternoon."', name: 'Theo', role: 'Indie founder' },
-  { body: '"I stopped waking up anxious. The reminders are gentle, not loud."', name: 'Elena', role: 'Marketing strategist' },
+  { body: '"Six clients. Zero spreadsheets. I feel human again."', name: 'Amara', role: 'Freelance designer' },
+  { body: '"Set up in five minutes. Ten more things shipped that afternoon."', name: 'Marcus', role: 'Indie founder' },
+  { body: '"I stopped waking up anxious. The reminders are gentle, not loud."', name: 'Sofia', role: 'Marketing strategist' },
 ]
 
 const sizeMap = {
