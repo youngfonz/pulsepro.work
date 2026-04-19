@@ -35,8 +35,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true })
   }
 
-  // Handle link codes: LINK-XXXXXX or /start LINK-XXXXXX (from deep link)
-  const linkCodeMatch = text.match(/^(?:\/start\s+)?(LINK-[A-F0-9]{6})$/i)
+  // Handle link codes: LINK-XXXXXXXX or /start LINK-XXXXXXXX (from deep link)
+  // Generator emits 4 bytes of randomness = 8 hex chars (src/actions/telegram.ts).
+  const linkCodeMatch = text.match(/^(?:\/start\s+)?(LINK-[A-F0-9]{8})$/i)
   if (linkCodeMatch) {
     return handleVerification(chatId, linkCodeMatch[1].toUpperCase())
   }
