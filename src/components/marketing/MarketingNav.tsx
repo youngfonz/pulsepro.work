@@ -12,10 +12,21 @@ export function MarketingNav() {
   const isDark = theme === 'dark'
 
   useEffect(() => {
-    const onScroll = () => setIsScrolled(window.scrollY > 10)
+    const onScroll = () => {
+      const top =
+        window.scrollY ||
+        document.documentElement.scrollTop ||
+        document.body.scrollTop ||
+        0
+      setIsScrolled(top > 10)
+    }
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
+    document.addEventListener('scroll', onScroll, { passive: true, capture: true })
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      document.removeEventListener('scroll', onScroll, { capture: true } as EventListenerOptions)
+    }
   }, [])
 
   const navLinks = [
@@ -36,9 +47,11 @@ export function MarketingNav() {
       ? (isDark ? '#1a1a1a' : '#ffffff')
       : 'transparent',
     borderBottom: isScrolled
-      ? (isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.05)')
+      ? (isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.08)')
       : '1px solid transparent',
-    boxShadow: isScrolled ? '0 1px 2px rgba(0,0,0,0.05)' : 'none',
+    boxShadow: isScrolled
+      ? (isDark ? '0 4px 16px rgba(0,0,0,0.3)' : '0 4px 16px rgba(0,0,0,0.08)')
+      : 'none',
   }
 
   return (

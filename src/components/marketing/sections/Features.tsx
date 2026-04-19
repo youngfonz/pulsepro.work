@@ -305,7 +305,7 @@ export function Features() {
                     0{idx + 1}
                   </span>
                 </div>
-                <h3 className="text-lg font-semibold mt-5 tracking-tight font-[family-name:var(--font-display)]">{feature.title}</h3>
+                <h3 className="text-lg font-semibold mt-5 tracking-tight font-[family-name:var(--font-display)] text-foreground">{feature.title}</h3>
                 <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
                   {feature.description}
                 </p>
