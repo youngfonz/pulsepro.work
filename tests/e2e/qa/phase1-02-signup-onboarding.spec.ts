@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 import { qaUsers } from './users'
-import { goToDashboard, waitHydrated } from './helpers'
+import { goToDashboard, waitHydrated, userIdFor } from './helpers'
 
 /**
  * Phase 1 · §1.2–1.4: post-signup redirect, onboarding overlay, empty dashboard.
@@ -48,12 +48,46 @@ test.describe('@phase1 1.3 Onboarding Overlay', () => {
     expect(isShowing).toBe(false)
   })
 
-  test.skip('t26-t31: initial onboarding overlay flow', () => {
-    /*
-     * Covered by global-setup (each QA user completed signup, which implies
-     * the overlay was dismissed). Re-testing requires wiping the
-     * OnboardingCompleted flag on the user — parked as a manual check.
-     */
+  test('t26-t31: full onboarding overlay flow — appears, advances 4 steps, dismisses', async ({ page }) => {
+    const uid = await userIdFor('free')
+    const storageKey = `pulse-onboarding-complete-${uid}`
+
+    // Wipe the localStorage flag BEFORE the page loads so the overlay's
+    // useEffect sees no completion record on its first read.
+    await page.addInitScript((key) => {
+      window.localStorage.removeItem(key)
+    }, storageKey)
+
+    await page.goto('/dashboard')
+    await waitHydrated(page)
+
+    // t26: overlay appears (modal with backdrop + centered card)
+    const step1Heading = page.getByRole('heading', { name: /add your first task/i })
+    await expect(step1Heading).toBeVisible({ timeout: 5_000 })
+
+    // t27: Step 1 — title + Continue button visible
+    await expect(page.getByRole('button', { name: /^continue$/i })).toBeVisible()
+    await page.getByRole('button', { name: /^continue$/i }).click()
+
+    // t28: Step 2 — "Organize when you're ready"
+    await expect(page.getByRole('heading', { name: /organize when you/i })).toBeVisible({ timeout: 3_000 })
+    await page.getByRole('button', { name: /^continue$/i }).click()
+
+    // t29: Step 3 — "Shortcuts that save time"
+    await expect(page.getByRole('heading', { name: /shortcuts that save time/i })).toBeVisible({ timeout: 3_000 })
+    await page.getByRole('button', { name: /^continue$/i }).click()
+
+    // t30: Step 4 — "You're all set" + button text changes to "Get started"
+    await expect(page.getByRole('heading', { name: /you.{1,3}re all set/i })).toBeVisible({ timeout: 3_000 })
+    const getStarted = page.getByRole('button', { name: /^get started$/i })
+    await expect(getStarted).toBeVisible()
+
+    // t31: clicking Get started dismisses the overlay
+    await getStarted.click()
+    await expect(step1Heading).toBeHidden({ timeout: 3_000 })
+    // localStorage flag now persisted
+    const flag = await page.evaluate((k) => window.localStorage.getItem(k), storageKey)
+    expect(flag).toBe('true')
   })
 })
 

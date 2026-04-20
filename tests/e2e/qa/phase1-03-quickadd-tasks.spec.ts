@@ -70,8 +70,11 @@ test.describe('@phase1 1.5 — 1.6 Task creation via N, dialog, and Cmd+K', () =
       .first()
     await input.waitFor({ state: 'visible', timeout: 6_000 })
     await input.fill('Review wireframes')
+    // The dialog's submit button is "Create Task" (or "Creating..." while pending).
+    // Match it precisely — the outer "Add Task" trigger is behind the bg-black/50 backdrop
+    // and would intercept clicks if matched as `.first()`.
     await page
-      .getByRole('button', { name: /^(create task|save|add task)$/i })
+      .getByRole('button', { name: /^create task$/i })
       .first()
       .click()
     await page.waitForTimeout(1_500)

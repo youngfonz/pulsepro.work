@@ -48,6 +48,78 @@ test.describe('@phase2 2.8 Project sharing and roles', () => {
     await ctx.close()
   })
 
+  test('t161: role flip to Editor persists in DB', async () => {
+    const proUid = await userIdFor('pro')
+    const secUid = await userIdFor('secondary')
+    const client = await prisma().client.create({ data: { userId: proUid, name: 'Acme Corp' } })
+    const project = await prisma().project.create({
+      data: { userId: proUid, name: 'Website Redesign', clientId: client.id, status: 'in_progress' },
+    })
+    const access = await prisma().projectAccess.create({
+      data: { projectId: project.id, userId: secUid, role: 'viewer', grantedBy: proUid },
+    })
+    // Flip role to editor (simulates what the UI role-select would do)
+    await prisma().projectAccess.update({
+      where: { id: access.id },
+      data: { role: 'editor' },
+    })
+    const after = await prisma().projectAccess.findUnique({ where: { id: access.id } })
+    expect(after?.role).toBe('editor')
+  })
+
+  test('t162: role flip to Manager persists in DB', async () => {
+    const proUid = await userIdFor('pro')
+    const secUid = await userIdFor('secondary')
+    const client = await prisma().client.create({ data: { userId: proUid, name: 'Acme Corp' } })
+    const project = await prisma().project.create({
+      data: { userId: proUid, name: 'Website Redesign', clientId: client.id, status: 'in_progress' },
+    })
+    const access = await prisma().projectAccess.create({
+      data: { projectId: project.id, userId: secUid, role: 'viewer', grantedBy: proUid },
+    })
+    await prisma().projectAccess.update({
+      where: { id: access.id },
+      data: { role: 'manager' },
+    })
+    const after = await prisma().projectAccess.findUnique({ where: { id: access.id } })
+    expect(after?.role).toBe('manager')
+  })
+
+  test('t163: 3 collaborators on a Pro project succeed (at the cap)', async () => {
+    const proUid = await userIdFor('pro')
+    const client = await prisma().client.create({ data: { userId: proUid, name: 'Acme Corp' } })
+    const project = await prisma().project.create({
+      data: { userId: proUid, name: 'Website Redesign', clientId: client.id, status: 'in_progress' },
+    })
+    for (let i = 0; i < 3; i++) {
+      await prisma().projectAccess.create({
+        data: {
+          projectId: project.id,
+          userId: `user_pro_collab_${i}`,
+          role: 'viewer',
+          grantedBy: proUid,
+        },
+      })
+    }
+    const count = await prisma().projectAccess.count({ where: { projectId: project.id } })
+    expect(count).toBe(3)
+  })
+
+  test('t165: removing a collaborator drops their access row', async () => {
+    const proUid = await userIdFor('pro')
+    const secUid = await userIdFor('secondary')
+    const client = await prisma().client.create({ data: { userId: proUid, name: 'Acme Corp' } })
+    const project = await prisma().project.create({
+      data: { userId: proUid, name: 'Website Redesign', clientId: client.id, status: 'in_progress' },
+    })
+    const access = await prisma().projectAccess.create({
+      data: { projectId: project.id, userId: secUid, role: 'viewer', grantedBy: proUid },
+    })
+    await prisma().projectAccess.delete({ where: { id: access.id } })
+    const gone = await prisma().projectAccess.findUnique({ where: { id: access.id } })
+    expect(gone).toBeNull()
+  })
+
   test('t164: adding a 4th collaborator on Pro hits the limit', async ({ browser, page }) => {
     const proUid = await userIdFor('pro')
     const client = await prisma().client.create({

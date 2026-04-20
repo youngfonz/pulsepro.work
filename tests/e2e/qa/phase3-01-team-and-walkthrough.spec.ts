@@ -154,26 +154,42 @@ test.describe('@phase3 3.3 All Pro features still work on Team', () => {
 test.describe('@phase3 3.4 Final walkthrough', () => {
   test.use({ storageState: qaUsers.team.storageStatePath })
 
-  for (const route of [
-    '/dashboard',
-    '/tasks',
-    '/projects',
-    '/clients',
-    '/bookmarks',
-    '/calendar',
-    '/invoices',
-    '/settings',
-  ]) {
-    test(`loads ${route} without error`, async ({ page }) => {
+  // Guide items t174–t182 each map to one route/area in the walkthrough.
+  const walkthrough: Array<[string, string]> = [
+    ['t174', '/dashboard'],
+    ['t175', '/tasks'],
+    ['t176', '/projects'],
+    ['t178', '/clients'],
+    ['t179', '/bookmarks'],
+    ['t180', '/calendar'],
+    ['t181', '/invoices'],
+    ['t182', '/settings'],
+  ]
+  for (const [id, route] of walkthrough) {
+    test(`${id}: ${route} loads without error`, async ({ page }) => {
       const res = await page.goto(route)
       await waitHydrated(page)
       expect(res?.ok()).toBe(true)
-      // Use innerText (visible text only) — textContent includes <script> bodies
-      // which in Next dev mode contain bundle paths matching /500/ etc.
       const visible = await page.locator('body').innerText()
       expect(visible).not.toMatch(/something went wrong|internal server error/i)
     })
   }
+
+  test('t177: project detail shows Tasks / Time / Team sections', async ({ page }) => {
+    const uid = await userIdFor('team')
+    await ensurePlan(uid, 'team')
+    await wipeUserData(uid)
+    const client = await prisma().client.create({ data: { userId: uid, name: 'Walk C' } })
+    const project = await prisma().project.create({
+      data: { userId: uid, name: 'Walk P', clientId: client.id, status: 'in_progress' },
+    })
+    await page.goto(`/projects/${project.id}`)
+    await waitHydrated(page)
+    const body = await page.locator('body').innerText()
+    expect(body).toMatch(/tasks/i)
+    expect(body).toMatch(/time/i)
+    expect(body).toMatch(/team|members/i)
+  })
 
   test('t183: Cmd+K search returns results across types', async ({ page }) => {
     const uid = await userIdFor('team')

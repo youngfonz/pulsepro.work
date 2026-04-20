@@ -86,8 +86,16 @@ test.describe('@phase1 1.15 Dark Mode', () => {
 test.describe('@phase1 @mobile 1.16 Mobile viewport (390px)', () => {
   test.use({ storageState: qaUsers.free.storageStatePath, viewport: { width: 390, height: 844 } })
 
-  for (const route of ['/dashboard', '/tasks', '/projects', '/settings']) {
-    test(`${route}: no horizontal scroll, readable`, async ({ page }) => {
+  // t108: setup-only check ("set width to 390") — covered by viewport config above.
+  // The route checks t109-t112 each verify scrollWidth <= innerWidth at 390px wide.
+  const routeIdMap: Record<string, string> = {
+    '/dashboard': 't109',
+    '/tasks': 't110',
+    '/projects': 't111',
+    '/settings': 't112',
+  }
+  for (const [route, id] of Object.entries(routeIdMap)) {
+    test(`t108 ${id}: ${route} — no horizontal scroll at 390px`, async ({ page }) => {
       await page.goto(route)
       await waitHydrated(page)
       const [scrollWidth, innerWidth] = await page.evaluate(() => [
@@ -95,8 +103,26 @@ test.describe('@phase1 @mobile 1.16 Mobile viewport (390px)', () => {
         window.innerWidth,
       ])
       expect(scrollWidth).toBeLessThanOrEqual(innerWidth + 4)
-      const body = await page.textContent('body')
-      expect(body).not.toMatch(/something went wrong/i)
+      const visible = await page.locator('body').innerText()
+      expect(visible).not.toMatch(/something went wrong/i)
     })
   }
+
+  test('t113: mobile sidebar collapses into a menu icon at <md', async ({ page }) => {
+    await page.goto('/dashboard')
+    await waitHydrated(page)
+    // Desktop sidebar items (e.g. "Dashboard" nav link) are hidden via `md:translate-x-0`
+    // — at 390px they sit off-screen until the menu button is tapped. We check that:
+    //   1. The mobile header is visible
+    //   2. A hamburger menu button is visible
+    //   3. Tapping it reveals the nav links
+    const mobileHeader = page.locator('div.md\\:hidden').first()
+    await expect(mobileHeader).toBeVisible()
+    // The hamburger is the last button inside the mobile header (after search + theme toggle)
+    const hamburger = mobileHeader.locator('button').last()
+    await expect(hamburger).toBeVisible()
+    await hamburger.click()
+    // After tapping, the sidebar slides in and Dashboard nav link becomes visible
+    await expect(page.getByRole('link', { name: /^dashboard$/i }).first()).toBeVisible({ timeout: 3_000 })
+  })
 })

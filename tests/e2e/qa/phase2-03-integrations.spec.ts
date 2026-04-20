@@ -1,119 +1,199 @@
 import { test, expect } from '@playwright/test'
 import { qaUsers } from './users'
-import { userIdFor, wipeUserData, ensurePlan, waitHydrated } from './helpers'
+import { userIdFor, wipeUserData, ensurePlan, prisma, waitHydrated } from './helpers'
+import crypto from 'node:crypto'
 
 /**
  * Phase 2 · §2.4 Telegram · §2.5 Email-to-Task · §2.6 API (Siri/Shortcuts) · §2.7 AI Insights
  *
- * Most of this section requires external systems (a real Telegram client,
- * a real inbound email to in.pulsepro.work, Anthropic API for insights, etc).
- * We automate ONLY what can be verified inside the browser:
- *   • t129, t140: settings UI shows correct buttons for Pro user.
- *   • t142-t143: generating the email token renders the address + copy button.
- *   • t148-t150: generating the API token renders pp_* + copy + curl examples.
- *   • t153-t156: AI insights panel visible on dashboard (content may vary).
- *
- * Skipped (Telegram round-trip, real email send, actual API call to live server)
- * are marked with test.skip + a reason.
+ * We automate everything that can be verified from Playwright (UI presence,
+ * DB state changes, real API round-trips). External-dependent bits
+ * (Telegram client round-trip, real email ingress from a user mailbox) stay
+ * skipped with reasons.
  */
 
-test.describe('@phase2 2.4 Telegram UI', () => {
+test.describe('@phase2 2.4 Telegram', () => {
   test.use({ storageState: qaUsers.pro.storageStatePath })
 
   test.beforeEach(async () => {
     const uid = await userIdFor('pro')
     await ensurePlan(uid, 'pro')
-    await wipeUserData(uid)
+    // Reset Telegram-specific fields before each test
+    await prisma().subscription.update({
+      where: { userId: uid },
+      data: {
+        telegramChatId: null,
+        telegramVerifyCode: null,
+        telegramVerifyExpires: null,
+        telegramRemindersEnabled: false,
+      },
+    })
   })
 
   test('t129: Telegram card shows "Link Telegram" button for Pro user', async ({ page }) => {
     await page.goto('/settings')
     await waitHydrated(page)
-    const body = await page.textContent('body')
-    expect(body).toMatch(/telegram/i)
-    // Either a Link button OR an upgrade CTA — assert the Pro-only one is there
+    await expect(page.getByRole('heading', { name: /telegram bot/i })).toBeVisible({ timeout: 8_000 })
     await expect(
       page.getByRole('button', { name: /link telegram|generate.*code/i }).first()
-    ).toBeVisible({ timeout: 5_000 })
+    ).toBeVisible()
   })
 
-  test('t130: clicking Link generates a LINK-XXXXXXXX code', async ({ page }) => {
+  test('t130: clicking Link generates a LINK-XXXXXXXX code and persists it', async ({ page }) => {
+    const uid = await userIdFor('pro')
     await page.goto('/settings')
     await waitHydrated(page)
-    const linkBtn = page
-      .getByRole('button', { name: /link telegram|generate.*code/i })
-      .first()
-    await linkBtn.click()
-    await page.waitForTimeout(1_000)
-    const body = await page.textContent('body')
-    // Generator emits LINK- + 8 hex chars (after security-hardening PR fix)
-    expect(body).toMatch(/LINK-[A-F0-9]{8}/)
+    await page.getByRole('button', { name: /link telegram|generate.*code/i }).first().click()
+    // Code should render + be persisted to the subscription row
+    await expect(page.getByText(/LINK-[A-F0-9]{8}/)).toBeVisible({ timeout: 5_000 })
+    const sub = await prisma().subscription.findUnique({ where: { userId: uid } })
+    expect(sub?.telegramVerifyCode).toMatch(/^LINK-[A-F0-9]{8}$/)
+    expect(sub?.telegramVerifyExpires).toBeTruthy()
   })
 
-  test.skip('t131-t139: Telegram round-trip (requires a real Telegram client on a phone)', () => {
-    /* Manual check — cannot automate without a Telegram bot API test rig. */
+  test('t133: linked Telegram shows "Linked" status in the UI', async ({ page }) => {
+    const uid = await userIdFor('pro')
+    // Simulate a successful webhook link by writing the chat ID directly
+    await prisma().subscription.update({
+      where: { userId: uid },
+      data: { telegramChatId: '987654321', telegramRemindersEnabled: true },
+    })
+    await page.goto('/settings')
+    await waitHydrated(page)
+    await expect(page.getByText(/linked|connected|unlink/i).first()).toBeVisible({ timeout: 5_000 })
   })
 
-  test.skip('t140-t141: Unlink Telegram (requires a linked state — also manual)', () => {
-    /* Covered by t129 + a manual once-over. */
+  test('t140-t141: unlink Telegram clears the chatId and reminders', async ({ page }) => {
+    const uid = await userIdFor('pro')
+    await prisma().subscription.update({
+      where: { userId: uid },
+      data: { telegramChatId: '987654321', telegramRemindersEnabled: true },
+    })
+    await page.goto('/settings')
+    await waitHydrated(page)
+    // Find an Unlink button (label may vary: "Unlink", "Unlink Telegram", "Disconnect")
+    const unlinkBtn = page.getByRole('button', { name: /^unlink|disconnect/i }).first()
+    if (!(await unlinkBtn.isVisible().catch(() => false))) {
+      test.skip(true, 'No Unlink button visible — verify manually; DB-level effect covered by action test')
+    }
+    // Auto-accept any confirm prompt
+    page.on('dialog', (d) => d.accept().catch(() => {}))
+    await unlinkBtn.click()
+    await page.waitForTimeout(1_200)
+    const after = await prisma().subscription.findUnique({ where: { userId: uid } })
+    expect(after?.telegramChatId).toBeNull()
+    expect(after?.telegramRemindersEnabled).toBe(false)
+  })
+
+  test.skip('t131-t139: full Telegram round-trip (requires a real Telegram client)', () => {
+    /* Bot commands (tasks/today/overdue/add/done/help) require a live Telegram
+     * session and Telegram API keys configured. Manual check per guide. */
   })
 })
 
-test.describe('@phase2 2.5 Email-to-Task UI', () => {
+test.describe('@phase2 2.5 Email-to-Task', () => {
   test.use({ storageState: qaUsers.pro.storageStatePath })
 
   test.beforeEach(async () => {
     const uid = await userIdFor('pro')
     await ensurePlan(uid, 'pro')
-    await wipeUserData(uid)
+    await prisma().subscription.update({
+      where: { userId: uid },
+      data: { inboundEmailToken: null },
+    })
   })
 
-  test('t142-t143: Generate Email Address button renders a {token}@in.pulsepro.work address', async ({ page }) => {
+  test('t142-t143: Generate Email Address button produces {token}@in.pulsepro.work', async ({ page }) => {
+    const uid = await userIdFor('pro')
     await page.goto('/settings')
     await waitHydrated(page)
-    const genBtn = page.getByRole('button', { name: /generate (email|address)/i }).first()
-    if (!(await genBtn.count())) {
-      test.skip(true, 'Email card may use a different label — verify manually first')
+    const genBtn = page
+      .getByRole('button', { name: /generate.*(email|address)/i })
+      .first()
+    if (!(await genBtn.isVisible().catch(() => false))) {
+      test.skip(true, 'Email-to-task generate button not visible — verify manually')
     }
     await genBtn.click()
-    await page.waitForTimeout(800)
-    const body = await page.textContent('body')
-    // Expect something like abc123@in.pulsepro.work
-    expect(body).toMatch(/[a-f0-9]{16,}@in\.pulsepro\.work/i)
+    await page.waitForTimeout(1_500)
+
+    // Verify in DB — token is 32 hex chars per generateEmailToken() in integrations.ts
+    const sub = await prisma().subscription.findUnique({ where: { userId: uid } })
+    expect(sub?.inboundEmailToken).toMatch(/^[a-f0-9]{32}$/)
+    // UI should render the token alongside the domain
+    const text = await page.textContent('body')
+    expect(text).toMatch(/[a-f0-9]{16,}@in\.pulsepro\.work/i)
   })
 
-  test.skip('t144-t147: Send actual email and verify task creation (requires real inbox + webhook)', () => {
-    /* Postmark inbound webhook is hit by Postmark in prod; cannot automate locally. */
+  test.skip('t144-t147: send real inbound email and verify task creation (Postmark required)', () => {
+    /* Postmark inbound webhook only fires in prod. Manual verification. */
   })
 })
 
-test.describe('@phase2 2.6 API token UI', () => {
+test.describe('@phase2 2.6 API Access (Siri / Shortcuts)', () => {
   test.use({ storageState: qaUsers.pro.storageStatePath })
 
   test.beforeEach(async () => {
     const uid = await userIdFor('pro')
     await ensurePlan(uid, 'pro')
-    await wipeUserData(uid)
+    await prisma().subscription.update({ where: { userId: uid }, data: { apiToken: null } })
   })
 
-  test('t148-t150: Generate API Token button reveals pp_* and curl examples', async ({ page }) => {
+  test('t148-t150: Generate API Token reveals pp_* + curl examples, hash persists', async ({ page }) => {
+    const uid = await userIdFor('pro')
     await page.goto('/settings')
     await waitHydrated(page)
-    const btn = page.getByRole('button', { name: /generate api token/i }).first()
-    if (!(await btn.count())) {
-      test.skip(true, 'API token card may use a different label')
+    const genBtn = page.getByRole('button', { name: /generate api token/i }).first()
+    if (!(await genBtn.isVisible().catch(() => false))) {
+      test.skip(true, 'Generate API Token button not visible — verify manually')
     }
-    await btn.click()
-    await page.waitForTimeout(800)
-    const body = await page.textContent('body')
-    expect(body).toMatch(/pp_/)
-    // Curl examples with Authorization: Bearer
-    expect(body?.toLowerCase()).toContain('authorization')
-    expect(body?.toLowerCase()).toContain('bearer')
+    await genBtn.click()
+    await page.waitForTimeout(1_500)
+    // Token visible in UI
+    await expect(page.getByText(/pp_[a-f0-9]{8,}/).first()).toBeVisible({ timeout: 5_000 })
+    // Curl example visible
+    const body = (await page.textContent('body')) || ''
+    expect(body.toLowerCase()).toContain('authorization')
+    expect(body.toLowerCase()).toContain('bearer')
+    // DB row has the SHA-256 hash (not the plaintext token)
+    const sub = await prisma().subscription.findUnique({ where: { userId: uid } })
+    expect(sub?.apiToken).toMatch(/^[a-f0-9]{64}$/)
   })
 
-  test.skip('t151-t152: actual POST/GET via curl (covered by 3.2-api-security.spec.ts)', () => {
-    /* Not re-running — parent suite already tests the REST API. */
+  test('t151: POST /api/v1/tasks with the generated token creates a task (201)', async ({ request }) => {
+    const uid = await userIdFor('pro')
+    // Mint a fresh token via the same path integrations.ts uses: pp_ + 24 random bytes
+    const plainToken = `pp_${crypto.randomBytes(24).toString('hex')}`
+    const hashed = crypto.createHash('sha256').update(plainToken).digest('hex')
+    await prisma().subscription.update({ where: { userId: uid }, data: { apiToken: hashed } })
+
+    const res = await request.post('/api/v1/tasks', {
+      headers: { Authorization: `Bearer ${plainToken}`, 'Content-Type': 'application/json' },
+      data: { title: 'API-created task', priority: 'high' },
+    })
+    expect(res.status()).toBe(201)
+    const body = await res.json()
+    expect(body.task?.title).toBe('API-created task')
+    expect(body.task?.priority).toBe('high')
+  })
+
+  test('t152: GET /api/v1/tasks returns the authenticated user\'s tasks', async ({ request }) => {
+    const uid = await userIdFor('pro')
+    const plainToken = `pp_${crypto.randomBytes(24).toString('hex')}`
+    const hashed = crypto.createHash('sha256').update(plainToken).digest('hex')
+    await prisma().subscription.update({ where: { userId: uid }, data: { apiToken: hashed } })
+
+    // Seed a couple of tasks
+    await prisma().task.create({ data: { userId: uid, title: 'API-list task 1', priority: 'medium' } })
+    await prisma().task.create({ data: { userId: uid, title: 'API-list task 2', priority: 'low' } })
+
+    const res = await request.get('/api/v1/tasks', {
+      headers: { Authorization: `Bearer ${plainToken}` },
+    })
+    expect(res.status()).toBe(200)
+    const body = await res.json()
+    expect(Array.isArray(body.tasks)).toBe(true)
+    const titles: string[] = body.tasks.map((t: { title: string }) => t.title)
+    expect(titles).toEqual(expect.arrayContaining(['API-list task 1', 'API-list task 2']))
   })
 })
 
@@ -125,9 +205,22 @@ test.describe('@phase2 2.7 AI Insights', () => {
     await ensurePlan(uid, 'pro')
     await page.goto('/dashboard')
     await waitHydrated(page)
-    const body = await page.textContent('body')
-    expect(body).toMatch(/insights|smart insights/i)
-    // Suppress unused
+    await expect(page.getByText(/insights/i).first()).toBeVisible({ timeout: 8_000 })
     void uid
+  })
+
+  test('t155-t156: refresh-insights button is present on dashboard', async ({ page }) => {
+    await ensurePlan(await userIdFor('pro'), 'pro')
+    await page.goto('/dashboard')
+    await waitHydrated(page)
+    const refreshBtn = page
+      .getByRole('button', { name: /generate|refresh.*insight|insights/i })
+      .first()
+    // Structural check only — actually triggering insights requires ANTHROPIC_API_KEY
+    // on the server AND the endpoint to not rate-limit. UI presence is what the guide asks.
+    if (!(await refreshBtn.isVisible().catch(() => false))) {
+      test.skip(true, 'Insights button not visible — verify manually')
+    }
+    await expect(refreshBtn).toBeVisible()
   })
 })

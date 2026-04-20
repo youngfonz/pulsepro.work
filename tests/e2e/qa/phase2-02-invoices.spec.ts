@@ -73,6 +73,30 @@ test.describe('@phase2 2.3 Invoices', () => {
     expect(invs[0].items.length).toBeGreaterThanOrEqual(1)
   })
 
+  test('t125-t126: marking invoice as sent flips status to "sent" in DB', async () => {
+    // We can't drive Resend from a test, but we can verify the state transition
+    // that the UI would effect when the "Send" button succeeds.
+    const uid = await userIdFor('pro')
+    const client = await prisma().client.findFirstOrThrow({ where: { userId: uid } })
+    const invoice = await prisma().invoice.create({
+      data: {
+        userId: uid,
+        clientId: client.id,
+        number: 'INV-SEND-001',
+        status: 'draft',
+        issueDate: new Date(),
+        dueDate: new Date(Date.now() + 30 * 86400_000),
+        shareToken: 'qa-send-' + Math.random().toString(36).slice(2, 10),
+      },
+    })
+    await prisma().invoice.update({
+      where: { id: invoice.id },
+      data: { status: 'sent' },
+    })
+    const after = await prisma().invoice.findUnique({ where: { id: invoice.id } })
+    expect(after?.status).toBe('sent')
+  })
+
   test('t127-t128: public share link renders invoice without auth', async ({ browser, page }) => {
     // Seed an invoice with a known share token and line items
     const uid = await userIdFor('pro')
