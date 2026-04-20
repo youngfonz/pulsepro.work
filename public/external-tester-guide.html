@@ -120,6 +120,31 @@
   .reset-btn { position: fixed; bottom: 24px; right: 24px; padding: 10px 18px; background: #ef4444; color: #fff; border: none; border-radius: 10px; font-size: 12px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(239,68,68,0.3); transition: all 0.15s; z-index: 100; font-family: inherit; }
   .reset-btn:hover { background: #dc2626; transform: translateY(-1px); }
 
+  /* Automation status (fed by /qa-results.json from Playwright) */
+  .automation-bar { margin-top: 10px; display: flex; align-items: center; gap: 10px; font-size: 12px; color: #525252; flex-wrap: wrap; }
+  .automation-bar .auto-pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 999px; font-weight: 600; font-size: 11px; }
+  .automation-bar .auto-pill.pass { background: #dcfce7; color: #15803d; }
+  .automation-bar .auto-pill.fail { background: #fef2f2; color: #b91c1c; }
+  .automation-bar .auto-pill.skip { background: #f4f4f5; color: #52525b; }
+  .automation-bar .auto-pill.unseen { background: #fffbeb; color: #a16207; }
+  .automation-bar .auto-timestamp { color: #71717a; }
+  .automation-bar .refresh-btn { background: #fff; border: 1px solid #d4d4d8; border-radius: 6px; padding: 3px 10px; font-size: 11px; font-weight: 600; color: #404040; cursor: pointer; font-family: inherit; }
+  .automation-bar .refresh-btn:hover { background: #f5f5f5; }
+  .automation-bar .refresh-btn:disabled { opacity: 0.5; cursor: default; }
+
+  /* Per-item auto badge */
+  .check-item { align-items: center; }
+  .check-item .auto-badge { margin-left: auto; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 999px; letter-spacing: 0.4px; text-transform: uppercase; flex-shrink: 0; white-space: nowrap; }
+  .check-item .auto-badge.pass { background: #dcfce7; color: #15803d; }
+  .check-item .auto-badge.fail { background: #fef2f2; color: #b91c1c; cursor: help; }
+  .check-item .auto-badge.skip { background: #f4f4f5; color: #52525b; }
+  .check-item .auto-badge:empty { display: none; }
+
+  /* Items that auto-passed get a subtle green ring on the checkbox so user knows
+     the automation confirmed it, even if they haven't manually ticked yet. */
+  .check-item.auto-pass input[type="checkbox"]:not(:checked) { border-color: #86efac; }
+  .check-item.auto-fail input[type="checkbox"]:not(:checked) { border-color: #fca5a5; background: #fef2f2; }
+
   /* Responsive */
   @media (max-width: 640px) {
     .dashboard { padding: 12px 16px; }
@@ -172,6 +197,15 @@
     </div>
     <div class="progress-bar-container">
       <div class="progress-bar" id="overall-bar" style="width: 0%"></div>
+    </div>
+    <div class="automation-bar" id="automation-bar">
+      <strong>Automation:</strong>
+      <span class="auto-pill pass"><span id="auto-pass-count">0</span> pass</span>
+      <span class="auto-pill fail"><span id="auto-fail-count">0</span> fail</span>
+      <span class="auto-pill skip"><span id="auto-skip-count">0</span> skip</span>
+      <span class="auto-pill unseen"><span id="auto-unseen-count">183</span> manual-only</span>
+      <span class="auto-timestamp" id="auto-timestamp">No run yet — execute <code>npx playwright test --config playwright.qa.config.ts</code></span>
+      <button class="refresh-btn" id="auto-refresh-btn" type="button">Refresh</button>
     </div>
     <div class="phase-tabs">
       <div class="phase-tab active" data-phase="setup">Setup</div>
@@ -909,6 +943,127 @@ Severity: Blocker / Major / Minor / Cosmetic</div>
   }
 
   updateStats();
+</script>
+
+<script>
+  // ──────────────────────────────────────────────────────────────────────
+  // Wire to Playwright results (public/qa-results.json). Runs on load and
+  // whenever the user clicks Refresh. Applies an auto-PASS / AUTO-FAIL /
+  // AUTO-SKIP badge to each check-item and updates the automation summary.
+  // Manual localStorage ticks are preserved independently — the auto layer
+  // is read-only signal, not a replacement.
+  // ──────────────────────────────────────────────────────────────────────
+  const AUTO_STATE = { loaded: false, tasks: {} };
+
+  function formatTimestamp(iso) {
+    try {
+      const d = new Date(iso);
+      const diff = Date.now() - d.getTime();
+      const mins = Math.floor(diff / 60000);
+      if (mins < 1) return 'just now';
+      if (mins < 60) return mins + ' min ago';
+      const hours = Math.floor(mins / 60);
+      if (hours < 24) return hours + ' hr ago';
+      return d.toLocaleString();
+    } catch { return iso; }
+  }
+
+  function applyAutoResults(data) {
+    AUTO_STATE.loaded = true;
+    AUTO_STATE.tasks = data.tasks || {};
+
+    // Clear previous badges
+    document.querySelectorAll('.auto-badge').forEach(el => el.remove());
+    document.querySelectorAll('.check-item').forEach(el => {
+      el.classList.remove('auto-pass', 'auto-fail', 'auto-skip');
+    });
+
+    // Apply per-item badges AND auto-tick checkboxes on PASS so progress reflects.
+    // Manual state (localStorage) still wins if user later unticks — auto only
+    // bootstraps from empty to checked.
+    const localState = loadState();
+    let stateChanged = false;
+
+    for (const [id, entry] of Object.entries(AUTO_STATE.tasks)) {
+      const cb = document.getElementById(id);
+      if (!cb) continue;
+      const item = cb.closest('.check-item');
+      if (!item) continue;
+
+      const status = entry.status;
+      item.classList.add('auto-' + status);
+
+      const badge = document.createElement('span');
+      badge.className = 'auto-badge ' + status;
+      badge.textContent = status;
+      if (status === 'fail' && entry.tests && entry.tests[0] && entry.tests[0].error) {
+        badge.title = entry.tests[0].error;
+      } else if (status === 'skip') {
+        badge.title = 'Test exists but was skipped — usually requires external system (Telegram, live email, payment).';
+      }
+      item.appendChild(badge);
+
+      // Auto-tick if PASS, auto-untick if FAIL (mirror automation truth in the checkbox).
+      // Skip items are left untouched — user decides if they verified manually.
+      if (status === 'pass' && cb.checked !== true) {
+        cb.checked = true;
+        item.classList.add('checked');
+        localState[id] = true;
+        stateChanged = true;
+      } else if (status === 'fail' && cb.checked === true) {
+        cb.checked = false;
+        item.classList.remove('checked');
+        localState[id] = false;
+        stateChanged = true;
+      }
+    }
+
+    if (stateChanged) {
+      saveState(localState);
+      updateStats();
+    }
+
+    // Summary counts
+    const c = data.counts || {};
+    document.getElementById('auto-pass-count').textContent = c.pass || 0;
+    document.getElementById('auto-fail-count').textContent = c.fail || 0;
+    document.getElementById('auto-skip-count').textContent = c.skip || 0;
+    document.getElementById('auto-unseen-count').textContent = (c.unseen || 0) + (c.unknown || 0);
+    document.getElementById('auto-timestamp').innerHTML =
+      'Last run <strong>' + formatTimestamp(data.generatedAt) + '</strong>' +
+      (data.baseUrl ? ' against <code>' + data.baseUrl + '</code>' : '');
+  }
+
+  function renderNoResults() {
+    document.getElementById('auto-timestamp').innerHTML =
+      'No run yet — execute <code>npx playwright test --config playwright.qa.config.ts</code>';
+    document.getElementById('auto-pass-count').textContent = '0';
+    document.getElementById('auto-fail-count').textContent = '0';
+    document.getElementById('auto-skip-count').textContent = '0';
+    document.getElementById('auto-unseen-count').textContent = '183';
+  }
+
+  async function fetchAutoResults() {
+    const btn = document.getElementById('auto-refresh-btn');
+    btn.disabled = true;
+    const originalLabel = btn.textContent;
+    btn.textContent = '...';
+    try {
+      // Cache-bust so refreshes actually refresh
+      const res = await fetch('/qa-results.json?_=' + Date.now(), { cache: 'no-store' });
+      if (!res.ok) throw new Error('no results');
+      const data = await res.json();
+      applyAutoResults(data);
+    } catch (err) {
+      renderNoResults();
+    } finally {
+      btn.textContent = originalLabel;
+      btn.disabled = false;
+    }
+  }
+
+  document.getElementById('auto-refresh-btn').addEventListener('click', fetchAutoResults);
+  fetchAutoResults();
 </script>
 
 </body>

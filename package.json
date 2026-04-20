@@ -48,6 +48,7 @@
     "seed": "npx tsx prisma/seed.ts"
   },
   "devDependencies": {
+    "@clerk/testing": "^2.0.17",
     "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4",
     "@types/dom-speech-recognition": "^0.0.7",
