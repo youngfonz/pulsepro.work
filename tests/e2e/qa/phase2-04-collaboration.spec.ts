@@ -19,24 +19,19 @@ test.describe('@phase2 2.8 Project sharing and roles', () => {
     await ensurePlan(proUid, 'pro')
     await wipeUserData(proUid)
     await wipeUserData(secUid)
-    const client = await prisma().client.create({
-      data: { userId: proUid, name: 'Acme Corp' },
-    })
-    await prisma().project.create({
-      data: {
-        userId: proUid,
-        name: 'Website Redesign',
-        clientId: client.id,
-        status: 'in_progress',
-      },
-    })
   })
 
   test('t158-t160: invite as Viewer — secondary sees project but cannot edit', async ({ browser }) => {
     const proUid = await userIdFor('pro')
     const secUid = await userIdFor('secondary')
-    const project = await prisma().project.findFirstOrThrow({
-      where: { userId: proUid, name: 'Website Redesign' },
+    // Create the project inline (not in beforeEach) so the row we hand to
+    // projectAccess.create is guaranteed to be the freshest committed row —
+    // suite-context state can leave stale "Website Redesign" rows pre-wipe.
+    const client = await prisma().client.create({
+      data: { userId: proUid, name: 'Acme Corp' },
+    })
+    const project = await prisma().project.create({
+      data: { userId: proUid, name: 'Website Redesign', clientId: client.id, status: 'in_progress' },
     })
 
     // Seed the access record directly (faster than driving the Team tab UI flow)
@@ -55,8 +50,11 @@ test.describe('@phase2 2.8 Project sharing and roles', () => {
 
   test('t164: adding a 4th collaborator on Pro hits the limit', async ({ browser, page }) => {
     const proUid = await userIdFor('pro')
-    const project = await prisma().project.findFirstOrThrow({
-      where: { userId: proUid, name: 'Website Redesign' },
+    const client = await prisma().client.create({
+      data: { userId: proUid, name: 'Acme Corp' },
+    })
+    const project = await prisma().project.create({
+      data: { userId: proUid, name: 'Website Redesign', clientId: client.id, status: 'in_progress' },
     })
 
     // Seed 3 collaborators so we're at the Pro cap

@@ -34,6 +34,7 @@ export default class GuideReporter implements Reporter {
 
   constructor(options?: { outputFile?: string }) {
     this.outputPath = options?.outputFile || 'public/qa-results.json'
+    console.log(`[qa-reporter] loaded, will write to ${this.outputPath}`)
   }
 
   onTestEnd(test: TestCase, result: TestResult) {
@@ -61,12 +62,10 @@ export default class GuideReporter implements Reporter {
       existing.status = aggregateStatus(existing.tests)
       this.tasks[id] = existing
     }
-    // Write incrementally so we don't lose state if the reporter is re-instantiated
-    // or if onEnd doesn't fire (has happened in some Playwright parallel setups).
-    this.flush(false)
   }
 
   async onEnd(full: FullResult) {
+    console.log(`[qa-reporter] onEnd fired. tasks tracked: ${Object.keys(this.tasks).length}`)
     this.flush(true, full.status)
   }
 

@@ -22,13 +22,27 @@ test.describe('@phase2 2.3 Invoices', () => {
   })
 
   test('t121-t124: create invoice with line items, total calculates correctly', async ({ page }) => {
+    const uid = await userIdFor('pro')
+    // Sanity: confirm the seed survived to the moment we navigate.
+    const seeded = await prisma().client.findFirst({ where: { userId: uid, name: 'Acme Corp' } })
+    if (!seeded) throw new Error('Acme Corp client missing before page load')
+
     await page.goto('/invoices/new')
     await waitHydrated(page)
 
-    // Client: Acme Corp — the InvoiceForm renders a labelled <select> when clients exist.
-    const clientSelect = page.getByLabel(/^client/i).first()
+    // Client: Acme Corp — InvoiceForm renders a <select> with "Select a client..." default.
+    // Label is plain text (not <label for>) so getByLabel won't match — use role + option text.
+    const clientSelect = page.getByRole('combobox').first()
     await clientSelect.waitFor({ state: 'visible', timeout: 8_000 })
     await clientSelect.selectOption({ label: 'Acme Corp' })
+
+    // Verify the value the form sees matches the row that exists in the DB.
+    const selected = await clientSelect.inputValue()
+    if (selected !== seeded.id) {
+      // The page's RSC payload is stale: re-fetch with a hard reload.
+      await page.goto('/invoices/new', { waitUntil: 'networkidle' })
+      await page.getByRole('combobox').first().selectOption({ label: 'Acme Corp' })
+    }
 
     // Due Date *: pick today via the DatePicker button
     await page.getByRole('button', { name: /pick a due date|due date/i }).first().click()
@@ -44,13 +58,16 @@ test.describe('@phase2 2.3 Invoices', () => {
     await spinbuttons.nth(0).fill('1')    // qty
     await spinbuttons.nth(1).fill('2500') // rate
 
+    // Final sanity: client must still exist immediately before submit
+    const stillThere = await prisma().client.findFirst({ where: { id: seeded.id } })
+    if (!stillThere) throw new Error('Acme Corp client vanished before submit')
+
     // Save Draft (now enabled because client + due date set)
     await page.getByRole('button', { name: /^save draft$/i }).click()
     await page.waitForURL(/\/invoice(s)?\/[^/]+/, { timeout: 10_000 }).catch(() => {})
     await page.waitForTimeout(1_000)
 
     // Verify in DB
-    const uid = await userIdFor('pro')
     const invs = await prisma().invoice.findMany({ where: { userId: uid }, include: { items: true } })
     expect(invs.length).toBeGreaterThanOrEqual(1)
     expect(invs[0].items.length).toBeGreaterThanOrEqual(1)

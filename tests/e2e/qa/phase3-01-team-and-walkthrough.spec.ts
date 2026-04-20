@@ -20,7 +20,9 @@ test.describe('@phase3 3.1 Verify Team upgrade', () => {
   test('t166: /settings shows Team plan and $29/month', async ({ page }) => {
     await page.goto('/settings')
     await waitHydrated(page)
-    const body = await page.textContent('body')
+    // Wait for the BillingCard to render the plan label before reading body text.
+    await page.getByText(/\bteam\b/i).first().waitFor({ state: 'visible', timeout: 10_000 })
+    const body = await page.locator('body').innerText()
     expect(body).toMatch(/\bteam\b/i)
     expect(body).toMatch(/\$?29/)
   })
