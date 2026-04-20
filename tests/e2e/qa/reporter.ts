@@ -38,7 +38,13 @@ export default class GuideReporter implements Reporter {
 
   onTestEnd(test: TestCase, result: TestResult) {
     const ids = extractTaskIds(test.title)
-    if (!ids.length) return
+    if (!ids.length) {
+      // Debug: log which titles are being skipped so we can see selector-ID mismatches
+      if (process.env.QA_REPORTER_DEBUG) {
+        console.log(`[qa-reporter] NO IDS for title="${test.title}" status=${result.status}`)
+      }
+      return
+    }
 
     const fullTitle = test.titlePath().slice(1).join(' > ')
     const file = test.location?.file ?? ''
@@ -55,9 +61,16 @@ export default class GuideReporter implements Reporter {
       existing.status = aggregateStatus(existing.tests)
       this.tasks[id] = existing
     }
+    // Write incrementally so we don't lose state if the reporter is re-instantiated
+    // or if onEnd doesn't fire (has happened in some Playwright parallel setups).
+    this.flush(false)
   }
 
   async onEnd(full: FullResult) {
+    this.flush(true, full.status)
+  }
+
+  private flush(verbose: boolean, runStatus: FullResult['status'] = 'passed') {
     const counts = { total: 183, pass: 0, fail: 0, skip: 0, unknown: 0, unseen: 0 }
     for (let i = 1; i <= 183; i++) {
       const id = `t${i}`
@@ -65,25 +78,25 @@ export default class GuideReporter implements Reporter {
       if (!entry) counts.unseen += 1
       else counts[entry.status] += 1
     }
-
     const payload = {
       generatedAt: new Date().toISOString(),
-      runStatus: full.status, // 'passed' | 'failed' | 'timedout' | 'interrupted'
+      runStatus,
       durationMs: Date.now() - this.startedAt,
       baseUrl: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3001',
       counts,
       tasks: this.tasks,
     }
-
     try {
       mkdirSync(dirname(this.outputPath), { recursive: true })
       writeFileSync(this.outputPath, JSON.stringify(payload, null, 2))
-      console.log(`\n[qa-reporter] wrote ${this.outputPath}`)
-      console.log(
-        `[qa-reporter] tasks: ${counts.pass} pass / ${counts.fail} fail / ${counts.skip} skip / ${counts.unseen} unseen (not automated) / 183 total`
-      )
+      if (verbose) {
+        console.log(`\n[qa-reporter] wrote ${this.outputPath}`)
+        console.log(
+          `[qa-reporter] tasks: ${counts.pass} pass / ${counts.fail} fail / ${counts.skip} skip / ${counts.unseen} unseen (not automated) / 183 total`
+        )
+      }
     } catch (err) {
-      console.error(`[qa-reporter] failed to write ${this.outputPath}:`, err)
+      if (verbose) console.error(`[qa-reporter] failed to write ${this.outputPath}:`, err)
     }
   }
 }

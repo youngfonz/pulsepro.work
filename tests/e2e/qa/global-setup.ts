@@ -139,6 +139,13 @@ async function captureStorageState(
   await page.waitForTimeout(800)
   console.log(`[qa-setup]   ↳ signed in, URL: ${page.url()}`)
 
+  // Mark the first-run onboarding overlay complete so tests aren't blocked
+  // by it. Key is per-user: `pulse-onboarding-complete-${userId}` (see
+  // src/components/OnboardingOverlay.tsx).
+  await page.evaluate((uid) => {
+    localStorage.setItem(`pulse-onboarding-complete-${uid}`, 'true')
+  }, userId)
+
   mkdirSync(dirname(outPath), { recursive: true })
   await context.storageState({ path: outPath })
   await context.close()

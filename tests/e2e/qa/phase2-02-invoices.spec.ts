@@ -22,39 +22,38 @@ test.describe('@phase2 2.3 Invoices', () => {
   })
 
   test('t121-t124: create invoice with line items, total calculates correctly', async ({ page }) => {
-    await page.goto('/invoices')
-    await waitHydrated(page)
-    await page.getByRole('button', { name: /new invoice|create invoice|add invoice/i }).first().click()
+    await page.goto('/invoices/new')
     await waitHydrated(page)
 
-    // Client: Acme Corp
-    const clientSelect = page
-      .locator('select[name="clientId"], [aria-label*="client" i]')
-      .or(page.getByRole('combobox', { name: /client/i }))
-      .first()
-    if (await clientSelect.count()) {
-      await clientSelect.click().catch(() => {})
-      await page.getByRole('option', { name: /acme corp/i }).first().click().catch(() => {})
-    }
+    // Client: Acme Corp — the InvoiceForm renders a labelled <select> when clients exist.
+    const clientSelect = page.getByLabel(/^client/i).first()
+    await clientSelect.waitFor({ state: 'visible', timeout: 8_000 })
+    await clientSelect.selectOption({ label: 'Acme Corp' })
 
-    // Line item 1
-    const desc1 = page.locator('input[name*="description" i]').first()
-    if (await desc1.count()) {
-      await desc1.fill('Website design')
-      const rate1 = page.locator('input[name*="rate" i], input[placeholder*="rate" i]').first()
-      if (await rate1.count()) await rate1.fill('2500')
-      const qty1 = page.locator('input[name*="quantity" i], input[placeholder*="qty" i]').first()
-      if (await qty1.count()) await qty1.fill('1')
-    }
+    // Due Date *: pick today via the DatePicker button
+    await page.getByRole('button', { name: /pick a due date|due date/i }).first().click()
+    // Calendar dialog: pick the first enabled day cell
+    const today = new Date().getDate()
+    await page.getByRole('button', { name: new RegExp(`^${today}$`) }).first().click()
 
-    // Save
-    await page.getByRole('button', { name: /save|create/i }).first().click()
-    await page.waitForTimeout(1_500)
+    // Line item: fill description, rate, qty
+    await page.getByRole('textbox', { name: /service description/i }).first()
+      .or(page.locator('input[placeholder*="service description" i]').first())
+      .fill('Website design')
+    const spinbuttons = page.getByRole('spinbutton')
+    await spinbuttons.nth(0).fill('1')    // qty
+    await spinbuttons.nth(1).fill('2500') // rate
+
+    // Save Draft (now enabled because client + due date set)
+    await page.getByRole('button', { name: /^save draft$/i }).click()
+    await page.waitForURL(/\/invoice(s)?\/[^/]+/, { timeout: 10_000 }).catch(() => {})
+    await page.waitForTimeout(1_000)
 
     // Verify in DB
     const uid = await userIdFor('pro')
-    const invs = await prisma().invoice.findMany({ where: { userId: uid } })
+    const invs = await prisma().invoice.findMany({ where: { userId: uid }, include: { items: true } })
     expect(invs.length).toBeGreaterThanOrEqual(1)
+    expect(invs[0].items.length).toBeGreaterThanOrEqual(1)
   })
 
   test('t127-t128: public share link renders invoice without auth', async ({ browser, page }) => {

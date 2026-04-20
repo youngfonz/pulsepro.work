@@ -28,8 +28,13 @@ test.describe('@phase2 2.1 Verify Pro upgrade', () => {
   test('t115: usage section shows unlimited or no limits', async ({ page }) => {
     await page.goto('/settings')
     await waitHydrated(page)
-    const body = await page.textContent('body')
-    expect(body).toMatch(/unlimited|no limit/i)
+    // BillingCard hides the Usage block entirely for paid plans (Pro/Team) —
+    // i.e. no "0 / 50" gauges should appear. That absence IS the unlimited
+    // signal in the current UI.
+    const body = await page.locator('body').innerText()
+    expect(body).not.toMatch(/\b\d+ ?\/ ?(1|3|50)\b/)
+    // Confirm we're seeing the Pro plan label so we know the page rendered.
+    expect(body).toMatch(/\bpro\b/i)
   })
 
   test('t116-t117: can create 4+ projects and 2+ clients without upgrade prompt', async ({ page }) => {

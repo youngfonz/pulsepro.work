@@ -19,22 +19,24 @@ test.describe('@phase1 1.14 Settings (Free plan)', () => {
 
   test('t96-t97: /settings loads and billing card shows Free + usage', async ({ page }) => {
     await page.goto('/settings')
-    await waitHydrated(page)
-    const body = await page.textContent('body')
-    expect(body).toMatch(/free/i)
-    // Usage: some fraction like "0/3", "1/3", "0/50", "0/1"
-    expect(body).toMatch(/\/\s?(1|3|50)\b/)
+    await expect(page.getByRole('heading', { name: /settings/i, level: 1 })).toBeVisible({ timeout: 10_000 })
+    await expect(page.getByRole('heading', { name: /billing/i })).toBeVisible()
+    // Plan label renders as paragraph "Current Plan" + "Free"
+    await expect(page.getByText(/current plan/i).first()).toBeVisible()
+    await expect(page.getByText(/^free$/i).first()).toBeVisible()
+    // Usage entries: "0 / 1" (clients), "0 / 3" (projects), "0 / 50" (tasks)
+    await expect(page.getByText('0 / 1')).toBeVisible()
+    await expect(page.getByText('0 / 3')).toBeVisible()
+    await expect(page.getByText('0 / 50')).toBeVisible()
   })
 
   test('t98-t100: Pro-only features show Pro badge (Telegram / Email-to-task / Siri)', async ({ page }) => {
     await page.goto('/settings')
-    await waitHydrated(page)
-    const body = await page.textContent('body')
-    // Any of: "Pro plan required", "Upgrade to Pro", "Pro" badge near feature — accept generic match
-    expect(body).toMatch(/telegram/i)
-    expect(body).toMatch(/email.*task|email-to-task/i)
-    // Pro hint near these cards
-    expect(body).toMatch(/pro\b|upgrade/i)
+    await expect(page.getByRole('heading', { name: /settings/i, level: 1 })).toBeVisible({ timeout: 10_000 })
+    // Each Pro-gated card renders as heading "{Feature Name} Pro"
+    await expect(page.getByRole('heading', { name: /telegram bot pro/i })).toBeVisible()
+    await expect(page.getByRole('heading', { name: /email to task pro/i })).toBeVisible()
+    await expect(page.getByRole('heading', { name: /siri.*shortcuts pro/i })).toBeVisible()
   })
 })
 
@@ -46,25 +48,18 @@ test.describe('@phase1 1.15 Dark Mode', () => {
     await ensurePlan(uid, 'free')
   })
 
-  test('t101: toggling dark mode adds .dark class on <html>', async ({ page }) => {
-    await page.goto('/settings')
+  test('t101: toggling dark mode from the sidebar adds .dark on <html>', async ({ page }) => {
+    await page.goto('/dashboard')
     await waitHydrated(page)
-
-    // Before: explicitly start from light — remove any stored theme
-    await page.evaluate(() => localStorage.setItem('theme', 'light'))
-    await page.reload()
-    await waitHydrated(page)
-
-    // Toggle — try a button with "dark" or a theme toggle with sun/moon icon
-    const toggle = page
-      .getByRole('button', { name: /dark mode|appearance|theme/i })
-      .or(page.locator('[aria-label*="theme" i], [aria-label*="dark mode" i]'))
-      .first()
-    if (!(await toggle.count())) {
-      test.skip(true, 'No dark mode toggle in UI — likely rendered as a switch inside Settings card')
-    }
+    // Start from light
+    await page.evaluate(() => {
+      localStorage.setItem('theme', 'light')
+      document.documentElement.classList.remove('dark')
+    })
+    // The sidebar has a `button "Dark mode"`.
+    const toggle = page.getByRole('button', { name: /^dark mode$/i })
     await toggle.click()
-    await page.waitForTimeout(500)
+    await page.waitForTimeout(400)
     const hasDark = await page.evaluate(() => document.documentElement.classList.contains('dark'))
     expect(hasDark).toBe(true)
   })

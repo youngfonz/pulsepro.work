@@ -166,8 +166,10 @@ test.describe('@phase3 3.4 Final walkthrough', () => {
       const res = await page.goto(route)
       await waitHydrated(page)
       expect(res?.ok()).toBe(true)
-      const body = await page.textContent('body')
-      expect(body).not.toMatch(/something went wrong|500|internal error/i)
+      // Use innerText (visible text only) — textContent includes <script> bodies
+      // which in Next dev mode contain bundle paths matching /500/ etc.
+      const visible = await page.locator('body').innerText()
+      expect(visible).not.toMatch(/something went wrong|internal server error/i)
     })
   }
 

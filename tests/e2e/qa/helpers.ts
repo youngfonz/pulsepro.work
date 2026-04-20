@@ -83,17 +83,21 @@ export async function dismissOnboarding(page: Page) {
 
 /** Open quick-add via N key and type a task, then Enter. */
 export async function quickAddTask(page: Page, text: string) {
-  // Make sure we're not focused inside an input
-  await page.locator('body').click({ position: { x: 1, y: 1 } })
-  await page.keyboard.press('n')
-  const input = page
-    .locator('input[placeholder*="What needs to be done"], input[placeholder*="task"], input[type="text"]:visible')
-    .first()
+  // Wait for hydration so the QuickAdd component's document keydown listener is attached.
+  await waitHydrated(page)
+  // Defocus any input/button so the global N handler isn't filtered out.
+  await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur?.())
+  const input = page.locator('input[placeholder="What needs to be done?"]').first()
+  // The listener attaches in a useEffect; retry the keypress a couple times.
+  for (let attempt = 0; attempt < 3; attempt++) {
+    await page.keyboard.press('n')
+    if (await input.isVisible({ timeout: 1_500 }).catch(() => false)) break
+    await page.waitForTimeout(400)
+  }
   await input.waitFor({ state: 'visible', timeout: 5_000 })
   await input.fill(text)
   await page.keyboard.press('Enter')
-  // Small wait for the server action to settle
-  await page.waitForTimeout(600)
+  await page.waitForTimeout(900)
 }
 
 /** Wait for a page to hydrate — Next.js App Router marker. */
