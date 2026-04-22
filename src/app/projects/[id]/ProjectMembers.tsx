@@ -112,7 +112,7 @@ export function ProjectMembers({
   const roleBadgeColors: Record<string, string> = {
     viewer: 'bg-muted text-muted-foreground',
     editor: 'bg-primary/10 text-primary',
-    manager: 'bg-amber-500/10 text-amber-500',
+    manager: 'bg-warning/10 text-warning',
   }
 
   return (
@@ -195,11 +195,11 @@ export function ProjectMembers({
 
       {/* Success message */}
       {successMessage && (
-        <div className="flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/5 px-4 py-3">
-          <svg className="w-4 h-4 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <div className="flex items-center gap-2 rounded-lg border border-success/30 bg-success/5 px-4 py-3">
+          <svg className="w-4 h-4 text-success flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <p className="text-sm text-emerald-500">{successMessage}</p>
+          <p className="text-sm text-success">{successMessage}</p>
         </div>
       )}
 

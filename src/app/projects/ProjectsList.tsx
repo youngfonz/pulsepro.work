@@ -25,10 +25,10 @@ interface Project {
 type HealthLabel = 'healthy' | 'at_risk' | 'critical' | 'completed'
 
 const healthDotColors: Record<HealthLabel, string> = {
-  healthy: 'bg-emerald-500',
-  at_risk: 'bg-amber-500',
-  critical: 'bg-rose-500',
-  completed: 'bg-emerald-500',
+  healthy: 'bg-success',
+  at_risk: 'bg-warning',
+  critical: 'bg-destructive',
+  completed: 'bg-success',
 }
 
 const healthTooltips: Record<HealthLabel, string> = {
@@ -156,7 +156,7 @@ export function ProjectsList({ projects, currentSort, viewMode, healthMap }: Pro
                   <tr key={project.id} className="hover:bg-muted/30 transition-colors text-muted-foreground">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <svg className="w-4 h-4 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <svg className="w-4 h-4 text-success flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                         </svg>
                         <Link
@@ -233,7 +233,7 @@ export function ProjectsList({ projects, currentSort, viewMode, healthMap }: Pro
                   {totalTasks > 0 && (
                     <div className="mt-3 relative w-full h-5 bg-secondary rounded overflow-hidden">
                       <div
-                        className={`h-full rounded transition-all ${progress === 100 ? 'bg-emerald-500' : 'bg-primary'}`}
+                        className={`h-full rounded transition-all ${progress === 100 ? 'bg-success' : 'bg-primary'}`}
                         style={{ width: `${Math.max(progress, 8)}%` }}
                       />
                       <span className="absolute inset-0 flex items-center px-2 text-xs font-medium text-white">
@@ -263,7 +263,7 @@ export function ProjectsList({ projects, currentSort, viewMode, healthMap }: Pro
                     href={`/projects/${project.id}`}
                     className="flex items-center gap-3 px-4 py-3 hover:bg-muted/30 transition-colors"
                   >
-                    <svg className="w-4 h-4 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <svg className="w-4 h-4 text-success flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                     <div className="flex-1 min-w-0">
@@ -327,7 +327,7 @@ export function ProjectsList({ projects, currentSort, viewMode, healthMap }: Pro
                         <div className="relative w-full h-5 bg-secondary rounded overflow-hidden">
                           <div
                             className={`h-full rounded transition-all ${
-                              progress === 100 ? 'bg-emerald-500' : 'bg-primary'
+                              progress === 100 ? 'bg-success' : 'bg-primary'
                             }`}
                             style={{ width: `${Math.max(progress, 8)}%` }}
                           />
@@ -375,8 +375,8 @@ export function ProjectsList({ projects, currentSort, viewMode, healthMap }: Pro
                 {completedProjects.map((project) => (
                   <Link key={project.id} href={`/projects/${project.id}`}>
                     <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-border/50 hover:bg-muted/30 transition-colors group">
-                      <div className="w-5 h-5 rounded-full bg-emerald-500/15 flex items-center justify-center flex-shrink-0">
-                        <svg className="w-3 h-3 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                      <div className="w-5 h-5 rounded-full bg-success/15 flex items-center justify-center flex-shrink-0">
+                        <svg className="w-3 h-3 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                         </svg>
                       </div>

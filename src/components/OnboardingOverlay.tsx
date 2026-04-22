@@ -218,7 +218,7 @@ function OrganizeVisual() {
             <div className="w-3.5 h-3.5 rounded border border-border flex-shrink-0" />
             <span className="text-[10px] text-foreground font-medium flex-1">{t.title}</span>
             <span className={`text-[8px] font-semibold px-1.5 py-0.5 rounded ${
-              t.priority === 'High' ? 'text-red-500 bg-red-50' : 'text-amber-600 bg-amber-50'
+              t.priority === 'High' ? 'text-destructive bg-destructive/10' : 'text-warning bg-warning/10'
             }`}>
               {t.priority}
             </span>
@@ -269,8 +269,8 @@ function ReadyVisual() {
       <div className="grid grid-cols-3 gap-2 p-3">
         {[
           { label: 'Active', value: '3', color: 'bg-primary' },
-          { label: 'Due soon', value: '1', color: 'bg-amber-500' },
-          { label: 'Done', value: '5', color: 'bg-emerald-500' },
+          { label: 'Due soon', value: '1', color: 'bg-warning' },
+          { label: 'Done', value: '5', color: 'bg-success' },
         ].map((s) => (
           <div key={s.label} className="bg-muted/50 rounded-md p-2">
             <div className="text-[15px] font-bold text-foreground">{s.value}</div>
@@ -282,7 +282,7 @@ function ReadyVisual() {
       {/* Task rows */}
       <div className="px-3 pb-3 space-y-1.5">
         {[
-          { name: 'Buy groceries', status: 'Due tomorrow', dot: 'bg-amber-500' },
+          { name: 'Buy groceries', status: 'Due tomorrow', dot: 'bg-warning' },
           { name: 'Finalize homepage copy', status: 'Acme Rebrand', dot: 'bg-primary' },
           { name: 'Call dentist', status: 'Quick task', dot: 'bg-muted-foreground' },
         ].map((p) => (

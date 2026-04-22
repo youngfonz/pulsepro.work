@@ -114,7 +114,7 @@ export function EmailTaskCard() {
         {token ? (
           <>
             <div className="flex items-center gap-2">
-              <span className="inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+              <span className="inline-flex h-2 w-2 rounded-full bg-success" />
               <span className="text-sm text-foreground">Email address active</span>
             </div>
 
@@ -130,7 +130,7 @@ export function EmailTaskCard() {
                   title="Copy address"
                 >
                   {copied ? (
-                    <svg className="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-4 h-4 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                   ) : (
@@ -157,7 +157,7 @@ export function EmailTaskCard() {
             <button
               onClick={handleRegenerate}
               disabled={actionLoading}
-              className="text-sm text-red-500 hover:text-red-400 transition-colors"
+              className="text-sm text-destructive hover:text-destructive/80 transition-colors"
             >
               {actionLoading ? 'Regenerating...' : 'Regenerate address'}
             </button>

@@ -46,18 +46,18 @@ export function isDueToday(date: Date | string | null): boolean {
 // Subtle, professional badge styles - outline-based design
 // Less visual noise while maintaining clarity
 export const statusColors: Record<string, string> = {
-  active: 'border border-emerald-500/50 text-emerald-600 dark:text-emerald-400 bg-emerald-500/5',
-  inactive: 'border border-zinc-400/50 text-zinc-500 dark:text-zinc-400 bg-zinc-500/5',
-  not_started: 'border border-zinc-400/50 text-zinc-500 dark:text-zinc-400 bg-zinc-500/5',
+  active: 'border border-success/50 text-success bg-success/5',
+  inactive: 'border border-muted-foreground/40 text-muted-foreground bg-muted-foreground/5',
+  not_started: 'border border-muted-foreground/40 text-muted-foreground bg-muted-foreground/5',
   in_progress: 'border border-primary/50 text-primary bg-primary/5',
-  on_hold: 'border border-amber-500/50 text-amber-600 dark:text-amber-400 bg-amber-500/5',
-  completed: 'border border-emerald-500/50 text-emerald-600 dark:text-emerald-400 bg-emerald-500/5',
+  on_hold: 'border border-warning/50 text-warning bg-warning/5',
+  completed: 'border border-success/50 text-success bg-success/5',
 }
 
 export const priorityColors: Record<string, string> = {
-  low: 'border border-zinc-400/50 text-zinc-600 dark:text-zinc-300 bg-zinc-500/5',
-  medium: 'border border-primary/50 text-primary bg-primary/5',
-  high: 'border border-rose-500/50 text-rose-600 dark:text-rose-400 bg-rose-500/5',
+  low: 'border border-success/50 text-success bg-success/5',
+  medium: 'border border-warning/50 text-warning bg-warning/5',
+  high: 'border border-destructive/50 text-destructive bg-destructive/5',
 }
 
 export const statusLabels: Record<string, string> = {

@@ -221,9 +221,9 @@ export function Calendar({ initialYear, initialMonth }: CalendarProps) {
                                 key={task.id}
                                 className={`w-1.5 h-1.5 rounded-full ${
                                   task.status === 'done'
-                                    ? 'bg-emerald-500'
+                                    ? 'bg-success'
                                     : task.priority === 'high'
-                                    ? 'bg-rose-500'
+                                    ? 'bg-destructive'
                                     : 'bg-primary'
                                 }`}
                               />
@@ -236,11 +236,11 @@ export function Calendar({ initialYear, initialMonth }: CalendarProps) {
                                 key={task.id}
                                 className={`text-xs truncate rounded px-1 py-0.5 font-medium ${
                                   task.status === 'done'
-                                    ? 'bg-emerald-600 text-white line-through'
+                                    ? 'bg-success text-success-foreground line-through'
                                     : hasOverdue
-                                    ? 'bg-rose-600 text-white'
+                                    ? 'bg-destructive text-destructive-foreground'
                                     : task.priority === 'high'
-                                    ? 'bg-rose-500 text-white'
+                                    ? 'bg-destructive text-destructive-foreground'
                                     : 'bg-primary text-primary-foreground'
                                 }`}
                               >
@@ -343,7 +343,7 @@ export function Calendar({ initialYear, initialMonth }: CalendarProps) {
             <h4 className="text-sm font-medium text-foreground mb-2">Legend</h4>
             <div className="space-y-2 text-xs">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded bg-rose-500" />
+                <div className="w-3 h-3 rounded bg-destructive" />
                 <span className="text-muted-foreground">High priority</span>
               </div>
               <div className="flex items-center gap-2">
@@ -351,11 +351,11 @@ export function Calendar({ initialYear, initialMonth }: CalendarProps) {
                 <span className="text-muted-foreground">Normal priority</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded bg-emerald-600" />
+                <div className="w-3 h-3 rounded bg-success" />
                 <span className="text-muted-foreground">Completed</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded bg-rose-600" />
+                <div className="w-3 h-3 rounded bg-destructive" />
                 <span className="text-muted-foreground">Overdue</span>
               </div>
             </div>

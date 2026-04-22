@@ -85,7 +85,7 @@ export default async function TasksPage({ searchParams }: Props) {
       {/* Task Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         <div className="flex items-center gap-3 rounded-lg border border-border px-4 py-3">
-          <ProgressRing value={completedTasks} max={stats.totalTasks} className="text-emerald-500" />
+          <ProgressRing value={completedTasks} max={stats.totalTasks} className="text-success" />
           <div>
             <p className="text-xs text-muted-foreground">Completed</p>
             <p className="text-lg font-semibold text-foreground">{completedTasks}<span className="text-sm font-normal text-muted-foreground">/{stats.totalTasks}</span></p>
@@ -96,7 +96,7 @@ export default async function TasksPage({ searchParams }: Props) {
             value={tasksDueThisWeekCount}
             max={Math.max(stats.pendingTasks, 1)}
             label={String(tasksDueThisWeekCount)}
-            className={tasksDueThisWeekCount === 0 ? 'text-emerald-500' : tasksDueThisWeekCount > 5 ? 'text-amber-500' : 'text-primary'}
+            className={tasksDueThisWeekCount === 0 ? 'text-success' : tasksDueThisWeekCount > 5 ? 'text-warning' : 'text-primary'}
           />
           <div>
             <p className="text-xs text-muted-foreground">Due This Week</p>

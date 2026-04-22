@@ -96,7 +96,7 @@ export function MultiImageUpload({
             <button
               type="button"
               onClick={() => onRemove(index, image.id)}
-              className="absolute right-1 top-1  bg-red-500 p-1 text-white shadow-sm hover:bg-red-600"
+              className="absolute right-1 top-1  bg-destructive p-1 text-destructive-foreground shadow-sm hover:bg-destructive/80"
             >
               <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -124,7 +124,7 @@ export function MultiImageUpload({
           />
         </label>
       </div>
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-destructive">{error}</p>}
     </div>
   )
 }
