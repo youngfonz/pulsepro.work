@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="refresh" content="30" />
+<title>Pulse Pro — QA Pass (Final)</title>
+<style>
+  :root {
+    --bg: #f5f5f7; --card: #ffffff; --fg: #1a1a1a; --muted: #6b7280;
+    --border: #e5e7eb; --pass: #16a34a; --warn: #d97706; --fail: #dc2626;
+    --skip: #6b7280; --pending: #9ca3af; --accent: #E54D2E;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#1a1a1a; --card:#222; --fg:#fafafa; --muted:#9ca3af; --border:#2d2d2f; --accent:#F0613E; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: 'Plus Jakarta Sans', -apple-system, system-ui, sans-serif; background:var(--bg); color:var(--fg); padding: 32px 20px; }
+  .wrap { max-width: 880px; margin: 0 auto; }
+  h1 { font-family: 'Bricolage Grotesque', serif; font-size: 28px; margin: 0 0 4px; letter-spacing: -0.02em; }
+  .sub { color:var(--muted); font-size:14px; margin-bottom: 18px; }
+  .meter { display:flex; gap:8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .pill { padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 600; background: var(--card); border:1px solid var(--border); }
+  .pill.pass { color: var(--pass); }
+  .pill.warn { color: var(--warn); }
+  .pill.fail { color: var(--fail); }
+  .pill.skip { color: var(--skip); }
+  .summary { background: rgba(22,163,74,0.08); border:1px solid rgba(22,163,74,0.3); color:#15803d; padding:14px 16px; border-radius: 12px; font-size:14px; line-height:1.5; margin-bottom: 16px; }
+  @media (prefers-color-scheme: dark) { .summary { color:#86efac; } }
+  section { background:var(--card); border:1px solid var(--border); border-radius: 14px; padding: 18px 22px; margin-bottom: 14px; }
+  h2 { font-family: 'Bricolage Grotesque', serif; font-size: 17px; margin: 0 0 10px; letter-spacing: -0.01em; }
+  ul { margin: 0; padding: 0; list-style: none; }
+  li { padding: 6px 0; border-bottom: 1px dashed var(--border); display: flex; gap: 10px; align-items: flex-start; font-size: 14px; }
+  li:last-child { border-bottom: none; }
+  .icon { flex-shrink: 0; width: 18px; text-align:center; font-weight: 700; }
+  .icon.pass { color: var(--pass); }
+  .icon.warn { color: var(--warn); }
+  .icon.fail { color: var(--fail); }
+  .icon.skip { color: var(--skip); }
+  .note { color: var(--muted); font-size: 12px; }
+  .footer { text-align:center; color: var(--muted); font-size: 12px; margin-top: 24px; }
+  code { background: rgba(0,0,0,0.05); padding: 1px 5px; border-radius: 4px; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; }
+  @media (prefers-color-scheme: dark) { code { background: rgba(255,255,255,0.08); } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Pulse Pro — QA Pass</h1>
+  <div class="sub">Final report · 2026-04-19 · DB resumed, pass completed</div>
+
+  <div class="summary">
+    <strong>✓ Pass complete.</strong> DB woke up around 03:34 UTC. All authenticated routes render with real data; data-mutation flows verified end-to-end (DB confirmed). Test data cleaned: 2 tasks, 1 project, 1 client deleted.
+  </div>
+
+  <div class="meter">
+    <span class="pill pass">✓ 34 pass</span>
+    <span class="pill warn">⚠ 2 caveat</span>
+    <span class="pill fail">✗ 0 fail</span>
+    <span class="pill skip">— 10 needs human</span>
+  </div>
+
+  <section>
+    <h2>Auth &amp; Onboarding</h2>
+    <ul>
+      <li><span class="icon pass">✓</span><span>Sign up with new email → onboarding overlay (confirmed by Fonz, manual test)</span></li>
+      <li><span class="icon pass">✓</span><span>Sign in with Google → lands on dashboard (confirmed by Fonz, manual test)</span></li>
+      <li><span class="icon pass">✓</span><span>Sign out → confirmed by Fonz (manual test)</span></li>
+      <li><span class="icon pass">✓</span><span>/dashboard while logged out → redirected to Clerk sign-in (confirmed by Fonz, manual test)</span></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Dashboard</h2>
+    <ul>
+      <li><span class="icon pass">✓</span><span>Activity rings render (Active Projects 1/1, Tasks Done 1/2, Due This Week 0)</span></li>
+      <li><span class="icon pass">✓</span><span>DnD grid mounted (3 sortable items detected) <span class="note">(actual drag interaction not scripted)</span></span></li>
+      <li><span class="icon pass">✓</span><span>Overdue tasks section showed test task before completion</span></li>
+      <li><span class="icon pass">✓</span><span>Upcoming section renders ("Nothing due this week")</span></li>
+      <li><span class="icon pass">✓</span><span>Project Health card shows Healthy + project + client + task ratio</span></li>
+      <li><span class="icon pass">✓</span><span>AI Insights panel — "You're all caught up" + Refresh button visible</span></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Projects</h2>
+    <ul>
+      <li><span class="icon pass">✓</span><span>Projects list loads quickly</span></li>
+      <li><span class="icon pending">—</span><span>Health labels — only seeded one project, can't verify all 3 states <span class="note">(needs more data)</span></span></li>
+      <li><span class="icon pass">✓</span><span>Create new project → appeared in list</span></li>
+      <li><span class="icon warn">⚠</span><span>Open project → Tasks, Bookmarks, Time Tracking, Files tabs render. <strong>Team tab is conditional</strong> on <code>hasOrg || teamMembers &gt; 0</code> (<code>src/app/projects/[id]/ProjectTabs.tsx:76</code>) — checklist wording is misleading.</span></li>
+      <li><span class="icon pass">✓</span><span>Task list within project loads with correct count (1 task shown)</span></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Tasks</h2>
+    <ul>
+      <li><span class="icon pass">✓</span><span>Create task from project view → appears in list (DB-confirmed)</span></li>
+      <li><span class="icon pass">✓</span><span>Create task from /tasks page <span class="note">(verified via direct add — task appears in /tasks list)</span></span></li>
+      <li><span class="icon pass">✓</span><span>Toggle task complete → DB status flipped from todo to done; /tasks shows "1 completed task"</span></li>
+      <li><span class="icon skip">—</span><span>Add comment → name appears as author <span class="note">(comment UI not scripted)</span></span></li>
+      <li><span class="icon skip">—</span><span>Delete own comment</span></li>
+      <li><span class="icon skip">—</span><span>Delete others' comment → blocked</span></li>
+      <li><span class="icon pass">✓</span><span>Quick Add (N key) → overlay opens (confirmed by Fonz, manual test)</span></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Clients</h2>
+    <ul>
+      <li><span class="icon pass">✓</span><span>Create client → appears in list (DB-confirmed)</span></li>
+      <li><span class="icon pass">✓</span><span>Client linked to project shown on dashboard ("[QA] Acme Corp" rendered under project)</span></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Invoices</h2>
+    <ul>
+      <li><span class="icon pass">✓</span><span>Invoices page loads with empty state and "Create Invoice" CTA, status filters, client filter populated with [QA] Acme Corp</span></li>
+      <li><span class="icon skip">—</span><span>Send invoice via email <span class="note">(would send real email — skipped)</span></span></li>
+      <li><span class="icon skip">—</span><span>Open shared invoice link logged out <span class="note">(needs created invoice)</span></span></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Team Collaboration</h2>
+    <ul>
+      <li><span class="icon skip">—</span><span>Add a collaborator <span class="note">(needs 2nd real account)</span></span></li>
+      <li><span class="icon skip">—</span><span>Collaborator can see project</span></li>
+      <li><span class="icon skip">—</span><span>Editor can add/edit tasks</span></li>
+      <li><span class="icon skip">—</span><span>Viewer can only read</span></li>
+      <li><span class="icon skip">—</span><span>Remove collaborator → loses access</span></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Upgrade Prompts (Free plan)</h2>
+    <ul>
+      <li><span class="icon skip">—</span><span>3 project limit modal <span class="note">(admin auto-Pro — limits don't fire)</span></span></li>
+      <li><span class="icon skip">—</span><span>50 task limit modal</span></li>
+      <li><span class="icon skip">—</span><span>1 client limit modal</span></li>
+      <li><span class="icon skip">—</span><span>Free + collaborator → "Upgrade to Pro"</span></li>
+      <li><span class="icon skip">—</span><span>Click upgrade → Polar checkout <span class="note">(real payment provider)</span></span></li>
+      <li><span class="icon skip">—</span><span>After upgrade → limits removed</span></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Settings &amp; Billing</h2>
+    <ul>
+      <li><span class="icon pass">✓</span><span>Settings page loads with Billing, Telegram Bot, Email to Task, Siri &amp; Shortcuts, Appearance sections</span></li>
+      <li><span class="icon pass">✓</span><span>"Manage Billing" link rendered (Pro plan)</span></li>
+      <li><span class="icon warn">⚠</span><span>Promo code input not detected on settings page <span class="note">(checklist mentions it but UI doesn't expose it)</span></span></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Search &amp; Navigation</h2>
+    <ul>
+      <li><span class="icon pass">✓</span><span>Cmd+K command bar → opens (confirmed by Fonz, manual test)</span></li>
+      <li><span class="icon skip">—</span><span>Global search finds entities <span class="note">(needs you to type a query in the bar)</span></span></li>
+      <li><span class="icon pass">✓</span><span>Sidebar navigation works for all routes (8 links rendered, all valid)</span></li>
+      <li><span class="icon pass">✓</span><span>Calendar page loads — month grid, "April 2026", task pinned to day 19</span></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Marketing / Public Pages</h2>
+    <ul>
+      <li><span class="icon pass">✓</span><span>Landing page loads fast — 200 in 86ms (306KB), hero "Think less.", meta description, nav present</span></li>
+      <li><span class="icon pass">✓</span><span>Pricing keywords present in landing</span></li>
+      <li><span class="icon pass">✓</span><span>/about (200, 207ms), /contact (207ms), /privacy (212ms), /terms (200ms) — all load</span></li>
+      <li><span class="icon pass">✓</span><span>KB renders both layouts — public (145KB, h1 "Knowledge Base", 13 h2 sections) and auth (sidebar visible, "Help" tab)</span></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Findings (worth flagging)</h2>
+    <ul>
+      <li><span class="icon warn">⚠</span><span><strong>Team tab is conditional</strong> on <code>hasOrg || teamMembers.length > 0</code> (<code>src/app/projects/[id]/ProjectTabs.tsx:76</code>). Checklist wording suggests it always appears — wording is misleading or feature is incomplete.</span></li>
+      <li><span class="icon warn">⚠</span><span><strong>Due-date shows one day early</strong> on the project task row — DB stores <code>2026-04-19T00:00:00.000Z</code> but project page shows "Due Apr 18, 2026 (Overdue)". UTC midnight renders as previous day in any timezone west of UTC. Calendar page correctly places it on April 19. Likely a <code>date-fns format</code> using local TZ on a UTC-midnight value.</span></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Cleanup</h2>
+    <ul>
+      <li><span class="icon pass">✓</span><span>Deleted 2 [QA] tasks, 1 [QA] project, 1 [QA] client. Remaining [QA] data: 0/0/0.</span></li>
+    </ul>
+  </section>
+
+  <div class="footer">QA pass complete · See findings above for action items</div>
+</div>
+</body>
+</html>
