@@ -38,8 +38,8 @@ export function MarketingNav() {
   // All visual properties computed in JS — no Tailwind for colors/bg
   // Hero flips with theme: white over dark hero (dark mode), black over light hero (light mode)
   const textColor = isScrolled
-    ? (isDark ? '#fafafa' : '#0a0a0a')
-    : (isDark ? '#ffffff' : '#0a0a0a')
+    ? (isDark ? '#fafafa' : '#1c1c1e')
+    : (isDark ? '#ffffff' : '#1c1c1e')
 
   const headerStyle: React.CSSProperties = {
     transition: 'background-color 0.2s, border-color 0.2s, box-shadow 0.2s',
