@@ -118,7 +118,7 @@ export function TelegramCard() {
         {state.linked ? (
           <>
             <div className="flex items-center gap-2">
-              <span className="inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+              <span className="inline-flex h-2 w-2 rounded-full bg-success" />
               <span className="text-sm text-foreground">Telegram linked</span>
             </div>
 
@@ -148,7 +148,7 @@ export function TelegramCard() {
             <button
               onClick={handleUnlink}
               disabled={actionLoading}
-              className="text-sm text-red-500 hover:text-red-400 transition-colors"
+              className="text-sm text-destructive hover:text-destructive/80 transition-colors"
             >
               Unlink Telegram
             </button>

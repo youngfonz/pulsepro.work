@@ -23,7 +23,7 @@ export function TaskCheckbox({ taskId, done }: TaskCheckboxProps) {
       disabled={isPending}
       className={`mt-1 flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
         done
-          ? 'bg-emerald-500 border-emerald-500 text-white'
+          ? 'bg-success border-success text-success-foreground'
           : 'border-border hover:border-primary'
       } ${isPending ? 'opacity-50' : ''}`}
     >

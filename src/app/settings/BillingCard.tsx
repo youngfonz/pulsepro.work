@@ -10,7 +10,7 @@ type UsageData = Awaited<ReturnType<typeof getUsageLimits>>
 
 const PLAN_DISPLAY = {
   free: { label: 'Free', price: null, badge: 'bg-muted text-muted-foreground' },
-  pro: { label: 'Pro', price: '$12/month', badge: 'bg-emerald-500/10 text-emerald-500' },
+  pro: { label: 'Pro', price: '$12/month', badge: 'bg-success/10 text-success' },
   team: { label: 'Team', price: '$29/month', badge: 'bg-primary/10 text-primary' },
 } as const
 
@@ -195,7 +195,7 @@ function PromoCodeInput({ onRedeemed }: { onRedeemed: () => void }) {
         </button>
       </div>
       {message && (
-        <p className={`text-xs ${message.type === 'success' ? 'text-emerald-500' : 'text-destructive'}`}>
+        <p className={`text-xs ${message.type === 'success' ? 'text-success' : 'text-destructive'}`}>
           {message.text}
         </p>
       )}
@@ -211,14 +211,14 @@ function UsageRow({ label, current, limit }: { label: string; current: number; l
     <div className="space-y-1">
       <div className="flex items-center justify-between text-xs">
         <span className="text-muted-foreground">{label}</span>
-        <span className={isNearLimit ? 'text-amber-500 font-medium' : 'text-foreground'}>
+        <span className={isNearLimit ? 'text-warning font-medium' : 'text-foreground'}>
           {current} / {limit === Infinity ? 'Unlimited' : limit}
         </span>
       </div>
       <div className="h-1.5 bg-muted rounded-full overflow-hidden">
         <div
           className={`h-full rounded-full transition-all ${
-            isNearLimit ? 'bg-amber-500' : 'bg-primary'
+            isNearLimit ? 'bg-warning' : 'bg-primary'
           }`}
           style={{ width: `${percentage}%` }}
         />

@@ -122,7 +122,7 @@ function TaskItem({ task, canEdit = true }: { task: Task; canEdit?: boolean }) {
               onClick={handleToggle}
               className={`mt-0.5 h-5 w-5 flex-shrink-0 rounded border-2 transition-colors ${
                 task.status === 'done'
-                  ? 'border-emerald-500 bg-emerald-500 text-white'
+                  ? 'border-success bg-success text-success-foreground'
                   : 'border-border hover:border-primary'
               }`}
             >
@@ -135,7 +135,7 @@ function TaskItem({ task, canEdit = true }: { task: Task; canEdit?: boolean }) {
           ) : (
             <div className={`mt-0.5 h-5 w-5 flex-shrink-0 rounded border-2 ${
               task.status === 'done'
-                ? 'border-emerald-500 bg-emerald-500 text-white'
+                ? 'border-success bg-success text-success-foreground'
                 : 'border-border'
             }`}>
               {task.status === 'done' && (
@@ -170,7 +170,7 @@ function TaskItem({ task, canEdit = true }: { task: Task; canEdit?: boolean }) {
               {isBookmark && (
                 <span className={`text-xs px-1.5 py-0.5 rounded ${
                   task.bookmarkType === 'youtube'
-                    ? 'bg-red-500/10 text-red-600 dark:text-red-400'
+                    ? 'bg-destructive/10 text-destructive'
                     : task.bookmarkType === 'twitter'
                     ? 'bg-secondary text-secondary-foreground'
                     : 'bg-primary/10 text-primary'

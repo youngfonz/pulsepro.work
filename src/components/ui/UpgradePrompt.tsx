@@ -33,8 +33,8 @@ export function UpgradePrompt({ message, onDismiss }: UpgradeModalProps) {
         >
           {/* Icon */}
           <div className="flex justify-center">
-            <div className="w-14 h-14 rounded-full bg-amber-500/10 flex items-center justify-center">
-              <svg className="w-7 h-7 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <div className="w-14 h-14 rounded-full bg-warning/10 flex items-center justify-center">
+              <svg className="w-7 h-7 text-warning" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
               </svg>
             </div>

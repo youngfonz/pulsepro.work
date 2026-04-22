@@ -23,7 +23,7 @@ function CopyButton({ value, label }: { value: string; label?: string }) {
       title={`Copy ${label || 'value'}`}
     >
       {copied ? (
-        <svg className="w-3 h-3 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="w-3 h-3 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
         </svg>
       ) : (
@@ -164,7 +164,7 @@ export function ApiAccessCard() {
         {hasToken ? (
           <>
             <div className="flex items-center gap-2">
-              <span className="inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+              <span className="inline-flex h-2 w-2 rounded-full bg-success" />
               <span className="text-sm text-foreground">API access enabled</span>
             </div>
 
@@ -197,7 +197,7 @@ export function ApiAccessCard() {
                     title="Copy token"
                   >
                     {copied ? (
-                      <svg className="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className="w-4 h-4 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                     ) : (
@@ -207,7 +207,7 @@ export function ApiAccessCard() {
                     )}
                   </button>
                 </div>
-                <p className="text-[11px] text-amber-500 mt-2">
+                <p className="text-[11px] text-warning mt-2">
                   Copy this token now — it won&apos;t be shown again.
                 </p>
               </div>
@@ -342,7 +342,7 @@ export function ApiAccessCard() {
               <button
                 onClick={handleRevoke}
                 disabled={actionLoading}
-                className="text-sm text-red-500 hover:text-red-400 transition-colors"
+                className="text-sm text-destructive hover:text-destructive/80 transition-colors"
               >
                 Revoke access
               </button>

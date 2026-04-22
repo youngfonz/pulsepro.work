@@ -56,10 +56,10 @@ export default async function DashboardPage() {
     ...(overdueTasks.length > 0 ? [{
       id: 'overdue',
       content: (
-        <Card className="h-full border-l-2 border-l-rose-500/40">
+        <Card className="h-full border-l-2 border-l-destructive/40">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-rose-600 dark:text-rose-400 text-base">Overdue</CardTitle>
-            <Link href="/tasks" className="text-sm text-rose-500 dark:text-rose-400 hover:text-rose-600 dark:hover:text-rose-300">
+            <CardTitle className="text-destructive text-base">Overdue</CardTitle>
+            <Link href="/tasks" className="text-sm text-destructive hover:text-destructive/80">
               View all
             </Link>
           </CardHeader>
@@ -72,7 +72,7 @@ export default async function DashboardPage() {
                     className="flex items-center justify-between px-4 sm:px-6 pt-3 pb-1 hover:bg-muted/30 transition-colors"
                   >
                     <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{group.name}</p>
-                    <span className="text-xs text-rose-500 dark:text-rose-400 font-medium">
+                    <span className="text-xs text-destructive font-medium">
                       {group.tasks.length} task{group.tasks.length > 1 ? 's' : ''}
                     </span>
                   </Link>
@@ -90,7 +90,7 @@ export default async function DashboardPage() {
                           {priorityLabels[task.priority]}
                         </Badge>
                       </div>
-                      <p className="mt-0.5 text-xs text-rose-500 dark:text-rose-400">
+                      <p className="mt-0.5 text-xs text-destructive">
                         Due {formatDate(task.dueDate)}
                       </p>
                     </Link>
@@ -117,7 +117,7 @@ export default async function DashboardPage() {
           <CardContent className="p-0">
             {tasksDueToday.length === 0 && projectsDueThisWeek.length === 0 ? (
               <div className="px-6 py-10 flex flex-col items-center justify-center text-center">
-                <svg className="w-8 h-8 text-emerald-500 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <svg className="w-8 h-8 text-success mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <p className="text-sm text-muted-foreground">Nothing due this week</p>
@@ -203,18 +203,18 @@ export default async function DashboardPage() {
                   <span
                     className={`inline-flex items-center gap-1.5 text-[10px] font-medium px-1.5 py-0.5 rounded flex-shrink-0 ${
                       project.label === 'completed' || project.label === 'healthy'
-                        ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10'
+                        ? 'text-success bg-success/10'
                         : project.label === 'at_risk'
-                        ? 'text-amber-600 dark:text-amber-400 bg-amber-500/10'
-                        : 'text-rose-600 dark:text-rose-400 bg-rose-500/10'
+                        ? 'text-warning bg-warning/10'
+                        : 'text-destructive bg-destructive/10'
                     }`}
                   >
                     <span className={`w-1.5 h-1.5 rounded-full ${
                       project.label === 'completed' || project.label === 'healthy'
-                        ? 'bg-emerald-500'
+                        ? 'bg-success'
                         : project.label === 'at_risk'
-                        ? 'bg-amber-500'
-                        : 'bg-rose-500'
+                        ? 'bg-warning'
+                        : 'bg-destructive'
                     }`} />
                     {project.label === 'completed' ? 'Done' : project.label === 'healthy' ? 'Healthy' : project.label === 'at_risk' ? 'At Risk' : 'Critical'}
                   </span>
@@ -224,11 +224,11 @@ export default async function DashboardPage() {
                   </div>
                   <div className="text-right flex-shrink-0">
                     {project.label === 'completed' ? (
-                      <Badge className="border border-emerald-500/30 text-emerald-500 dark:text-emerald-400 bg-emerald-500/10 text-xs">
+                      <Badge className="border border-success/30 text-success bg-success/10 text-xs">
                         Done
                       </Badge>
                     ) : project.overdueTasks > 0 ? (
-                      <span className="text-xs text-rose-500 font-medium">
+                      <span className="text-xs text-destructive font-medium">
                         {project.overdueTasks} overdue
                       </span>
                     ) : (
@@ -371,17 +371,17 @@ export default async function DashboardPage() {
                   {/* Glow effect */}
                   <div className="absolute inset-0 blur-xl opacity-20">
                     <svg viewBox="0 0 100 100" className="w-full h-full">
-                      <circle cx="50" cy="50" r="42" fill="none" stroke="#f43f5e" strokeWidth="6" />
-                      <circle cx="50" cy="50" r="32" fill="none" stroke="#3b82f6" strokeWidth="6" />
+                      <circle cx="50" cy="50" r="42" fill="none" stroke="#E54D2E" strokeWidth="6" />
+                      <circle cx="50" cy="50" r="32" fill="none" stroke="#f59e0b" strokeWidth="6" />
                       <circle cx="50" cy="50" r="22" fill="none" stroke="#22c55e" strokeWidth="6" />
                     </svg>
                   </div>
 
                   {/* Background rings */}
                   <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full">
-                    <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" className="text-rose-500/15" strokeWidth="6" />
-                    <circle cx="50" cy="50" r="32" fill="none" stroke="currentColor" className="text-primary/15" strokeWidth="6" />
-                    <circle cx="50" cy="50" r="22" fill="none" stroke="currentColor" className="text-emerald-500/15" strokeWidth="6" />
+                    <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" className="text-primary/15" strokeWidth="6" />
+                    <circle cx="50" cy="50" r="32" fill="none" stroke="currentColor" className="text-warning/15" strokeWidth="6" />
+                    <circle cx="50" cy="50" r="22" fill="none" stroke="currentColor" className="text-success/15" strokeWidth="6" />
                   </svg>
 
                   {/* Progress rings */}
@@ -412,12 +412,12 @@ export default async function DashboardPage() {
                     />
                     <defs>
                       <linearGradient id="projectGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stopColor="#fb7185" />
-                        <stop offset="100%" stopColor="#f43f5e" />
+                        <stop offset="0%" stopColor="#F0613E" />
+                        <stop offset="100%" stopColor="#E54D2E" />
                       </linearGradient>
                       <linearGradient id="taskGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stopColor="#60a5fa" />
-                        <stop offset="100%" stopColor="#3b82f6" />
+                        <stop offset="0%" stopColor="#fbbf24" />
+                        <stop offset="100%" stopColor="#f59e0b" />
                       </linearGradient>
                       <linearGradient id="dueGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                         <stop offset="0%" stopColor="#4ade80" />
@@ -435,7 +435,7 @@ export default async function DashboardPage() {
                 {/* Stats Legend */}
                 <div className="flex flex-wrap items-start justify-center gap-x-6 gap-y-3">
                   <Link href="/projects" className="group flex items-center gap-2.5 p-1.5 rounded-lg hover:bg-muted/50 transition-colors">
-                    <div className="w-2.5 h-2.5 rounded-full bg-rose-500 flex-shrink-0" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-primary flex-shrink-0" />
                     <div>
                       <div className="text-lg font-semibold text-foreground">{stats.activeProjects}<span className="text-sm font-normal text-muted-foreground">/{stats.totalProjects}</span></div>
                       <div className="text-xs text-muted-foreground">Active Projects</div>
@@ -443,7 +443,7 @@ export default async function DashboardPage() {
                   </Link>
 
                   <Link href="/tasks" className="group flex items-center gap-2.5 p-1.5 rounded-lg hover:bg-muted/50 transition-colors">
-                    <div className="w-2.5 h-2.5 rounded-full bg-primary flex-shrink-0" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-warning flex-shrink-0" />
                     <div>
                       <div className="text-lg font-semibold text-foreground">{completedTasks}<span className="text-sm font-normal text-muted-foreground">/{stats.totalTasks}</span></div>
                       <div className="text-xs text-muted-foreground">Tasks Done</div>
@@ -451,7 +451,7 @@ export default async function DashboardPage() {
                   </Link>
 
                   <Link href="/tasks" className="group flex items-center gap-2.5 p-1.5 rounded-lg hover:bg-muted/50 transition-colors">
-                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 flex-shrink-0" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-success flex-shrink-0" />
                     <div>
                       <div className="text-lg font-semibold text-foreground">{tasksDueThisWeekCount}</div>
                       <div className="text-xs text-muted-foreground">Due This Week</div>

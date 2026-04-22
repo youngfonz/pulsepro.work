@@ -135,7 +135,7 @@ function DoneButton({ bookmarkId, done, type }: { bookmarkId: string; done: bool
       disabled={isPending}
       className={`p-2 rounded-md transition-colors ${
         done
-          ? 'text-emerald-500 hover:text-emerald-600 hover:bg-emerald-500/10'
+          ? 'text-success hover:text-success/80 hover:bg-success/10'
           : 'text-muted-foreground hover:text-foreground hover:bg-muted'
       }`}
       title={done ? `Undo ${labels.done.toLowerCase()}` : labels.undone}
@@ -388,7 +388,7 @@ function ImageCard({ bookmark }: { bookmark: Bookmark }) {
               <TypeBadge type={bookmark.bookmarkType} />
             </div>
             {isDone && (
-              <div className="absolute top-2 right-2 bg-emerald-500 text-white text-xs px-2 py-0.5 rounded font-medium">
+              <div className="absolute top-2 right-2 bg-success text-success-foreground text-xs px-2 py-0.5 rounded font-medium">
                 {labels.done}
               </div>
             )}
@@ -506,7 +506,7 @@ export function BookmarksList({ bookmarks }: { bookmarks: Bookmark[] }) {
           <div className="flex items-center gap-2">
             <div className="w-24 h-1.5 bg-secondary rounded-full overflow-hidden">
               <div
-                className="h-full bg-emerald-500 transition-all"
+                className="h-full bg-success transition-all"
                 style={{ width: `${Math.round((doneCount / totalCount) * 100)}%` }}
               />
             </div>

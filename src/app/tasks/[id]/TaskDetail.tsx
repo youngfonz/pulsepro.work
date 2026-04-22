@@ -127,7 +127,7 @@ export function TaskDetail({ task, projects }: { task: Task; projects: Project[]
             disabled={isPending}
             className={`mt-1 h-6 w-6 flex-shrink-0 rounded border-2 transition-colors ${
               task.status === 'done'
-                ? 'border-emerald-500 bg-emerald-500 text-white'
+                ? 'border-success bg-success text-success-foreground'
                 : 'border-border hover:border-primary'
             }`}
           >
@@ -202,7 +202,7 @@ function TaskReadView({ task, overdue }: { task: Task; overdue: boolean }) {
           {priorityLabels[task.priority]}
         </Badge>
         {task.status === 'done' && (
-          <Badge className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20">
+          <Badge className="bg-success/10 text-success border-success/20">
             Completed
           </Badge>
         )}

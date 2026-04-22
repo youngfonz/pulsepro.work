@@ -177,10 +177,10 @@ export function DashboardCalendar() {
                 <span
                   className={`absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 rounded-full ${
                     hasHighPriority
-                      ? 'bg-rose-600'
+                      ? 'bg-destructive'
                       : hasPendingTasks
                       ? 'bg-primary'
-                      : 'bg-emerald-600'
+                      : 'bg-success'
                   }`}
                 />
               )}
