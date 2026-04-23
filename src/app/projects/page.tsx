@@ -1,9 +1,10 @@
 import Link from 'next/link'
-import { getProjects, getClientsForSelect } from '@/actions/projects'
+import { getProjects, getClientsForSelect, getDeletedProjects } from '@/actions/projects'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent } from '@/components/ui/Card'
 import { ProjectsFilter } from './ProjectsFilter'
 import { ProjectsView } from './ProjectsView'
+import { DeletedProjects } from './DeletedProjects'
 
 export const dynamic = 'force-dynamic'
 
@@ -52,9 +53,10 @@ interface Props {
 
 export default async function ProjectsPage({ searchParams }: Props) {
   const params = await searchParams
-  const [projects, clients] = await Promise.all([
+  const [projects, clients, deletedProjects] = await Promise.all([
     getProjects(params),
     getClientsForSelect(),
+    getDeletedProjects(),
   ])
 
   const healthMap: Record<string, 'healthy' | 'at_risk' | 'critical' | 'completed'> = {}
@@ -121,6 +123,8 @@ export default async function ProjectsPage({ searchParams }: Props) {
           )}
         </CardContent>
       </Card>
+
+      <DeletedProjects projects={deletedProjects} />
     </div>
   )
 }
