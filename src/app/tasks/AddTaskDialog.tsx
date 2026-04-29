@@ -139,7 +139,7 @@ export function AddTaskDialog({ projects, defaultOpen = false }: AddTaskDialogPr
                     { value: '', label: 'No project (quick task)' },
                     ...projects.map((project) => ({
                       value: project.id,
-                      label: `${project.name}${project.client ? ` - ${project.client.name}` : ''}`,
+                      label: project.name,
                     })),
                   ]}
                 />
