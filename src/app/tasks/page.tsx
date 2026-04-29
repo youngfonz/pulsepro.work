@@ -171,7 +171,7 @@ export default async function TasksPage({ searchParams }: Props) {
                           {priorityLabels[task.priority]}
                         </Badge>
                         <p className="text-sm text-muted-foreground truncate">
-                          {task.project?.name ?? 'Quick task'}{task.project?.client?.name ? ` \u2022 ${task.project.client.name}` : ''}
+                          {task.project?.name ?? 'Quick task'}
                         </p>
                       </div>
                     </div>
@@ -218,7 +218,7 @@ export default async function TasksPage({ searchParams }: Props) {
                                 {priorityLabels[task.priority]}
                               </Badge>
                               <span className="truncate">
-                                {task.project?.name ?? 'Quick task'}{task.project?.client?.name ? ` \u2022 ${task.project.client.name}` : ''}
+                                {task.project?.name ?? 'Quick task'}
                               </span>
                               {task.dueDate && (
                                 <>
@@ -259,7 +259,7 @@ export default async function TasksPage({ searchParams }: Props) {
                                 {priorityLabels[task.priority]}
                               </Badge>
                               <p className="text-sm text-muted-foreground truncate">
-                                {task.project?.name ?? 'Quick task'}{task.project?.client?.name ? ` \u2022 ${task.project.client.name}` : ''}
+                                {task.project?.name ?? 'Quick task'}
                               </p>
                             </div>
                           </div>
