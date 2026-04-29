@@ -69,18 +69,18 @@ export default async function DashboardPage() {
                 <div key={group.id || '__standalone__'}>
                   <Link
                     href={group.id ? `/projects/${group.id}` : `/tasks`}
-                    className="flex items-center justify-between px-4 sm:px-6 pt-3 pb-1 hover:bg-muted/30 transition-colors"
+                    className="flex items-center justify-between gap-2 px-4 pt-3 pb-1 hover:bg-muted/30 transition-colors"
                   >
-                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{group.name}</p>
-                    <span className="text-xs text-destructive font-medium">
+                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground truncate">{group.name}</p>
+                    <Badge className="border border-destructive/40 text-destructive bg-destructive/5 flex-shrink-0">
                       {group.tasks.length} task{group.tasks.length > 1 ? 's' : ''}
-                    </span>
+                    </Badge>
                   </Link>
                   {group.tasks.map((task) => (
                     <Link
                       key={task.id}
                       href={`/tasks/${task.id}`}
-                      className="block px-4 py-2.5 sm:px-6 hover:bg-muted/50 transition-colors"
+                      className="block px-4 py-2.5 hover:bg-muted/50 transition-colors"
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0 flex-1">
@@ -126,13 +126,13 @@ export default async function DashboardPage() {
               <div>
                 {tasksDueToday.length > 0 && (
                   <div>
-                    <p className="px-4 sm:px-6 pt-2 pb-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">Due Today</p>
+                    <p className="px-4 pt-2 pb-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">Due Today</p>
                     <div className="divide-y divide-border">
                       {tasksDueToday.map((task) => (
                         <Link
                           key={task.id}
                           href={`/tasks/${task.id}`}
-                          className="flex items-center gap-3 px-4 py-2.5 sm:px-6 hover:bg-muted transition-colors"
+                          className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted transition-colors"
                         >
                           <svg className="w-4 h-4 text-muted-foreground flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -151,13 +151,13 @@ export default async function DashboardPage() {
                 )}
                 {projectsDueThisWeek.length > 0 && (
                   <div className={tasksDueToday.length > 0 ? 'border-t border-border' : ''}>
-                    <p className="px-4 sm:px-6 pt-3 pb-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">Projects This Week</p>
+                    <p className="px-4 pt-3 pb-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">Projects This Week</p>
                     <div className="divide-y divide-border">
                       {projectsDueThisWeek.map((project) => (
                         <Link
                           key={project.id}
                           href={`/projects/${project.id}`}
-                          className="flex items-center gap-3 px-4 py-2.5 sm:px-6 hover:bg-muted transition-colors"
+                          className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted transition-colors"
                         >
                           <svg className="w-4 h-4 text-muted-foreground flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
@@ -198,7 +198,7 @@ export default async function DashboardPage() {
                 <Link
                   key={project.projectId}
                   href={project.href}
-                  className="flex items-center gap-3 px-4 py-3 sm:px-6 hover:bg-muted/50 transition-colors"
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-muted/50 transition-colors"
                 >
                   <span
                     className={`inline-flex items-center gap-1.5 text-[10px] font-medium px-1.5 py-0.5 rounded flex-shrink-0 ${
