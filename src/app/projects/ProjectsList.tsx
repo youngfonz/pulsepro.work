@@ -70,9 +70,6 @@ export function ProjectsList({ projects, currentSort, viewMode, healthMap }: Pro
                   <th className="px-4 py-3">
                     <SortableHeader label="Project" sortKey="name" currentSort={currentSort} basePath="/projects" />
                   </th>
-                  <th className="px-4 py-3">
-                    <SortableHeader label="Client" sortKey="client" currentSort={currentSort} basePath="/projects" />
-                  </th>
                   <th className="px-4 py-3 min-w-[120px]">
                     <SortableHeader label="Status" sortKey="status" currentSort={currentSort} basePath="/projects" />
                   </th>
@@ -108,14 +105,6 @@ export function ProjectsList({ projects, currentSort, viewMode, healthMap }: Pro
                         </div>
                       </td>
                       <td className="px-4 py-3">
-                        <Link
-                          href={`/clients/${project.client.id}`}
-                          className="text-muted-foreground hover:text-link"
-                        >
-                          {project.client.name}
-                        </Link>
-                      </td>
-                      <td className="px-4 py-3">
                         <Badge className={statusColors[project.status]}>
                           {statusLabels[project.status]}
                         </Badge>
@@ -145,7 +134,7 @@ export function ProjectsList({ projects, currentSort, viewMode, healthMap }: Pro
                 })}
                 {completedProjects.length > 0 && (
                   <tr>
-                    <td colSpan={7} className="px-4 pt-8 pb-2">
+                    <td colSpan={6} className="px-4 pt-8 pb-2">
                       <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                         Completed ({completedProjects.length})
                       </span>
@@ -166,14 +155,6 @@ export function ProjectsList({ projects, currentSort, viewMode, healthMap }: Pro
                           {project.name}
                         </Link>
                       </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <Link
-                        href={`/clients/${project.client.id}`}
-                        className="text-muted-foreground/70 hover:text-foreground"
-                      >
-                        {project.client.name}
-                      </Link>
                     </td>
                     <td className="px-4 py-3" colSpan={3}>
                       <span className="text-xs text-muted-foreground/50">
@@ -219,7 +200,6 @@ export function ProjectsList({ projects, currentSort, viewMode, healthMap }: Pro
                         )}
                         <h3 className="font-medium text-foreground truncate">{project.name}</h3>
                       </div>
-                      <p className="text-sm text-muted-foreground truncate">{project.client.name}</p>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
                       <Badge className={statusColors[project.status]}>
@@ -268,7 +248,6 @@ export function ProjectsList({ projects, currentSort, viewMode, healthMap }: Pro
                     </svg>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-muted-foreground truncate">{project.name}</p>
-                      <p className="text-xs text-muted-foreground/70 truncate">{project.client.name}</p>
                     </div>
                     <span className="text-xs text-muted-foreground/50 flex-shrink-0">
                       {project._count.tasks} tasks
@@ -307,9 +286,6 @@ export function ProjectsList({ projects, currentSort, viewMode, healthMap }: Pro
                             {project.name}
                           </h3>
                         </div>
-                        <p className="text-sm text-muted-foreground mt-1 truncate">
-                          {project.client.name}
-                        </p>
                       </div>
 
                       {/* Badges */}
