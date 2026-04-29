@@ -171,7 +171,13 @@ export default async function TasksPage({ searchParams }: Props) {
                           {priorityLabels[task.priority]}
                         </Badge>
                         <p className="text-sm text-muted-foreground truncate">
-                          {task.project?.name ?? 'Quick task'}
+                          {task.project ? (
+                            <Link href={`/projects/${task.project.id}`} className="hover:text-link">
+                              {task.project.name}
+                            </Link>
+                          ) : (
+                            'Quick task'
+                          )}
                         </p>
                       </div>
                     </div>
@@ -218,7 +224,13 @@ export default async function TasksPage({ searchParams }: Props) {
                                 {priorityLabels[task.priority]}
                               </Badge>
                               <span className="truncate">
-                                {task.project?.name ?? 'Quick task'}
+                                {task.project ? (
+                                  <Link href={`/projects/${task.project.id}`} className="hover:text-link">
+                                    {task.project.name}
+                                  </Link>
+                                ) : (
+                                  'Quick task'
+                                )}
                               </span>
                               {task.dueDate && (
                                 <>
@@ -259,7 +271,13 @@ export default async function TasksPage({ searchParams }: Props) {
                                 {priorityLabels[task.priority]}
                               </Badge>
                               <p className="text-sm text-muted-foreground truncate">
-                                {task.project?.name ?? 'Quick task'}
+                                {task.project ? (
+                                  <Link href={`/projects/${task.project.id}`} className="hover:text-link">
+                                    {task.project.name}
+                                  </Link>
+                                ) : (
+                                  'Quick task'
+                                )}
                               </p>
                             </div>
                           </div>
