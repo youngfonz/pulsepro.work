@@ -116,8 +116,12 @@ function extractToken(toAddress: string): string | null {
 }
 
 function cleanSubject(subject: string): string {
-  return subject
-    .replace(/^(Re|Fwd|Fw):\s*/gi, '') // Strip Re:/Fwd: prefixes
+  let cleaned = subject
+  // Strip Re:/Fwd:/Fw:/Subject: prefixes (repeat to handle stacks like "Fwd: Subject:")
+  while (/^(Re|Fwd|Fw|Subject)\s*:\s*/i.test(cleaned)) {
+    cleaned = cleaned.replace(/^(Re|Fwd|Fw|Subject)\s*:\s*/i, '')
+  }
+  return cleaned
     .replace(/\[[^\]]+\]\s*/, '') // Strip [ProjectName] tags
     .trim() || 'Untitled task'
 }
