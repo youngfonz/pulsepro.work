@@ -84,9 +84,43 @@ async function resolveFailedMigrations() {
   }
 }
 
+// Prisma's migration advisory lock ID — see https://github.com/prisma/prisma/issues/9613
+// Leaks across pgbouncer pool cycling on Neon, causing future deploys to fail with a 10s timeout.
+const PRISMA_MIGRATION_LOCK_ID = 72707369
+
+async function clearOrphanedMigrationLock() {
+  const prisma = new PrismaClient()
+  try {
+    const holders = await prisma.$queryRawUnsafe(`
+      SELECT l.pid, a.state,
+             EXTRACT(EPOCH FROM (now() - a.state_change))::int as idle_s
+      FROM pg_locks l
+      LEFT JOIN pg_stat_activity a ON a.pid = l.pid
+      WHERE l.locktype = 'advisory' AND l.objid = ${PRISMA_MIGRATION_LOCK_ID}
+    `)
+    if (holders.length === 0) return
+
+    for (const h of holders) {
+      // Only terminate connections that have been idle for >30s — never kill an
+      // actively-running migration. Real `migrate deploy` sessions stay 'active'.
+      if (h.state === 'idle' && h.idle_s > 30) {
+        console.log(`[deploy] Terminating orphaned lock holder pid=${h.pid} (idle ${h.idle_s}s)`)
+        await prisma.$queryRawUnsafe(`SELECT pg_terminate_backend(${h.pid})`)
+      } else {
+        console.log(`[deploy] Skipping pid=${h.pid} (state=${h.state}, idle=${h.idle_s}s) — looks active`)
+      }
+    }
+  } catch (e) {
+    console.warn('[deploy] Lock cleanup check failed (non-fatal):', e.message)
+  } finally {
+    await prisma.$disconnect()
+  }
+}
+
 async function run() {
   await baselineIfNeeded()
   await resolveFailedMigrations()
+  await clearOrphanedMigrationLock()
 
   // Apply pending migrations safely — no data loss
   execSync('npx prisma migrate deploy', { stdio: 'inherit' })
