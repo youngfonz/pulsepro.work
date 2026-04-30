@@ -5,11 +5,12 @@ import { requireUserId } from '@/lib/auth'
 import { checkLimit } from '@/lib/subscription'
 import { revalidatePath } from 'next/cache'
 import { getProjectWhereWithAccess, canAccessProject, requireProjectAccess } from '@/lib/access'
-
-const VALID_PROJECT_STATUSES = ['not_started', 'in_progress', 'on_hold', 'completed']
-const VALID_PRIORITIES = ['high', 'medium', 'low']
-const MAX_NAME_LENGTH = 200
-const MAX_TEXT_LENGTH = 10000
+import {
+  VALID_PROJECT_STATUSES,
+  VALID_PRIORITIES,
+  MAX_NAME_LENGTH,
+  MAX_TEXT_LENGTH,
+} from './projects-validation'
 
 export async function getProjects(filters?: {
   search?: string

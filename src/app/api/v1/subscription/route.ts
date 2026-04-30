@@ -1,15 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { authenticateRequest, apiError, handleCors } from '@/lib/api-auth'
-import { isAdminUser } from '@/lib/auth'
+import { getSubscriptionForUser, PLAN_LIMITS } from '@/lib/subscription'
 
 export async function OPTIONS() { return handleCors() }
-
-const PLAN_LIMITS = {
-  free: { maxProjects: 3, maxTasks: 50, maxClients: 1, maxCollaborators: 0 },
-  pro: { maxProjects: Infinity, maxTasks: Infinity, maxClients: Infinity, maxCollaborators: 3 },
-  team: { maxProjects: Infinity, maxTasks: Infinity, maxClients: Infinity, maxCollaborators: 10 },
-} as const
 
 export async function GET(request: NextRequest) {
   try {
@@ -17,24 +11,8 @@ export async function GET(request: NextRequest) {
     if ('error' in auth) return apiError(auth.error, auth.status)
     const { userId } = auth
 
-    let subscription = await prisma.subscription.findUnique({ where: { userId } })
-
-    // Auto-create team subscription for admin users
-    if (isAdminUser(userId)) {
-      if (!subscription) {
-        subscription = await prisma.subscription.create({
-          data: { userId, plan: 'team' },
-        })
-      } else if (subscription.plan !== 'team') {
-        subscription = await prisma.subscription.update({
-          where: { userId },
-          data: { plan: 'team' },
-        })
-      }
-    }
-
-    const plan = (subscription?.plan || 'free') as keyof typeof PLAN_LIMITS
-    const limits = PLAN_LIMITS[plan]
+    const subscription = await getSubscriptionForUser(userId)
+    const limits = PLAN_LIMITS[subscription.plan]
 
     const [projectCount, taskCount, clientCount] = await Promise.all([
       prisma.project.count({ where: { userId } }),
@@ -43,11 +21,11 @@ export async function GET(request: NextRequest) {
     ])
 
     return NextResponse.json({
-      plan,
-      status: subscription?.status || 'active',
-      currentPeriodEnd: subscription?.currentPeriodEnd || null,
-      cancelAtPeriodEnd: subscription?.cancelAtPeriodEnd || false,
-      hasPortal: !!subscription?.polarCustomerId,
+      plan: subscription.plan,
+      status: subscription.status,
+      currentPeriodEnd: subscription.currentPeriodEnd,
+      cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
+      hasPortal: subscription.hasPortal,
       usage: {
         projects: { current: projectCount, limit: limits.maxProjects },
         tasks: { current: taskCount, limit: limits.maxTasks },

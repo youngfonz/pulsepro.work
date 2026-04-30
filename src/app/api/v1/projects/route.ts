@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { authenticateRequest, apiError, handleCors } from '@/lib/api-auth'
+import { checkLimitForUser } from '@/lib/subscription'
+import {
+  VALID_PROJECT_STATUSES,
+  VALID_PRIORITIES,
+  MAX_NAME_LENGTH,
+  MAX_TEXT_LENGTH,
+} from '@/actions/projects-validation'
 
 export async function OPTIONS() { return handleCors() }
-
-const VALID_PROJECT_STATUSES = ['not_started', 'in_progress', 'on_hold', 'completed']
-const VALID_PRIORITIES = ['high', 'medium', 'low']
-const MAX_NAME_LENGTH = 200
-const MAX_TEXT_LENGTH = 10000
 
 export async function GET(request: NextRequest) {
   try {
@@ -99,12 +101,9 @@ export async function POST(request: NextRequest) {
     const client = await prisma.client.findFirst({ where: { id: body.clientId, userId } })
     if (!client) return apiError('Client not found', 404)
 
-    // Check plan limit
-    const plan = await getSimplePlan(userId)
-    const limits = { free: 3, pro: Infinity, team: Infinity }
-    const projectCount = await prisma.project.count({ where: { userId } })
-    if (projectCount >= limits[plan]) {
-      return apiError(`Free plan limit: ${limits[plan]} projects. Upgrade to Pro for unlimited.`, 403)
+    const limit = await checkLimitForUser(userId, 'projects')
+    if (!limit.allowed) {
+      return apiError(`Free plan limit: ${limit.limit} projects. Upgrade to Pro for unlimited.`, 403)
     }
 
     const name = (body.name || '').slice(0, MAX_NAME_LENGTH)
@@ -138,7 +137,3 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function getSimplePlan(userId: string): Promise<'free' | 'pro' | 'team'> {
-  const sub = await prisma.subscription.findUnique({ where: { userId } })
-  return (sub?.plan as 'free' | 'pro' | 'team') || 'free'
-}

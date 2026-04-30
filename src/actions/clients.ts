@@ -4,10 +4,11 @@ import { prisma } from '@/lib/prisma'
 import { requireUserId } from '@/lib/auth'
 import { checkLimit } from '@/lib/subscription'
 import { revalidatePath } from 'next/cache'
-
-const VALID_CLIENT_STATUSES = ['active', 'inactive']
-const MAX_NAME_LENGTH = 200
-const MAX_TEXT_LENGTH = 5000
+import {
+  VALID_CLIENT_STATUSES,
+  MAX_NAME_LENGTH,
+  MAX_TEXT_LENGTH,
+} from './clients-validation'
 
 export async function getClients(search?: string, status?: string, sort?: string) {
   try {

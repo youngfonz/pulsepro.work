@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { parseTaskFromVoice } from '@/lib/voice'
 import { authenticateRequest, apiError, handleCors } from '@/lib/api-auth'
+import { checkLimitForUser } from '@/lib/subscription'
+import { VALID_PRIORITIES } from '@/actions/tasks-validation'
 
 /**
  * Extract project name from natural language text.
@@ -59,6 +61,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Title is required. Send {"title": "..."} or {"text": "..."}' }, { status: 400 })
     }
 
+    const limit = await checkLimitForUser(userId, 'tasks')
+    if (!limit.allowed) {
+      return apiError(`Free plan limit: ${limit.limit} tasks. Upgrade to Pro for unlimited.`, 403)
+    }
+
     // Match project by name (case-insensitive, optional)
     let projectId: string | undefined
     let projectName: string | undefined
@@ -77,8 +84,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate priority
-    const validPriorities = ['low', 'medium', 'high']
-    const taskPriority = validPriorities.includes(priority) ? priority : 'medium'
+    const taskPriority = VALID_PRIORITIES.includes(priority) ? priority : 'medium'
 
     // Parse due date
     let parsedDueDate: Date | null = null
