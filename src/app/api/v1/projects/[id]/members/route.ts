@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { authenticateRequest, apiError, handleCors } from '@/lib/api-auth'
+import { checkCollaboratorLimitForUser } from '@/lib/subscription'
 
 export async function OPTIONS() { return handleCors() }
 
@@ -97,19 +98,20 @@ export async function POST(
       return apiError('User is already the project owner', 400)
     }
 
-    // Check collaborator limit
-    const PLAN_LIMITS = { free: 0, pro: 3, team: 10 }
-    const sub = await prisma.subscription.findUnique({
-      where: { userId: projectRecord?.userId ?? userId },
-    })
-    const plan = (sub?.plan || 'free') as keyof typeof PLAN_LIMITS
-    const currentCount = await prisma.projectAccess.count({ where: { projectId } })
     const existing = await prisma.projectAccess.findUnique({
       where: { projectId_userId: { projectId, userId: targetUserId } },
     })
 
-    if (!existing && currentCount >= PLAN_LIMITS[plan]) {
-      return apiError(`Collaborator limit reached for ${plan} plan`, 403)
+    // Limit is on the project owner's plan, not the requester's.
+    // Skip check on re-grant (existing row) since count doesn't grow.
+    if (!existing) {
+      const limit = await checkCollaboratorLimitForUser(
+        projectRecord?.userId ?? userId,
+        projectId,
+      )
+      if (!limit.allowed) {
+        return apiError(`Collaborator limit reached for ${limit.plan} plan`, 403)
+      }
     }
 
     await prisma.projectAccess.upsert({

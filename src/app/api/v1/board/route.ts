@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { authenticateRequest, apiError, handleCors } from '@/lib/api-auth'
+import { VALID_TASK_STATUSES } from '@/actions/board-validation'
 
 export async function OPTIONS() { return handleCors() }
-
-const VALID_TASK_STATUSES = ['todo', 'in_progress', 'done']
 
 export async function PATCH(request: NextRequest) {
   try {

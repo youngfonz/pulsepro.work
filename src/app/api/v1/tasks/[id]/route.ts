@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { authenticateRequest, apiError, handleCors } from '@/lib/api-auth'
+import {
+  VALID_PRIORITIES,
+  MAX_TITLE_LENGTH,
+  MAX_TEXT_LENGTH,
+} from '@/actions/tasks-validation'
 
 export async function OPTIONS() { return handleCors() }
-
-const VALID_PRIORITIES = ['high', 'medium', 'low']
-const MAX_TITLE_LENGTH = 500
-const MAX_TEXT_LENGTH = 10000
 
 export async function GET(
   request: NextRequest,
