@@ -1,8 +1,10 @@
+import { Suspense } from 'react'
 import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { SettingsClient } from './SettingsClient'
 import { BillingCard } from './BillingCard'
 import { TelegramCard } from './TelegramCard'
+import { SlackCard } from './SlackCard'
 import { EmailTaskCard } from './EmailTaskCard'
 import { ApiAccessCard } from './ApiAccessCard'
 
@@ -25,6 +27,10 @@ export default function SettingsPage() {
       <BillingCard />
 
       <TelegramCard />
+
+      <Suspense fallback={null}>
+        <SlackCard />
+      </Suspense>
 
       <EmailTaskCard />
 
