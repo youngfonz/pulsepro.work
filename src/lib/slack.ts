@@ -26,6 +26,8 @@ export function verifySlackSignature(
 /**
  * Exchange a Slack OAuth code for an access token.
  */
+const OAUTH_REDIRECT_URI = 'https://pulsepro.work/api/webhook/slack/oauth'
+
 export async function exchangeSlackCode(code: string): Promise<{
   ok: boolean
   access_token?: string
@@ -35,6 +37,7 @@ export async function exchangeSlackCode(code: string): Promise<{
 }> {
   const params = new URLSearchParams({
     code,
+    redirect_uri: OAUTH_REDIRECT_URI,
     client_id: process.env.SLACK_CLIENT_ID!,
     client_secret: process.env.SLACK_CLIENT_SECRET!,
   })

@@ -64,8 +64,9 @@ export function SlackCard() {
   }
 
   const clientId = process.env.NEXT_PUBLIC_SLACK_CLIENT_ID
+  const redirectUri = 'https://pulsepro.work/api/webhook/slack/oauth'
   const oauthUrl = clientId && state?.userId
-    ? `https://slack.com/oauth/v2/authorize?client_id=${clientId}&scope=commands,chat:write&state=${encodeURIComponent(state.userId)}`
+    ? `https://slack.com/oauth/v2/authorize?client_id=${clientId}&scope=commands,chat:write&state=${encodeURIComponent(state.userId)}&redirect_uri=${encodeURIComponent(redirectUri)}`
     : '#'
 
   return (
