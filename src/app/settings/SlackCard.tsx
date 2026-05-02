@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+import { CardContent } from '@/components/ui/Card'
 import { getSlackSettings, unlinkSlack } from '@/actions/slack'
 
 type SlackState = Awaited<ReturnType<typeof getSlackSettings>>
@@ -29,39 +29,23 @@ export function SlackCard() {
 
   if (loading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <SlackIcon />
-            Slack
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="animate-pulse space-y-3">
-            <div className="h-4 bg-muted rounded w-2/3" />
-            <div className="h-4 bg-muted rounded w-1/2" />
-          </div>
-        </CardContent>
-      </Card>
+      <CardContent>
+        <div className="animate-pulse space-y-3">
+          <div className="h-4 bg-muted rounded w-2/3" />
+          <div className="h-4 bg-muted rounded w-1/2" />
+        </div>
+      </CardContent>
     )
   }
 
   if (!state || (state.plan !== 'pro' && state.plan !== 'team')) {
     return (
-      <Card className="opacity-60">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <SlackIcon />
-            Slack
-            <span className="ml-auto text-[10px] font-medium uppercase tracking-wider text-muted-foreground border border-border rounded px-1.5 py-0.5">Pro</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            Create tasks from any Slack channel with <code className="text-foreground">/pulse task title</code>.
-          </p>
-        </CardContent>
-      </Card>
+      <CardContent>
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">Pro feature</p>
+        <p className="text-sm text-muted-foreground">
+          Create tasks from any Slack channel with <code className="text-foreground">/pulse task title</code>.
+        </p>
+      </CardContent>
     )
   }
 
@@ -80,20 +64,12 @@ export function SlackCard() {
   }
 
   const clientId = process.env.NEXT_PUBLIC_SLACK_CLIENT_ID
-  const redirectUri = 'https://pulsepro.work/api/webhook/slack/oauth'
   const oauthUrl = clientId && state?.userId
-    ? `https://slack.com/oauth/v2/authorize?client_id=${clientId}&scope=commands,chat:write&state=${encodeURIComponent(state.userId)}&redirect_uri=${encodeURIComponent(redirectUri)}`
+    ? `https://slack.com/oauth/v2/authorize?client_id=${clientId}&scope=commands,chat:write&state=${encodeURIComponent(state.userId)}`
     : '#'
 
   return (
-    <Card id="slack">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <SlackIcon />
-          Slack
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <CardContent className="space-y-4">
         {flash && (
           <p className={`text-sm ${flash.includes('connected') ? 'text-success' : 'text-destructive'}`}>
             {flash}
@@ -142,7 +118,6 @@ export function SlackCard() {
           </div>
         </div>
       </CardContent>
-    </Card>
   )
 }
 

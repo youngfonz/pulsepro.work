@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+import { CardContent } from '@/components/ui/Card'
 import { getSubscriptionStatus, getUsageLimits } from '@/actions/subscription'
 import { redeemPromoCode } from '@/actions/promo'
 
@@ -30,17 +30,12 @@ export function BillingCard() {
 
   if (loading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Billing</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="animate-pulse space-y-3">
-            <div className="h-4 bg-muted rounded w-1/3" />
-            <div className="h-4 bg-muted rounded w-1/2" />
-          </div>
-        </CardContent>
-      </Card>
+      <CardContent>
+        <div className="animate-pulse space-y-3">
+          <div className="h-4 bg-muted rounded w-1/3" />
+          <div className="h-4 bg-muted rounded w-1/2" />
+        </div>
+      </CardContent>
     )
   }
 
@@ -50,11 +45,7 @@ export function BillingCard() {
   const isCanceling = subscription?.cancelAtPeriodEnd
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Billing</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <CardContent className="space-y-4">
         {/* Current Plan */}
         <div className="flex items-center justify-between">
           <div>
@@ -130,7 +121,6 @@ export function BillingCard() {
             .then(([sub, usg]) => { setSubscription(sub); setUsage(usg) })
         }} />
       </CardContent>
-    </Card>
   )
 }
 
