@@ -3,8 +3,6 @@ import { prisma } from '@/lib/prisma'
 import { exchangeSlackCode } from '@/lib/slack'
 import { getSubscriptionForUser } from '@/lib/subscription'
 
-const REDIRECT_URI = 'https://pulsepro.work/api/webhook/slack/oauth'
-
 export async function GET(request: NextRequest) {
   const url = new URL(request.url)
   const code = url.searchParams.get('code')
@@ -25,7 +23,7 @@ export async function GET(request: NextRequest) {
   }
 
   // Exchange OAuth code for access token
-  const token = await exchangeSlackCode(code, REDIRECT_URI)
+  const token = await exchangeSlackCode(code)
   if (!token.ok || !token.team?.id || !token.authed_user?.id) {
     return NextResponse.redirect(new URL('/settings?slack=error#slack', request.url))
   }

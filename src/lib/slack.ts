@@ -26,7 +26,7 @@ export function verifySlackSignature(
 /**
  * Exchange a Slack OAuth code for an access token.
  */
-export async function exchangeSlackCode(code: string, redirectUri: string): Promise<{
+export async function exchangeSlackCode(code: string): Promise<{
   ok: boolean
   access_token?: string
   team?: { id: string; name: string }
@@ -35,7 +35,6 @@ export async function exchangeSlackCode(code: string, redirectUri: string): Prom
 }> {
   const params = new URLSearchParams({
     code,
-    redirect_uri: redirectUri,
     client_id: process.env.SLACK_CLIENT_ID!,
     client_secret: process.env.SLACK_CLIENT_SECRET!,
   })

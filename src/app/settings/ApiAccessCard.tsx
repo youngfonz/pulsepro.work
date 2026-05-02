@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+import { CardContent } from '@/components/ui/Card'
 import {
   getIntegrationSettings,
   generateApiToken,
@@ -58,39 +58,23 @@ export function ApiAccessCard() {
 
   if (loading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <ApiIcon />
-            Siri &amp; Shortcuts
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="animate-pulse space-y-3">
-            <div className="h-4 bg-muted rounded w-2/3" />
-            <div className="h-4 bg-muted rounded w-1/2" />
-          </div>
-        </CardContent>
-      </Card>
+      <CardContent>
+        <div className="animate-pulse space-y-3">
+          <div className="h-4 bg-muted rounded w-2/3" />
+          <div className="h-4 bg-muted rounded w-1/2" />
+        </div>
+      </CardContent>
     )
   }
 
   if (plan !== 'pro' && plan !== 'team') {
     return (
-      <Card className="opacity-60">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <ApiIcon />
-            Siri &amp; Shortcuts
-            <span className="ml-auto text-[10px] font-medium uppercase tracking-wider text-muted-foreground border border-border rounded px-1.5 py-0.5">Pro</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            Create tasks from Siri, Apple Shortcuts, or any tool that can make HTTP requests.
-          </p>
-        </CardContent>
-      </Card>
+      <CardContent>
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">Pro feature</p>
+        <p className="text-sm text-muted-foreground">
+          Create tasks from Siri, Apple Shortcuts, or any tool that can make HTTP requests.
+        </p>
+      </CardContent>
     )
   }
 
@@ -153,14 +137,7 @@ export function ApiAccessCard() {
   const maskedToken = freshToken ? `${freshToken.slice(0, 6)}${'*'.repeat(20)}` : null
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <ApiIcon />
-          Siri &amp; Shortcuts
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <CardContent className="space-y-4">
         {hasToken ? (
           <>
             <div className="flex items-center gap-2">
@@ -363,7 +340,6 @@ export function ApiAccessCard() {
           </div>
         )}
       </CardContent>
-    </Card>
   )
 }
 
