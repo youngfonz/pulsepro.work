@@ -189,6 +189,11 @@ model Subscription {
   telegramVerifyCode        String?
   telegramVerifyExpires     DateTime?
   telegramRemindersEnabled  Boolean   @default(false)
+  // Slack integration
+  slackTeamId               String?
+  slackUserId               String?
+  slackBotToken             String?
+  slackInstalledAt          DateTime?
   // API access
   apiToken              String?   @unique
   inboundEmailToken     String?   @unique
@@ -200,6 +205,7 @@ model Subscription {
   @@index([userId])
   @@index([polarCustomerId])
   @@index([polarSubscriptionId])
+  @@index([slackTeamId, slackUserId])
 }
 
 model Invoice {
