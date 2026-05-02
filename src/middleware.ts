@@ -21,6 +21,7 @@ const isPublicRoute = createRouteMatcher([
   '/api/cron/daily-reminder',
   '/api/webhook/telegram',
   '/api/webhook/email',
+  '/api/webhook/slack/(.*)',
   '/api/v1/(.*)',
   '/api/og',
   '/invoice/(.*)',
