@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
       const userId = payload.data.metadata?.userId as string | undefined
       if (!userId) return
 
-      await prisma.subscription.update({
+      await prisma.subscription.updateMany({
         where: { userId },
         data: {
           cancelAtPeriodEnd: true,
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
       const userId = payload.data.metadata?.userId as string | undefined
       if (!userId) return
 
-      await prisma.subscription.update({
+      await prisma.subscription.updateMany({
         where: { userId },
         data: {
           plan: 'free',

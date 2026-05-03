@@ -8,6 +8,25 @@ const VALID_PRIORITIES = ['high', 'medium', 'low']
 const MAX_TITLE_LENGTH = 500
 const MAX_TEXT_LENGTH = 10000
 
+async function getEditableProject(projectId: string, userId: string) {
+  const owned = await prisma.project.findFirst({
+    where: { id: projectId, userId },
+    select: { id: true, userId: true },
+  })
+  if (owned) return owned
+
+  const access = await prisma.projectAccess.findUnique({
+    where: { projectId_userId: { projectId, userId } },
+    select: { role: true, project: { select: { id: true, userId: true } } },
+  })
+
+  if (access && ['editor', 'manager'].includes(access.role)) {
+    return access.project
+  }
+
+  return null
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -62,14 +81,14 @@ export async function PATCH(
 
     let task = await prisma.task.findFirst({
       where: { id, userId },
-      select: { projectId: true, url: true },
+      select: { projectId: true, url: true, userId: true },
     })
 
     if (!task) {
       // Check shared project access (editor+)
       const found = await prisma.task.findFirst({
         where: { id },
-        select: { projectId: true, url: true },
+        select: { projectId: true, url: true, userId: true },
       })
       if (found?.projectId) {
         const access = await prisma.projectAccess.findUnique({
@@ -114,7 +133,24 @@ export async function PATCH(
     }
 
     if (body.projectId !== undefined) {
-      data.projectId = body.projectId === 'none' || body.projectId === null ? null : body.projectId
+      const nextProjectId = body.projectId === 'none' || body.projectId === null ? null : body.projectId
+      if (nextProjectId !== null && typeof nextProjectId !== 'string') {
+        return apiError('Invalid projectId', 400)
+      }
+
+      if (nextProjectId !== task.projectId) {
+        if (!nextProjectId) {
+          if (task.userId !== userId) {
+            return apiError('Not authorized to remove shared task from its project', 403)
+          }
+        } else {
+          const destination = await getEditableProject(nextProjectId, userId)
+          if (!destination) return apiError('Destination project not found or insufficient permissions', 404)
+          data.userId = destination.userId
+        }
+      }
+
+      data.projectId = nextProjectId
     }
 
     if (body.startDate !== undefined) {

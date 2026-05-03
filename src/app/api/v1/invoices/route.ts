@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { authenticateRequest, apiError, handleCors } from '@/lib/api-auth'
+import { InvoiceInputError, resolveInvoiceProjectId, validateInvoiceItems } from '@/lib/invoice-validation'
 import crypto from 'crypto'
 
 export async function OPTIONS() { return handleCors() }
@@ -87,10 +88,6 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json()
     if (!body.clientId) return apiError('clientId is required', 400)
-    if (!body.items || !Array.isArray(body.items) || body.items.length === 0) {
-      return apiError('At least one line item is required', 400)
-    }
-
     // Prevent email header injection
     if (body.fromEmail && /[\r\n]/.test(body.fromEmail)) return apiError('Invalid email format', 400)
     if (body.fromName && /[\r\n]/.test(body.fromName)) return apiError('Invalid name format', 400)
@@ -99,6 +96,13 @@ export async function POST(request: NextRequest) {
     // Verify client ownership
     const client = await prisma.client.findFirst({ where: { id: body.clientId, userId } })
     if (!client) return apiError('Client not found', 404)
+
+    const projectId = await resolveInvoiceProjectId({
+      projectId: body.projectId,
+      userId,
+      clientId: body.clientId,
+    })
+    const items = validateInvoiceItems(body.items)
 
     // Generate next invoice number
     const latest = await prisma.invoice.findFirst({
@@ -119,7 +123,7 @@ export async function POST(request: NextRequest) {
           userId,
           number,
           clientId: body.clientId,
-          projectId: body.projectId || null,
+          projectId,
           dueDate: body.dueDate ? new Date(body.dueDate) : new Date(),
           taxRate: body.taxRate ?? 0,
           notes: body.notes || null,
@@ -131,12 +135,12 @@ export async function POST(request: NextRequest) {
       })
 
       await tx.invoiceItem.createMany({
-        data: body.items.map((item: { description: string; quantity: number; rate: number }) => ({
+        data: items.map((item) => ({
           invoiceId: created.id,
           description: item.description,
           quantity: item.quantity,
           rate: item.rate,
-          amount: item.quantity * item.rate,
+          amount: item.amount,
         })),
       })
 
@@ -145,6 +149,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(invoice, { status: 201 })
   } catch (error) {
+    if (error instanceof InvoiceInputError) return apiError(error.message, error.status)
     console.error('API v1/invoices POST error:', error)
     return apiError('Internal error', 500)
   }

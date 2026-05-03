@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { requireUserId } from '@/lib/auth'
 import { revalidatePath } from 'next/cache'
 import { sendInvoiceEmail } from '@/lib/email'
+import { resolveInvoiceProjectId, validateInvoiceItems } from '@/lib/invoice-validation'
 import crypto from 'crypto'
 
 // ---------------------------------------------------------------------------
@@ -300,6 +301,13 @@ export async function createInvoice(data: InvoiceInput) {
     const client = await prisma.client.findFirst({ where: { id: data.clientId, userId } })
     if (!client) throw new Error('Client not found')
 
+    const projectId = await resolveInvoiceProjectId({
+      projectId: data.projectId,
+      userId,
+      clientId: data.clientId,
+    })
+    const items = validateInvoiceItems(data.items)
+
     // Prevent email header injection
     if (data.fromEmail && /[\r\n]/.test(data.fromEmail)) throw new Error('Invalid email format')
     if (data.fromName && /[\r\n]/.test(data.fromName)) throw new Error('Invalid name format')
@@ -313,7 +321,7 @@ export async function createInvoice(data: InvoiceInput) {
           userId,
           number,
           clientId: data.clientId,
-          projectId: data.projectId ?? null,
+          projectId,
           dueDate: new Date(data.dueDate),
           taxRate: data.taxRate ?? 0,
           notes: data.notes ?? null,
@@ -325,12 +333,12 @@ export async function createInvoice(data: InvoiceInput) {
       })
 
       await tx.invoiceItem.createMany({
-        data: data.items.map((item) => ({
+        data: items.map((item) => ({
           invoiceId: created.id,
           description: item.description,
           quantity: item.quantity,
           rate: item.rate,
-          amount: item.quantity * item.rate,
+          amount: item.amount,
         })),
       })
 
@@ -357,6 +365,13 @@ export async function updateInvoice(id: string, data: InvoiceInput) {
     const client = await prisma.client.findFirst({ where: { id: data.clientId, userId } })
     if (!client) throw new Error('Client not found')
 
+    const projectId = await resolveInvoiceProjectId({
+      projectId: data.projectId,
+      userId,
+      clientId: data.clientId,
+    })
+    const items = validateInvoiceItems(data.items)
+
     // Prevent email header injection
     if (data.fromEmail && /[\r\n]/.test(data.fromEmail)) throw new Error('Invalid email format')
     if (data.fromName && /[\r\n]/.test(data.fromName)) throw new Error('Invalid name format')
@@ -370,7 +385,7 @@ export async function updateInvoice(id: string, data: InvoiceInput) {
         where: { id },
         data: {
           clientId: data.clientId,
-          projectId: data.projectId ?? null,
+          projectId,
           dueDate: new Date(data.dueDate),
           taxRate: data.taxRate ?? 0,
           notes: data.notes ?? null,
@@ -381,12 +396,12 @@ export async function updateInvoice(id: string, data: InvoiceInput) {
       })
 
       await tx.invoiceItem.createMany({
-        data: data.items.map((item) => ({
+        data: items.map((item) => ({
           invoiceId: id,
           description: item.description,
           quantity: item.quantity,
           rate: item.rate,
-          amount: item.quantity * item.rate,
+          amount: item.amount,
         })),
       })
     })

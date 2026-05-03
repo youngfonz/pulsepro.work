@@ -104,11 +104,11 @@ export async function updateTask(id: string, formData: FormData) {
     const userId = await requireUserId()
     let task = await prisma.task.findFirst({
       where: { id, userId },
-      select: { projectId: true, url: true },
+      select: { projectId: true, url: true, userId: true },
     })
 
     if (!task) {
-      task = await prisma.task.findFirst({ where: { id }, select: { projectId: true, url: true } })
+      task = await prisma.task.findFirst({ where: { id }, select: { projectId: true, url: true, userId: true } })
       if (!task) return
       if (!task.projectId) throw new Error('Not authorized')
       await requireProjectAccess(task.projectId, 'editor')
@@ -120,18 +120,33 @@ export async function updateTask(id: string, formData: FormData) {
     if (!VALID_PRIORITIES.includes(priority)) throw new Error('Invalid priority')
 
     const projectIdValue = formData.get('projectId') as string | null
+    const nextProjectId = projectIdValue === 'none' ? null : projectIdValue || task.projectId
     const data: Record<string, unknown> = {
       title,
       description: (formData.get('description') as string || '').slice(0, MAX_TEXT_LENGTH) || null,
       notes: (formData.get('notes') as string || '').slice(0, MAX_TEXT_LENGTH) || null,
       priority,
-      projectId: projectIdValue === 'none' ? null : projectIdValue || task.projectId,
+      projectId: nextProjectId,
       startDate: formData.get('startDate')
         ? new Date(formData.get('startDate') as string)
         : null,
       dueDate: formData.get('dueDate')
         ? new Date(formData.get('dueDate') as string)
         : null,
+    }
+
+    if (nextProjectId !== task.projectId) {
+      if (!nextProjectId) {
+        if (task.userId !== userId) throw new Error('Not authorized to remove shared task from its project')
+      } else {
+        await requireProjectAccess(nextProjectId, 'editor')
+        const destination = await prisma.project.findUnique({
+          where: { id: nextProjectId },
+          select: { userId: true },
+        })
+        if (!destination) throw new Error('Project not found')
+        data.userId = destination.userId
+      }
     }
 
     if (task.url) {
@@ -678,7 +693,7 @@ export async function getTaskComments(taskId: string) {
 
     // Enrich with author names from Clerk
     const authorIds = [...new Set(comments.map(c => c.userId).filter(Boolean))] as string[]
-    let authorMap: Record<string, string> = {}
+    const authorMap: Record<string, string> = {}
     if (authorIds.length > 0) {
       try {
         const { clerkClient } = await import('@clerk/nextjs/server')
