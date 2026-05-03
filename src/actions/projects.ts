@@ -336,8 +336,9 @@ export async function deleteProject(id: string) {
     const project = await prisma.project.findFirst({ where: { id, userId } })
     if (!project) return
 
-    await prisma.project.delete({
+    await prisma.project.update({
       where: { id },
+      data: { deletedAt: new Date() },
     })
     revalidatePath('/projects')
     revalidatePath(`/clients/${project.clientId}`)
@@ -346,6 +347,64 @@ export async function deleteProject(id: string) {
   } catch (error) {
     console.error('Failed to delete project:', error)
     throw new Error('Failed to delete project')
+  }
+}
+
+export async function getDeletedProjects() {
+  try {
+    const userId = await requireUserId()
+    return prisma.project.findMany({
+      where: { userId, deletedAt: { not: null } },
+      include: {
+        client: { select: { id: true, name: true } },
+        _count: { select: { tasks: true } },
+      },
+      orderBy: { deletedAt: 'desc' },
+    })
+  } catch (error) {
+    console.error('Failed to fetch deleted projects:', error)
+    return []
+  }
+}
+
+export async function restoreProject(id: string) {
+  try {
+    const userId = await requireUserId()
+    const project = await prisma.project.findFirst({
+      where: { id, userId, deletedAt: { not: null } },
+    })
+    if (!project) return
+
+    await prisma.project.update({
+      where: { id },
+      data: { deletedAt: null },
+    })
+    revalidatePath('/projects')
+    revalidatePath(`/clients/${project.clientId}`)
+    revalidatePath('/dashboard')
+    revalidatePath('/tasks')
+  } catch (error) {
+    console.error('Failed to restore project:', error)
+    throw new Error('Failed to restore project')
+  }
+}
+
+export async function permanentDeleteProject(id: string) {
+  try {
+    const userId = await requireUserId()
+    const project = await prisma.project.findFirst({
+      where: { id, userId, deletedAt: { not: null } },
+    })
+    if (!project) return
+
+    await prisma.project.delete({
+      where: { id },
+    })
+    revalidatePath('/projects')
+    revalidatePath(`/clients/${project.clientId}`)
+  } catch (error) {
+    console.error('Failed to permanently delete project:', error)
+    throw new Error('Failed to permanently delete project')
   }
 }
 

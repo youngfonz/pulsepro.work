@@ -29,20 +29,21 @@ model Client {
 }
 
 model Project {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   userId      String
   name        String
   description String?
   notes       String?
-  status      String   @default("not_started") // not_started, in_progress, on_hold, completed
-  priority    String   @default("medium") // low, medium, high
+  status      String    @default("not_started") // not_started, in_progress, on_hold, completed
+  priority    String    @default("medium") // low, medium, high
   dueDate     DateTime?
   budget      Float?
   hourlyRate  Float?
   clientId    String
-  client      Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  client      Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime? // Soft delete — null means active, set means trashed
   tasks       Task[]
   images      ProjectImage[]
   timeEntries TimeEntry[]
@@ -55,6 +56,7 @@ model Project {
   @@index([userId, status, dueDate])
   @@index([userId, updatedAt])
   @@index([clientId])
+  @@index([userId, deletedAt])
 }
 
 model TimeEntry {
