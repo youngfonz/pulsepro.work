@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/Button'
 interface Project {
   id: string
   name: string
-  client: { name: string }
 }
 
 interface TasksFilterProps {
@@ -69,7 +68,7 @@ export function TasksFilter({ currentDate, currentStatus, currentPriority, curre
         options={[
           { value: 'all', label: 'All Projects' },
           { value: 'none', label: 'Quick Tasks (No Project)' },
-          ...projects.map((p) => ({ value: p.id, label: `${p.name} (${p.client.name})` })),
+          ...projects.map((p) => ({ value: p.id, label: p.name })),
         ]}
         className="col-span-2 sm:w-48"
       />
