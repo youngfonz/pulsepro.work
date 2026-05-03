@@ -136,4 +136,3 @@ export async function POST(request: NextRequest) {
     return apiError('Internal error', 500)
   }
 }
-

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { authenticateRequest, apiError, handleCors } from '@/lib/api-auth'
+import { InvoiceInputError, resolveInvoiceProjectId, validateInvoiceItems } from '@/lib/invoice-validation'
 
 export async function OPTIONS() { return handleCors() }
 
@@ -57,22 +58,27 @@ export async function PATCH(
     if (body.fromName && /[\r\n]/.test(body.fromName)) return apiError('Invalid name format', 400)
     if (body.fromAddress && /[\r\n]/.test(body.fromAddress)) return apiError('Invalid address format', 400)
 
-    // Verify client ownership if changing client
-    if (body.clientId) {
-      const client = await prisma.client.findFirst({ where: { id: body.clientId, userId } })
-      if (!client) return apiError('Client not found', 404)
-    }
+    const clientId = body.clientId || existing.clientId
+    const client = await prisma.client.findFirst({ where: { id: clientId, userId } })
+    if (!client) return apiError('Client not found', 404)
+
+    const projectId = await resolveInvoiceProjectId({
+      projectId: body.projectId !== undefined ? body.projectId : existing.projectId,
+      userId,
+      clientId,
+    })
+    const items = body.items !== undefined ? validateInvoiceItems(body.items) : null
 
     await prisma.$transaction(async (tx) => {
-      if (body.items && Array.isArray(body.items)) {
+      if (items) {
         await tx.invoiceItem.deleteMany({ where: { invoiceId: id } })
         await tx.invoiceItem.createMany({
-          data: body.items.map((item: { description: string; quantity: number; rate: number }) => ({
+          data: items.map((item) => ({
             invoiceId: id,
             description: item.description,
             quantity: item.quantity,
             rate: item.rate,
-            amount: item.quantity * item.rate,
+            amount: item.amount,
           })),
         })
       }
@@ -81,7 +87,7 @@ export async function PATCH(
         where: { id },
         data: {
           ...(body.clientId && { clientId: body.clientId }),
-          ...(body.projectId !== undefined && { projectId: body.projectId || null }),
+          ...(body.projectId !== undefined && { projectId }),
           ...(body.dueDate && { dueDate: new Date(body.dueDate) }),
           ...(body.taxRate !== undefined && { taxRate: body.taxRate }),
           ...(body.notes !== undefined && { notes: body.notes || null }),
@@ -104,6 +110,7 @@ export async function PATCH(
 
     return NextResponse.json(updated)
   } catch (error) {
+    if (error instanceof InvoiceInputError) return apiError(error.message, error.status)
     console.error('API v1/invoices/[id] PATCH error:', error)
     return apiError('Internal error', 500)
   }
