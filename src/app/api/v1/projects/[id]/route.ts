@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { authenticateRequest, apiError, handleCors } from '@/lib/api-auth'
+import {
+  VALID_PROJECT_STATUSES,
+  VALID_PRIORITIES,
+  MAX_NAME_LENGTH,
+  MAX_TEXT_LENGTH,
+} from '@/actions/projects-validation'
 
 export async function OPTIONS() { return handleCors() }
-
-const VALID_PROJECT_STATUSES = ['not_started', 'in_progress', 'on_hold', 'completed']
-const VALID_PRIORITIES = ['high', 'medium', 'low']
-const MAX_NAME_LENGTH = 200
-const MAX_TEXT_LENGTH = 10000
 
 export async function GET(
   request: NextRequest,

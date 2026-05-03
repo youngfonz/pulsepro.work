@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { authenticateRequest, apiError, handleCors } from '@/lib/api-auth'
-import { isAdminUser } from '@/lib/auth'
+import { checkLimitForUser } from '@/lib/subscription'
+import {
+  VALID_CLIENT_STATUSES,
+  MAX_NAME_LENGTH,
+  MAX_TEXT_LENGTH,
+} from '@/actions/clients-validation'
 
 export async function OPTIONS() { return handleCors() }
-
-const VALID_CLIENT_STATUSES = ['active', 'inactive']
-const MAX_NAME_LENGTH = 200
-const MAX_TEXT_LENGTH = 5000
 
 export async function GET(request: NextRequest) {
   try {
@@ -76,15 +77,9 @@ export async function POST(request: NextRequest) {
     if ('error' in auth) return apiError(auth.error, auth.status)
     const { userId } = auth
 
-    // Check plan limits
-    const subscription = await prisma.subscription.findUnique({ where: { userId } })
-    const plan = (subscription?.plan || 'free') as 'free' | 'pro' | 'team'
-    if (!isAdminUser(userId)) {
-      const LIMITS = { free: 1, pro: Infinity, team: Infinity }
-      const current = await prisma.client.count({ where: { userId } })
-      if (current >= LIMITS[plan]) {
-        return apiError(`Plan limit reached: ${LIMITS[plan]} client(s). Upgrade to Pro.`, 403)
-      }
+    const limit = await checkLimitForUser(userId, 'clients')
+    if (!limit.allowed) {
+      return apiError(`Plan limit reached: ${limit.limit} client(s). Upgrade to Pro.`, 403)
     }
 
     const body = await request.json()

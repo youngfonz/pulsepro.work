@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+import { CardContent } from '@/components/ui/Card'
 import {
   getIntegrationSettings,
   generateEmailToken,
@@ -28,39 +28,23 @@ export function EmailTaskCard() {
 
   if (loading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <EmailIcon />
-            Email to Task
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="animate-pulse space-y-3">
-            <div className="h-4 bg-muted rounded w-2/3" />
-            <div className="h-4 bg-muted rounded w-1/2" />
-          </div>
-        </CardContent>
-      </Card>
+      <CardContent>
+        <div className="animate-pulse space-y-3">
+          <div className="h-4 bg-muted rounded w-2/3" />
+          <div className="h-4 bg-muted rounded w-1/2" />
+        </div>
+      </CardContent>
     )
   }
 
   if (plan !== 'pro' && plan !== 'team') {
     return (
-      <Card className="opacity-60">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <EmailIcon />
-            Email to Task
-            <span className="ml-auto text-[10px] font-medium uppercase tracking-wider text-muted-foreground border border-border rounded px-1.5 py-0.5">Pro</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            Forward emails to your personal Pulse Pro address and they become tasks automatically.
-          </p>
-        </CardContent>
-      </Card>
+      <CardContent>
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">Pro feature</p>
+        <p className="text-sm text-muted-foreground">
+          Forward emails to your personal Pulse Pro address and they become tasks automatically.
+        </p>
+      </CardContent>
     )
   }
 
@@ -103,14 +87,7 @@ export function EmailTaskCard() {
   const emailAddress = token ? `${token}@${EMAIL_DOMAIN}` : null
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <EmailIcon />
-          Email to Task
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <CardContent className="space-y-4">
         {token ? (
           <>
             <div className="flex items-center gap-2">
@@ -177,7 +154,6 @@ export function EmailTaskCard() {
           </div>
         )}
       </CardContent>
-    </Card>
   )
 }
 

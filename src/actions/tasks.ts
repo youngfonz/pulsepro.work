@@ -5,10 +5,11 @@ import { requireUserId } from '@/lib/auth'
 import { checkLimit } from '@/lib/subscription'
 import { revalidatePath } from 'next/cache'
 import { getAccessibleProjectIds, requireProjectAccess } from '@/lib/access'
-
-const VALID_PRIORITIES = ['high', 'medium', 'low']
-const MAX_TITLE_LENGTH = 500
-const MAX_TEXT_LENGTH = 10000
+import {
+  VALID_PRIORITIES,
+  MAX_TITLE_LENGTH,
+  MAX_TEXT_LENGTH,
+} from './tasks-validation'
 
 export async function getTask(id: string) {
   const userId = await requireUserId()
