@@ -6,7 +6,7 @@ const OUT = process.env.OG_OUT || 'public/og.png';
 const browser = await chromium.launch();
 const page = await browser.newPage({
   viewport: { width: 1200, height: 630 },
-  deviceScaleFactor: 2,
+  deviceScaleFactor: 3,
 });
 await page.goto(URL, { waitUntil: 'networkidle' });
 // zoom out so the hero headline AND the dashboard mock both fit the 1.91:1 frame
