@@ -44,13 +44,13 @@ export const metadata: Metadata = {
     title: "Pulse Pro — Project & Task Management",
     description: "Plan, track, and manage your projects and tasks in one place. Organize clients, set deadlines, and stay on top of your work with Pulse Pro.",
     type: "website",
-    images: [{ url: "/og.png", width: 1200, height: 630 }],
+    images: [{ url: "https://www.pulsepro.work/og.png?v=2", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Pulse Pro — Project & Task Management",
     description: "Plan, track, and manage your projects and tasks in one place.",
-    images: [{ url: "/og.png", width: 1200, height: 630 }],
+    images: [{ url: "https://www.pulsepro.work/og.png?v=2", width: 1200, height: 630 }],
   },
   alternates: {
     canonical: "/",
