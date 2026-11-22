@@ -3,13 +3,26 @@
 import { prisma } from '@/lib/prisma'
 import { requireUserId } from '@/lib/auth'
 import { revalidatePath } from 'next/cache'
+import { unstable_rethrow } from 'next/navigation'
 import { sendInvoiceEmail } from '@/lib/email'
-import { resolveInvoiceProjectId, validateInvoiceItems } from '@/lib/invoice-validation'
+import { InvoiceInputError, resolveInvoiceProjectId, validateInvoiceItems } from '@/lib/invoice-validation'
 import crypto from 'crypto'
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
+
+// In production Next.js strips the message from any error thrown by a server
+// action, so the form would show a generic "Server Components render" notice.
+// Mutations return expected failures as values instead of throwing them.
+function actionError(error: unknown, fallback: string) {
+  unstable_rethrow(error) // let redirect() from requireUserId() through
+  if (error instanceof InvoiceInputError) {
+    return { ok: false as const, error: error.message }
+  }
+  console.error(`${fallback}:`, error)
+  return { ok: false as const, error: `${fallback}. Please try again.` }
+}
 
 export async function getNextInvoiceNumber(): Promise<string> {
   const userId = await requireUserId()
@@ -248,7 +261,7 @@ export async function getTimeEntriesForImport(projectId: string) {
       select: { hourlyRate: true },
     })
 
-    if (!project) throw new Error('Project not found')
+    if (!project) throw new InvoiceInputError('Project not found')
 
     const entries = await prisma.timeEntry.findMany({
       where: { projectId },
@@ -299,7 +312,7 @@ export async function createInvoice(data: InvoiceInput) {
 
     // Verify the client belongs to this user
     const client = await prisma.client.findFirst({ where: { id: data.clientId, userId } })
-    if (!client) throw new Error('Client not found')
+    if (!client) throw new InvoiceInputError('Client not found')
 
     const projectId = await resolveInvoiceProjectId({
       projectId: data.projectId,
@@ -308,11 +321,9 @@ export async function createInvoice(data: InvoiceInput) {
     })
     const items = validateInvoiceItems(data.items)
 
-    // Prevent email header injection
-    if (data.fromEmail && /[\r\n]/.test(data.fromEmail)) throw new Error('Invalid email format')
-    if (data.fromName && /[\r\n]/.test(data.fromName)) throw new Error('Invalid name format')
-    if (data.fromAddress && /[\r\n]/.test(data.fromAddress)) throw new Error('Invalid address format')
-
+    // Prevent email header injection. The address is multi-line and never used in a header.
+    if (data.fromEmail && /[\r\n]/.test(data.fromEmail)) throw new InvoiceInputError('Invalid email format')
+    if (data.fromName && /[\r\n]/.test(data.fromName)) throw new InvoiceInputError('Invalid name format')
     const number = await getNextInvoiceNumber()
 
     const invoice = await prisma.$transaction(async (tx) => {
@@ -346,10 +357,9 @@ export async function createInvoice(data: InvoiceInput) {
     })
 
     revalidatePath('/invoices')
-    return invoice
+    return { ok: true as const, invoice }
   } catch (error) {
-    console.error('Failed to create invoice:', error)
-    throw error instanceof Error ? error : new Error('Failed to create invoice')
+    return actionError(error, 'Failed to create invoice')
   }
 }
 
@@ -358,12 +368,12 @@ export async function updateInvoice(id: string, data: InvoiceInput) {
     const userId = await requireUserId()
 
     const existing = await prisma.invoice.findFirst({ where: { id, userId } })
-    if (!existing) throw new Error('Invoice not found')
-    if (existing.status !== 'draft') throw new Error('Only draft invoices can be edited')
+    if (!existing) throw new InvoiceInputError('Invoice not found')
+    if (existing.status !== 'draft') throw new InvoiceInputError('Only draft invoices can be edited')
 
     // Verify the client belongs to this user (prevent IDOR)
     const client = await prisma.client.findFirst({ where: { id: data.clientId, userId } })
-    if (!client) throw new Error('Client not found')
+    if (!client) throw new InvoiceInputError('Client not found')
 
     const projectId = await resolveInvoiceProjectId({
       projectId: data.projectId,
@@ -372,11 +382,9 @@ export async function updateInvoice(id: string, data: InvoiceInput) {
     })
     const items = validateInvoiceItems(data.items)
 
-    // Prevent email header injection
-    if (data.fromEmail && /[\r\n]/.test(data.fromEmail)) throw new Error('Invalid email format')
-    if (data.fromName && /[\r\n]/.test(data.fromName)) throw new Error('Invalid name format')
-    if (data.fromAddress && /[\r\n]/.test(data.fromAddress)) throw new Error('Invalid address format')
-
+    // Prevent email header injection. The address is multi-line and never used in a header.
+    if (data.fromEmail && /[\r\n]/.test(data.fromEmail)) throw new InvoiceInputError('Invalid email format')
+    if (data.fromName && /[\r\n]/.test(data.fromName)) throw new InvoiceInputError('Invalid name format')
     await prisma.$transaction(async (tx) => {
       // Delete existing items and recreate
       await tx.invoiceItem.deleteMany({ where: { invoiceId: id } })
@@ -408,9 +416,9 @@ export async function updateInvoice(id: string, data: InvoiceInput) {
 
     revalidatePath('/invoices')
     revalidatePath(`/invoices/${id}`)
+    return { ok: true as const }
   } catch (error) {
-    console.error('Failed to update invoice:', error)
-    throw error instanceof Error ? error : new Error('Failed to update invoice')
+    return actionError(error, 'Failed to update invoice')
   }
 }
 
@@ -419,15 +427,15 @@ export async function deleteInvoice(id: string) {
     const userId = await requireUserId()
 
     const invoice = await prisma.invoice.findFirst({ where: { id, userId } })
-    if (!invoice) throw new Error('Invoice not found')
-    if (invoice.status !== 'draft') throw new Error('Only draft invoices can be deleted')
+    if (!invoice) throw new InvoiceInputError('Invoice not found')
+    if (invoice.status !== 'draft') throw new InvoiceInputError('Only draft invoices can be deleted')
 
     await prisma.invoice.delete({ where: { id } })
 
     revalidatePath('/invoices')
+    return { ok: true as const }
   } catch (error) {
-    console.error('Failed to delete invoice:', error)
-    throw error instanceof Error ? error : new Error('Failed to delete invoice')
+    return actionError(error, 'Failed to delete invoice')
   }
 }
 
@@ -456,9 +464,9 @@ export async function sendInvoice(id: string) {
       },
     })
 
-    if (!invoice) throw new Error('Invoice not found')
+    if (!invoice) throw new InvoiceInputError('Invoice not found')
     if (!invoice.client.email) {
-      throw new Error(`Client "${invoice.client.name}" has no email address. Add an email in their client profile first.`)
+      throw new InvoiceInputError(`Client "${invoice.client.name}" has no email address. Add an email in their client profile first.`)
     }
 
     const subtotal = invoice.items.reduce((sum, item) => sum + item.amount, 0)
@@ -473,9 +481,9 @@ export async function sendInvoice(id: string) {
 
     revalidatePath('/invoices')
     revalidatePath(`/invoices/${id}`)
+    return { ok: true as const }
   } catch (error) {
-    console.error('Failed to send invoice:', error)
-    throw error instanceof Error ? error : new Error('Failed to send invoice')
+    return actionError(error, 'Failed to send invoice')
   }
 }
 
@@ -484,7 +492,7 @@ export async function markInvoicePaid(id: string) {
     const userId = await requireUserId()
 
     const invoice = await prisma.invoice.findFirst({ where: { id, userId } })
-    if (!invoice) throw new Error('Invoice not found')
+    if (!invoice) throw new InvoiceInputError('Invoice not found')
 
     await prisma.invoice.update({
       where: { id },
@@ -496,8 +504,8 @@ export async function markInvoicePaid(id: string) {
 
     revalidatePath('/invoices')
     revalidatePath(`/invoices/${id}`)
+    return { ok: true as const }
   } catch (error) {
-    console.error('Failed to mark invoice as paid:', error)
-    throw error instanceof Error ? error : new Error('Failed to mark invoice as paid')
+    return actionError(error, 'Failed to mark invoice as paid')
   }
 }

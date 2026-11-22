@@ -91,8 +91,6 @@ export async function POST(request: NextRequest) {
     // Prevent email header injection
     if (body.fromEmail && /[\r\n]/.test(body.fromEmail)) return apiError('Invalid email format', 400)
     if (body.fromName && /[\r\n]/.test(body.fromName)) return apiError('Invalid name format', 400)
-    if (body.fromAddress && /[\r\n]/.test(body.fromAddress)) return apiError('Invalid address format', 400)
-
     // Verify client ownership
     const client = await prisma.client.findFirst({ where: { id: body.clientId, userId } })
     if (!client) return apiError('Client not found', 404)
