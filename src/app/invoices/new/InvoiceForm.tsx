@@ -198,11 +198,13 @@ export function InvoiceForm({ clients, nextNumber, invoice }: InvoiceFormProps) 
     startTransition(async () => {
       try {
         if (isEdit) {
-          await updateInvoice(invoice.id, buildInvoiceData())
+          const saved = await updateInvoice(invoice.id, buildInvoiceData())
+          if (!saved.ok) return setError(saved.error)
           router.push(`/invoices/${invoice.id}`)
         } else {
           const created = await createInvoice(buildInvoiceData())
-          router.push(`/invoices/${created.id}`)
+          if (!created.ok) return setError(created.error)
+          router.push(`/invoices/${created.invoice.id}`)
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to save invoice.')
@@ -216,13 +218,17 @@ export function InvoiceForm({ clients, nextNumber, invoice }: InvoiceFormProps) 
     startTransition(async () => {
       try {
         if (isEdit) {
-          await updateInvoice(invoice.id, buildInvoiceData())
-          await sendInvoice(invoice.id)
+          const saved = await updateInvoice(invoice.id, buildInvoiceData())
+          if (!saved.ok) return setError(saved.error)
+          const sent = await sendInvoice(invoice.id)
+          if (!sent.ok) return setError(sent.error)
           router.push(`/invoices/${invoice.id}`)
         } else {
           const created = await createInvoice(buildInvoiceData())
-          await sendInvoice(created.id)
-          router.push(`/invoices/${created.id}`)
+          if (!created.ok) return setError(created.error)
+          const sent = await sendInvoice(created.invoice.id)
+          if (!sent.ok) return setError(sent.error)
+          router.push(`/invoices/${created.invoice.id}`)
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to save and send invoice.')

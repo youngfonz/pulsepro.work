@@ -75,7 +75,8 @@ export function InvoiceDetail({ invoice }: InvoiceDetailProps) {
   const handleSend = () => {
     startTransition(async () => {
       try {
-        await sendInvoice(invoice.id)
+        const result = await sendInvoice(invoice.id)
+        if (!result.ok) return showToast(result.error)
         router.refresh()
         showToast('Invoice sent successfully')
       } catch (err) {
@@ -87,7 +88,8 @@ export function InvoiceDetail({ invoice }: InvoiceDetailProps) {
   const handleMarkPaid = () => {
     startTransition(async () => {
       try {
-        await markInvoicePaid(invoice.id)
+        const result = await markInvoicePaid(invoice.id)
+        if (!result.ok) return showToast(result.error)
         router.refresh()
         showToast('Invoice marked as paid')
       } catch (err) {
@@ -100,7 +102,8 @@ export function InvoiceDetail({ invoice }: InvoiceDetailProps) {
     if (!confirm('Delete this invoice? This cannot be undone.')) return
     startTransition(async () => {
       try {
-        await deleteInvoice(invoice.id)
+        const result = await deleteInvoice(invoice.id)
+        if (!result.ok) return showToast(result.error)
         router.push('/invoices')
       } catch (err) {
         showToast(err instanceof Error ? err.message : 'Failed to delete invoice')
