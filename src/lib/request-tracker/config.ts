@@ -11,6 +11,10 @@ export const tracker = {
   listId: process.env.REQUEST_TRACKER_LIST_ID ?? '',
   requesterName: process.env.REQUEST_TRACKER_REQUESTER_NAME ?? 'Joel',
   ownerName: process.env.REQUEST_TRACKER_OWNER_NAME ?? 'Fonz',
+  // Cloud routine "Joel request tracker". With the token set, requester messages fire the
+  // routine (runs on the Claude plan) instead of calling the Anthropic API from here.
+  routineToken: process.env.REQUEST_TRACKER_ROUTINE_TOKEN ?? '',
+  routineId: process.env.REQUEST_TRACKER_ROUTINE_ID ?? 'trig_014vPDziKxjc3mHPDVLyFmXp',
 }
 
 export function trackerConfigured() {

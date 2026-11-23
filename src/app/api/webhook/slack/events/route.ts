@@ -2,8 +2,10 @@ import { NextRequest, NextResponse, after } from 'next/server'
 import { verifySlackSignature } from '@/lib/slack'
 import { tracker, trackerConfigured } from '@/lib/request-tracker/config'
 import { isRequesterMessage, handleRequesterMessage } from '@/lib/request-tracker/handle-message'
+import { routineEnabled, bridgeRequesterMessage } from '@/lib/request-tracker/routine-bridge'
 
-export const maxDuration = 60
+// The routine bridge waits up to 150 s to batch a burst before it fires.
+export const maxDuration = 300
 
 // Slack Events API: user event message.im on the owner's behalf.
 export async function POST(request: NextRequest) {
@@ -26,7 +28,8 @@ export async function POST(request: NextRequest) {
     const event = body.event
     after(async () => {
       try {
-        await handleRequesterMessage(event)
+        if (routineEnabled()) await bridgeRequesterMessage(event)
+        else await handleRequesterMessage(event)
       } catch (err) {
         // Never log message content.
         console.error('[request-tracker] event failed:', err instanceof Error ? err.message : 'unknown')
