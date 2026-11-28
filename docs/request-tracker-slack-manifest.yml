@@ -24,12 +24,12 @@ oauth_config:
       - im:write
 settings:
   event_subscriptions:
-    request_url: https://pulsepro.work/api/webhook/slack/events
+    request_url: https://www.pulsepro.work/api/webhook/slack/events
     user_events:
       - message.im
   interactivity:
     is_enabled: true
-    request_url: https://pulsepro.work/api/webhook/slack/interact
+    request_url: https://www.pulsepro.work/api/webhook/slack/interact
   org_deploy_enabled: false
   socket_mode_enabled: false
   token_rotation_enabled: false
